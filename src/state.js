@@ -1,19 +1,27 @@
-const state = [];
+const _state = [];
 let _id = 0;
 
-export const MOUSE_X = declare(0);
-export const MOUSE_Y = declare(0);
-
-function declare(defaultValue) {
+export function declare(defaultValue = null) {
   const id = _id++;
-  state[id] = defaultValue;
+  _state[id] = defaultValue;
   return id;
 }
 
-export function setState(id, value) {
-  state[id] = value;
+export function state(id, value) {
+  if(value !== undefined) {
+    if(typeof value === 'function') {
+      _state[id] = value(_state[id]);
+    } else {
+      _state[id] = value;
+    }
+  }
+  return _state[id];
 }
 
-export function getState(id) {
-  return state[id];
+export function stepTo(id, target, step) {
+  if(state(id) > target) {
+    state(id, v => Math.max(v - Math.abs(step), target));
+  } else if(state(id) < 0) {
+    state(id, v => Math.min(v + Math.abs(step), target));
+  }
 }
