@@ -1,34 +1,54 @@
-import { state, declare, stepTo } from '../state';
-import {
-  DRAG_START_X,
-  DRAG_START_Y,
-  CURSOR_PRESSING,
-  CURSOR_X,
-  CURSOR_Y,
-} from './interaction';
+import { pressDownPos, isPressing, cursorPos, addOnPressUpListener } from './interaction';
+import { toFixed } from '../utils';
 
-export const VX = declare(0);
-export const VY = declare(0);
-export const X = declare(0);
-export const Y = declare(0);
+export const pos = [0, 0];
+export let v = [0, 0];
+export let time = 1;
 
-window.addEventListener('mouseup', () => {
-  
+const width = 30;
+const height = 30;
+
+function getReleaseVelocity() {
+  const factor = 20;
+  return cursorPos.map((pos, index) => (pos - pressDownPos[index]) / factor);
+}
+
+addOnPressUpListener(() => {
+  v = getReleaseVelocity();
 });
 
 export default (ctx) => {
-  if (state(CURSOR_PRESSING)) {
-    state(X, state(CURSOR_X));
-    state(Y, state(CURSOR_Y));
-    state(VX, (state(CURSOR_X) - state(DRAG_START_X)) / 10);
-    state(VY, (state(CURSOR_Y) - state(DRAG_START_Y)) / 10);
-  } else {
-    stepTo(VX, 0, state(VX) / 10);
-    stepTo(VY, 0, state(VY) / 10);
-    state(X, v => v - state(VX));
-    state(Y, v => v - state(VY));
-  }
+  // update speed
+  time = isPressing ? 0.1 : 1;
+  
+  // update position
+  pos[0] -= v[0] * time;
+  pos[1] -= v[1] * time;
+  
+  // bounce off the walls
+  if(pos[0] + width > ctx.canvas.width || pos[0] < 0) v[0] *= -1;
+  if(pos[1] + height > ctx.canvas.height || pos[1] < 0) v[1] *= -1;  
+  
+  // display data
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(`${state(VX)}, ${state(VY)}`, state(X), state(Y));
+  ctx.fillText(`${v.map(toFixed)}`, 30, 30);
+  
+  // draw character
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(...pos, width, height);
+  
+  if(isPressing) {
+    const estimateV = getReleaseVelocity();
+    
+    ctx.fillText(`${estimateV.map(toFixed)}`, 30, 50);
+    
+    // visualize force direction
+    ctx.strokeStyle = '#f0f';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pos[0] + width / 2, pos[1] + height / 2);
+    ctx.lineTo(pos[0] - estimateV[0] * 10, pos[1] - estimateV[1] * 10);
+    ctx.stroke();
+  }
 };

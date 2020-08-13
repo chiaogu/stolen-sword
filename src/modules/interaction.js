@@ -1,33 +1,37 @@
-import { state, declare } from '../state';
+export let isPressing = false;
+export const cursorPos = [0,0];
+export const pressDownPos = [0,0];
 
-export const CURSOR_X = declare(0);
-export const CURSOR_Y = declare(0);
-export const CURSOR_PRESSING = declare(false);
-export const DRAG_START_X = declare(0);
-export const DRAG_START_Y = declare(0);
+const onPressUpListeners = [];
+const onPressDownListeners = [];
+const onPressMoveListeners = [];
 
-function onMove({ clientX, clientY }) {
-  state(CURSOR_X, clientX);
-  state(CURSOR_Y, clientY);
+export function addOnPressUpListener(callback) {
+  onPressUpListeners.push(callback);
 }
 
-function onDown({ clientX, clientY }) {
-  state(CURSOR_PRESSING, true);
-  state(DRAG_START_X, clientX);
-  state(DRAG_START_Y, clientY);
+function onPressMove({ clientX, clientY }) {
+  cursorPos[0] = clientX;
+  cursorPos[1] = clientY;
 }
 
-function onUp() {
-  state(CURSOR_PRESSING, false);
+function onPressDown({ clientX, clientY }) {
+  pressDownPos[0] = clientX;
+  pressDownPos[1] = clientY;
+  isPressing = true;
 }
 
-window.addEventListener('mousemove', onMove);
-window.addEventListener('mousedown', onDown);
-window.addEventListener('mouseup', onUp);
+function onPressUp() {
+  isPressing = false;
+  onPressUpListeners.map(callback => callback());
+}
+
+window.addEventListener('mousemove', onPressMove);
+window.addEventListener('mousedown', onPressDown);
+window.addEventListener('mouseup', onPressUp);
 
 export default ctx => {
-  ctx.font = `20px`;
-  ctx.fillStyle = '#fff';
-  ctx.fillText(`${state(CURSOR_X)}, ${state(CURSOR_Y)}, ${state(CURSOR_PRESSING)}`, 100, 100);
-  ctx.fillText(`${state(DRAG_START_X)}, ${state(DRAG_START_Y)}`, state(DRAG_START_X), state(DRAG_START_Y));
+  // ctx.font = `20px`;
+  // ctx.fillStyle = '#fff';
+  // ctx.fillText(`${cursorPos[0]}, ${cursorPos[1]}, ${isPressing}`, 100, 100);
 }
