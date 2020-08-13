@@ -10,6 +10,10 @@ export function addOnPressUpListener(callback) {
   onPressUpListeners.push(callback);
 }
 
+export function addOnPressDownListener(callback) {
+  onPressDownListeners.push(callback);
+}
+
 function onPressMove({ clientX, clientY }) {
   cursorPos[0] = clientX;
   cursorPos[1] = clientY;

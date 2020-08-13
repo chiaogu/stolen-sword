@@ -1,9 +1,9 @@
 import { pressDownPos, isPressing, cursorPos, addOnPressUpListener } from './interaction';
+import { timeRatio } from './time';
 import { toFixed } from '../utils';
 
 export const pos = [0, 0];
 export let v = [0, 0];
-export let time = 1;
 
 const width = 30;
 const height = 30;
@@ -18,12 +18,9 @@ addOnPressUpListener(() => {
 });
 
 export default (ctx) => {
-  // update speed
-  time = isPressing ? 0.1 : 1;
-  
   // update position
-  pos[0] -= v[0] * time;
-  pos[1] -= v[1] * time;
+  pos[0] -= v[0] * timeRatio;
+  pos[1] -= v[1] * timeRatio;
   
   // bounce off the walls
   if(pos[0] + width > ctx.canvas.width || pos[0] < 0) v[0] *= -1;
