@@ -23,6 +23,7 @@ function onPressDown({ clientX, clientY }) {
   pressDownPos[0] = clientX;
   pressDownPos[1] = clientY;
   isPressing = true;
+  onPressDownListeners.map(callback => callback());
 }
 
 function onPressUp() {

@@ -9,7 +9,7 @@ const width = 30;
 const height = 30;
 
 function getReleaseVelocity() {
-  const factor = 20;
+  const factor = 15;
   return cursorPos.map((pos, index) => (pos - pressDownPos[index]) / factor);
 }
 

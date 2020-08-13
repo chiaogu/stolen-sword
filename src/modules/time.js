@@ -1,16 +1,32 @@
 import { isPressing, addOnPressUpListener, addOnPressDownListener } from './interaction';
 
-export let timeRatio = 1;
+const FRAME_DURAITON = 16;
+const SLOW_DOWN_DURATION = 1000;
+const SLOW_MOTION_TIME_RATIO = 0.05;
+const NORAML_TIME_RATIO = 1;
 const animations = [];
 let animationId = 0;
-const FRAME_DURAITON = 16;
+let cancelTimeRatioAnimation
+
+export let timeRatio = NORAML_TIME_RATIO;
 
 addOnPressDownListener(() => {
-  
+  // const diffPerFrame = (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) / (SLOW_DOWN_DURATION / FRAME_DURAITON);
+  // cancelTimeRatioAnimation = stepTo(
+  //   () => {
+      // let newTimeRatio = timeRatio - diffPerFrame * (isPressing ? 1 : -1);
+      // timeRatio = Math.min(Math.max(newTimeRatio, SLOW_MOTION_TIME_RATIO), NORAML_TIME_RATIO)
+  //   }, 
+  //   () => isPressing ? timeRatio <= SLOW_MOTION_TIME_RATIO : timeRatio >= NORAML_TIME_RATIO
+  // );
+  cancelTimeRatioAnimation = animateTo(ratio => {
+    timeRatio = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
+  }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t)
 });
 
 addOnPressUpListener(() => {
-  animateTo(v => console.log(`${v}`), 5000);
+  if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
+  timeRatio = NORAML_TIME_RATIO;
 });
 
 
@@ -20,27 +36,24 @@ function removeAnimation(id) {
 }
 
 export function animateTo(callback, duration = 1, timingFunc = v => v) {
-  const id = animationId++;
-  animations.push([id, 0, duration, timingFunc, callback]);
-  return () => removeAnimation(id);
+  let frame = 0;
+  return stepTo(
+    () => callback(timingFunc(Math.min(Math.max(frame++ * FRAME_DURAITON / duration, 0), 1))),
+    () => frame * FRAME_DURAITON > duration
+  );
 }
 
 export function stepTo(callback, shouldStop) {
   const id = animationId++;
-  animations.push([id, 0, duration, timingFunc, callback]);
+  animations.push([id, callback, shouldStop]);
   return () => removeAnimation(id);
 }
 
 export default (ctx) => {
-  // update speed
-  timeRatio = isPressing ? 0.1 : 1;
-  
   // execute animation
   for(let i = animations.length - 1; i >= 0; i--) {
-    const [id, frame, duration, timingFunc, callback] = animations[i];
-    const time = frame * FRAME_DURAITON;
-    callback(timingFunc(time / duration));
-    animations[i][1]++;
-    if(time >= duration) removeAnimation(id);
+    const [id, callback, shouldStop] = animations[i];
+    callback();
+    if(shouldStop()) removeAnimation(id);
   }
 }
