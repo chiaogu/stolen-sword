@@ -36,7 +36,18 @@ window.addEventListener('mousedown', onPressDown);
 window.addEventListener('mouseup', onPressUp);
 
 export default ctx => {
-  // ctx.font = `20px`;
-  // ctx.fillStyle = '#fff';
-  // ctx.fillText(`${cursorPos[0]}, ${cursorPos[1]}, ${isPressing}`, 100, 100);
+    
+  ctx.font = `20px`;
+  ctx.fillStyle = '#fff';
+  ctx.fillText(cursorPos, ...cursorPos);
+  
+  if(isPressing) {
+    // visualize drag track
+    ctx.strokeStyle = '#0ff';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(...pressDownPos);
+    ctx.lineTo(...cursorPos);
+    ctx.stroke();
+  }
 }

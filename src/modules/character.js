@@ -1,51 +1,60 @@
 import { pressDownPos, isPressing, cursorPos, addOnPressUpListener } from './interaction';
-import { timeRatio } from './time';
+import time, { timeRatio } from './time';
+import { transform } from './camera';
+import { display } from './display';
 import { toFixed } from '../utils';
 
 export const pos = [0, 0];
 export let v = [0, 0];
+const size = [30, 30];
 
-const width = 30;
-const height = 30;
-
-function getReleaseVelocity() {
-  const factor = 15;
-  return cursorPos.map((pos, index) => (pos - pressDownPos[index]) / factor);
-}
+display(() => `pos: ${pos.map(toFixed)}`);
+display(() => `v: ${getReleaseVelocity().map(toFixed)}`, () => isPressing);
 
 addOnPressUpListener(() => {
   v = getReleaseVelocity();
 });
 
+function getReleaseVelocity() {
+  const factor = 15;
+  return [
+    (pressDownPos[0] - cursorPos[0]) / factor,
+    (cursorPos[1] - pressDownPos[1]) / factor,
+  ]
+}
+
+export function getBoundary() {
+  return [
+    pos[0] - size[0] / 2,
+    pos[1] + size[1] / 2,
+    pos[0] + size[0] / 2,
+    pos[1] - size[1] / 2,
+  ];
+}
+
 export default (ctx) => {
   // update position
-  pos[0] -= v[0] * timeRatio;
-  pos[1] -= v[1] * timeRatio;
+  pos[0] += v[0] * timeRatio;
+  pos[1] += v[1] * timeRatio;
   
-  // bounce off the walls
-  if(pos[0] + width > ctx.canvas.width || pos[0] < 0) v[0] *= -1;
-  if(pos[1] + height > ctx.canvas.height || pos[1] < 0) v[1] *= -1;  
-  
-  // display data
-  ctx.font = `20px`;
-  ctx.fillStyle = '#fff';
-  ctx.fillText(`${v.map(toFixed)}`, 30, 30);
+  const [l, t] = getBoundary();
   
   // draw character
   ctx.fillStyle = '#fff';
-  ctx.fillRect(...pos, width, height);
+  ctx.fillRect(...transform([l, t]), ...size);
   
   if(isPressing) {
     const estimateV = getReleaseVelocity();
-    
-    ctx.fillText(`${estimateV.map(toFixed)}`, 30, 50);
-    
+    const posOnCanvas = transform(pos);
     // visualize force direction
     ctx.strokeStyle = '#f0f';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(pos[0] + width / 2, pos[1] + height / 2);
-    ctx.lineTo(pos[0] - estimateV[0] * 10, pos[1] - estimateV[1] * 10);
+    ctx.moveTo(...posOnCanvas);
+    ctx.lineTo(
+      posOnCanvas[0] + estimateV[0] * 10,
+      posOnCanvas[1] - estimateV[1] * 10
+    );
     ctx.stroke();
   }
 };

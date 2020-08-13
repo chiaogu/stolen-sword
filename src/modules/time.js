@@ -1,4 +1,4 @@
-import { isPressing, addOnPressUpListener, addOnPressDownListener } from './interaction';
+import { addOnPressUpListener, addOnPressDownListener } from './interaction';
 
 const FRAME_DURAITON = 16;
 const SLOW_DOWN_DURATION = 1000;
@@ -10,15 +10,12 @@ let cancelTimeRatioAnimation
 
 export let timeRatio = NORAML_TIME_RATIO;
 
+function removeAnimation(id) {
+  const index = animations.findIndex(([_id]) => _id === id);
+  if(index !== -1) animations.splice(index, 1);
+}
+
 addOnPressDownListener(() => {
-  // const diffPerFrame = (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) / (SLOW_DOWN_DURATION / FRAME_DURAITON);
-  // cancelTimeRatioAnimation = stepTo(
-  //   () => {
-      // let newTimeRatio = timeRatio - diffPerFrame * (isPressing ? 1 : -1);
-      // timeRatio = Math.min(Math.max(newTimeRatio, SLOW_MOTION_TIME_RATIO), NORAML_TIME_RATIO)
-  //   }, 
-  //   () => isPressing ? timeRatio <= SLOW_MOTION_TIME_RATIO : timeRatio >= NORAML_TIME_RATIO
-  // );
   cancelTimeRatioAnimation = animateTo(ratio => {
     timeRatio = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
   }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t)
@@ -28,12 +25,6 @@ addOnPressUpListener(() => {
   if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
   timeRatio = NORAML_TIME_RATIO;
 });
-
-
-function removeAnimation(id) {
-  const index = animations.findIndex(([_id]) => _id === id);
-  if(index !== -1) animations.splice(index, 1);
-}
 
 export function animateTo(callback, duration = 1, timingFunc = v => v) {
   let frame = 0;

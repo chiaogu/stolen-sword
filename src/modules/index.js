@@ -1,9 +1,15 @@
 import interaction from './interaction';
 import character from './character';
 import time from './time';
+import camera from './camera';
+import display from './display';
+import collision from './collision';
 
 export default [
   interaction,
   time,
-  character
-].filter(render => render);
+  character,
+  collision,
+  camera,
+  display,
+];
