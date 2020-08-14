@@ -4,8 +4,8 @@ import { pressingKeys } from './interaction';
 import { PLAYER_POS_CHANGE, listen } from '../events';
 
 let isFocusingOnPlayer = true;
-const center = [0, 0];
-const frameSize = [window.innerWidth, window.innerHeight];
+export const center = [0, 0];
+export const frameSize = [window.innerWidth, window.innerHeight];
 
 display(() => `camera: ${center.map(toFixed)}`);
 listen(PLAYER_POS_CHANGE, pos => {
