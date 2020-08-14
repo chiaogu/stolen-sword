@@ -1,6 +1,5 @@
 import { PRESS_DONW, PRESS_UP, emit } from '../events';
 import { cursorPos, pressDownPos, pressingKeys, $isPressing } from '../state';
-import { beginPath, moveTo, lineTo, stroke, fillText } from '../utils';
 
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
@@ -30,15 +29,15 @@ export default ctx => {
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  fillText(ctx, cursorPos, ...cursorPos);
+  ctx.fillText(cursorPos, ...cursorPos);
   
   if($isPressing.$) {
     // visualize drag track
     ctx.strokeStyle = '#0ff';
     ctx.lineWidth = 1;
-    beginPath(ctx);
-    moveTo(ctx, ...pressDownPos);
-    lineTo(ctx, ...cursorPos);
-    stroke(ctx);
+    ctx.beginPath();
+    ctx.moveTo(...pressDownPos);
+    ctx.lineTo(...cursorPos);
+    ctx.stroke();
   }
 }

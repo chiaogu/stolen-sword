@@ -1,5 +1,4 @@
 import { getPlayerBoundary, playerV, playerPos, playerSize } from '../state';
-import { beginPath, moveTo, lineTo, stroke } from '../utils';
 import { transform } from './camera';
 import { timeRatio } from './time';
 
@@ -17,8 +16,8 @@ export default (ctx) => {
   // draw ground
   const transformedGround = transform([0, groundY]);
   ctx.strokeStyle = '#fff';
-  beginPath(ctx);
-  moveTo(ctx, 0, transformedGround[1]);
-  lineTo(ctx, window.innerWidth, transformedGround[1]);
-  stroke(ctx);
+  ctx.beginPath();
+  ctx.moveTo(0, transformedGround[1]);
+  ctx.lineTo(window.innerWidth, transformedGround[1]);
+  ctx.stroke();
 };

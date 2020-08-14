@@ -10,7 +10,6 @@ import{
 import { timeRatio } from './time';
 import { transform } from './camera';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
-import { beginPath, moveTo, lineTo, stroke, fillRect } from '../utils';
 
 
 listen(PRESS_UP, () => {
@@ -38,18 +37,18 @@ export default (ctx) => {
   
   // draw character
   ctx.fillStyle = '#fff';
-  fillRect(ctx, ...transform([l, t]), ...playerSize);
+  ctx.fillRect(...transform([l, t]), ...playerSize);
   
   if($isPressing.$) {
     // visualize force direction
     ctx.strokeStyle = '#f0f';
     ctx.lineWidth = 1;
-    beginPath(ctx);
-    moveTo(ctx, ...transform(playerPos));
-    lineTo(ctx, ...transform([
+    ctx.beginPath();
+    ctx.moveTo(...transform(playerPos));
+    ctx.lineTo(...transform([
       playerPos[0] + estimateV[0] * 10,
       playerPos[1] + estimateV[1] * 10
     ]));
-    stroke(ctx);
+    ctx.stroke();
   } 
 };
