@@ -1,18 +1,12 @@
+import { PRESS_DONW, PRESS_UP, emit } from '../events';
+
 export let isPressing = false;
 export const cursorPos = [0,0];
 export const pressDownPos = [0,0];
+export const pressingKeys = new Set();
 
-const onPressUpListeners = [];
-const onPressDownListeners = [];
-const onPressMoveListeners = [];
-
-export function addOnPressUpListener(callback) {
-  onPressUpListeners.push(callback);
-}
-
-export function addOnPressDownListener(callback) {
-  onPressDownListeners.push(callback);
-}
+window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
+window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
 
 function onPressMove({ clientX, clientY }) {
   cursorPos[0] = clientX;
@@ -23,12 +17,12 @@ function onPressDown({ clientX, clientY }) {
   pressDownPos[0] = clientX;
   pressDownPos[1] = clientY;
   isPressing = true;
-  onPressDownListeners.map(callback => callback());
+  emit(PRESS_DONW);
 }
 
 function onPressUp() {
   isPressing = false;
-  onPressUpListeners.map(callback => callback());
+  emit(PRESS_UP);
 }
 
 window.addEventListener('mousemove', onPressMove);

@@ -1,7 +1,7 @@
-import { addOnPressUpListener, addOnPressDownListener } from './interaction';
+import { PRESS_DONW, PRESS_UP, listen } from '../events';
 
 const FRAME_DURAITON = 16;
-const SLOW_DOWN_DURATION = 1000;
+const SLOW_DOWN_DURATION = 500;
 const SLOW_MOTION_TIME_RATIO = 0.05;
 const NORAML_TIME_RATIO = 1;
 const animations = [];
@@ -15,13 +15,13 @@ function removeAnimation(id) {
   if(index !== -1) animations.splice(index, 1);
 }
 
-addOnPressDownListener(() => {
+listen(PRESS_DONW, () => {
   cancelTimeRatioAnimation = animateTo(ratio => {
     timeRatio = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
   }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t)
 });
 
-addOnPressUpListener(() => {
+listen(PRESS_UP, () => {
   if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
   timeRatio = NORAML_TIME_RATIO;
 });

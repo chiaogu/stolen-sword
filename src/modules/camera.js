@@ -1,19 +1,18 @@
 import { toFixed } from '../utils'
 import { display } from './display';
+import { pressingKeys } from './interaction';
+import { PLAYER_POS_CHANGE, listen } from '../events';
 
-export const center = [0, 0];
-export const frameSize = [window.innerWidth, window.innerHeight];
-
-const W = 87;
-const A = 65;
-const S = 83;
-const D = 68;
-const pressingKeys = [];
+let isFocusingOnPlayer = true;
+const center = [0, 0];
+const frameSize = [window.innerWidth, window.innerHeight];
 
 display(() => `camera: ${center.map(toFixed)}`);
-
-window.addEventListener('keydown', ({ keyCode }) => pressingKeys[keyCode] = true);
-window.addEventListener('keyup', ({ keyCode }) => pressingKeys[keyCode] = false);
+listen(PLAYER_POS_CHANGE, pos => {
+  if(!isFocusingOnPlayer) return;
+  center[0] = pos[0];
+  center[1] = pos[1];
+});
 
 export function transform(vector) {
   return [
@@ -23,16 +22,12 @@ export function transform(vector) {
 }
 
 export default (ctx) => {
-  ctx.fillStyle = '#0ff';
-  ctx.fillRect(...transform(center), 5, 5);
+  // ctx.fillStyle = '#0ff';
+  // ctx.fillRect(...transform(center), 5, 5);
   
-  pressingKeys.map((isPressing, key) => {
-    if(!isPressing) return;
-    switch(key) {
-    case W: return center[1] += 10;
-    case A: return center[0] -= 10;
-    case S: return center[1] -= 10;
-    case D: return center[0] += 10;
-    }
-  })
+  isFocusingOnPlayer = !pressingKeys.has('Shift');
+  if(pressingKeys.has('W')) center[1] += 10;
+  if(pressingKeys.has('A')) center[0] -= 10;
+  if(pressingKeys.has('S')) center[1] -= 10;
+  if(pressingKeys.has('D')) center[0] += 10;
 }
