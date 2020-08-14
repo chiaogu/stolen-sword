@@ -5,12 +5,12 @@ import { display } from './display';
 import { toFixed } from '../utils';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 
-export const pos = [0, 0];
+export const pos = [0, 100];
 export let v = [0, 0];
-const size = [30, 30];
+export const size = [30, 30];
 
 display(() => `pos: ${pos.map(toFixed)}`);
-display(() => `v: ${getReleaseVelocity().map(toFixed)}`, () => isPressing);
+display(() => `v: ${v.map(toFixed)}`);
 
 listen(PRESS_UP, () => {
   v = getReleaseVelocity();
@@ -24,6 +24,7 @@ function getReleaseVelocity() {
   ]
 }
 
+
 export function getBoundary() {
   return [
     pos[0] - size[0] / 2,
@@ -36,8 +37,17 @@ export function getBoundary() {
 export default (ctx) => {
   // update position
   pos[0] += v[0] * timeRatio;
-  pos[1] += v[1] * timeRatio;
+  pos[1] += v[1] * timeRatio; 
   emit(PLAYER_POS_CHANGE, pos);
+  
+  // decrease
+  // if(Math.hypot(...v) < 0.1) {
+  //   v[0] = 0;
+  //   v[1] = 0;
+  // } else {
+  //   v[0] *= 0.95;
+  //   v[1] *= 0.95;
+  // }
   
   const estimateV = getReleaseVelocity();
   const [l, t] = getBoundary();

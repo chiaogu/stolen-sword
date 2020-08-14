@@ -3,13 +3,13 @@ import character from './character';
 import time from './time';
 import camera from './camera';
 import display from './display';
-import collision from './collision';
+import physic from './physic';
 
 export default [
   interaction,
   time,
   character,
-  collision,
+  physic,
   camera,
   display,
 ];
