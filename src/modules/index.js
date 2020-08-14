@@ -1,5 +1,5 @@
 import interaction from './interaction';
-import character from './character';
+import player from './player';
 import time from './time';
 import camera from './camera';
 import display from './display';
@@ -10,7 +10,7 @@ export default [
   background,
   interaction,
   time,
-  character,
+  player,
   physic,
   camera,
   display,

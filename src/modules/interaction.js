@@ -1,9 +1,6 @@
 import { PRESS_DONW, PRESS_UP, emit } from '../events';
-
-export let isPressing = false;
-export const cursorPos = [0,0];
-export const pressDownPos = [0,0];
-export const pressingKeys = new Set();
+import { cursorPos, pressDownPos, pressingKeys, $isPressing } from '../state';
+import { beginPath, moveTo, lineTo, stroke, fillText } from '../utils';
 
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
@@ -16,12 +13,12 @@ function onPressMove({ clientX, clientY }) {
 function onPressDown({ clientX, clientY }) {
   pressDownPos[0] = clientX;
   pressDownPos[1] = clientY;
-  isPressing = true;
+  $isPressing.$ = true;
   emit(PRESS_DONW);
 }
 
 function onPressUp() {
-  isPressing = false;
+  $isPressing.$ = false;
   emit(PRESS_UP);
 }
 
@@ -33,15 +30,15 @@ export default ctx => {
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(cursorPos, ...cursorPos);
+  fillText(ctx, cursorPos, ...cursorPos);
   
-  if(isPressing) {
+  if($isPressing.$) {
     // visualize drag track
     ctx.strokeStyle = '#0ff';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(...pressDownPos);
-    ctx.lineTo(...cursorPos);
-    ctx.stroke();
+    beginPath(ctx);
+    moveTo(ctx, ...pressDownPos);
+    lineTo(ctx, ...cursorPos);
+    stroke(ctx);
   }
 }

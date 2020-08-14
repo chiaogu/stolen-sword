@@ -1,6 +1,6 @@
 import { toFixed } from '../utils'
 import { display } from './display';
-import { pressingKeys } from './interaction';
+import { pressingKeys } from '../state';
 import { PLAYER_POS_CHANGE, listen } from '../events';
 
 let isFocusingOnPlayer = true;
