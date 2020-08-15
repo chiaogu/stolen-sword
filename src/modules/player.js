@@ -6,29 +6,29 @@ import{
   pressDownPos,
   cursorPos,
   $isPressing,
-  $timeRatio
+  $timeRatio,
+  $cameraZoom
 } from '../state';
 import { transform } from './camera';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
+import { vectorOp, vector } from '../utils';
 
 listen(PRESS_UP, () => {
   const v = getReleaseVelocity();
-  playerV.x = v[0];
-  playerV.y = v[1];
+  playerV.x = v.x;
+  playerV.y = v.y;
 });
 
-function getReleaseVelocity() {
-  const factor = 5;
-  return [
-    (pressDownPos.x - cursorPos.x) / factor,
-    (cursorPos.y - pressDownPos.y) / factor,
-  ]
+export function getReleaseVelocity() {
+  return vector(
+    (pressDownPos.x - cursorPos.x) / 10,
+    (cursorPos.y - pressDownPos.y) / 15,
+  )
 }
 
 export default (ctx) => {
   // update position
-  playerPos.x += playerV.x * $timeRatio.$;
-  playerPos.y += playerV.y * $timeRatio.$; 
+  vectorOp((pos, v) => pos + v * $timeRatio.$, [playerPos, playerV], playerPos);
   emit(PLAYER_POS_CHANGE, playerPos);
   
   const estimateV = getReleaseVelocity();
@@ -36,17 +36,14 @@ export default (ctx) => {
   
   // draw character
   ctx.fillStyle = '#fff';
-  ctx.fillRect(...transform([l, t]), transform(playerSize.x), transform(playerSize.y));
+  ctx.fillRect(...transform(vector(l, t)), transform(playerSize.x), transform(playerSize.y));
     
   // visualize velocity
   ctx.strokeStyle = '#0f0';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(...transform(playerPos));
-  ctx.lineTo(...transform([
-    playerPos.x + playerV.x * 5,
-    playerPos.y + playerV.y * 5
-  ]));
+  ctx.lineTo(...transform(vectorOp((pos, v) => pos + v * 5, [playerPos, playerV])));
   ctx.stroke();
   
   if($isPressing.$) {
@@ -55,10 +52,7 @@ export default (ctx) => {
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(...transform(playerPos));
-    ctx.lineTo(...transform([
-      playerPos.x + estimateV[0] * 10,
-      playerPos.y + estimateV[1] * 10
-    ]));
+    ctx.lineTo(...transform(vectorOp((pos, v) => pos + v * 10, [playerPos, estimateV])));
     ctx.stroke();
   } 
 };

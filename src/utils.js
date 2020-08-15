@@ -1,6 +1,11 @@
 export const toFixed = value => value;
 export const vector = (x, y) => ({ x, y });
-export const stringifyVector = vector => `${vector.x.toFixed()},${vector.y.toFixed()}`;
+export const vectorStringify = vector => `${vector.x.toFixed()},${vector.y.toFixed()}`;
+export const vectorOp = (callback, vectors, output = {}) => {
+  output.x = callback(...vectors.map(({ x }) => x));
+  output.y = callback(...vectors.map(({ y }) => y));
+  return output;
+};
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);

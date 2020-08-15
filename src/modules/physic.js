@@ -1,5 +1,6 @@
 import { getPlayerBoundary, playerV, playerPos, playerSize, $timeRatio } from '../state';
 import { transform } from './camera';
+import { vector } from '../utils';
 
 const groundY = 0;
 const G = 0.4;
@@ -13,7 +14,7 @@ export default (ctx) => {
   }
 
   // draw ground
-  const transformedGround = transform([0, groundY]);
+  const transformedGround = transform(vector(0, groundY));
   ctx.strokeStyle = '#fff';
   ctx.beginPath();
   ctx.moveTo(0, transformedGround[1]);

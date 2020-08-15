@@ -1,6 +1,6 @@
 import { cameraCenter, cameraFrameSize } from '../state';
 
-const interval = 158;
+const interval = 200;
 
 export default ctx => {
   const count = Math.round(Math.max(cameraFrameSize.x / interval, cameraFrameSize.y / interval));

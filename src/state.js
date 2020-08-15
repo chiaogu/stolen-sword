@@ -1,6 +1,6 @@
 import { NORAML_TIME_RATIO } from './constants';
 import { display } from './modules/display';
-import { stringifyVector, vector } from './utils';
+import { vectorStringify, vector } from './utils';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
   get: (object) => object[0],
@@ -22,8 +22,8 @@ export function getPlayerBoundary() {
     b: playerPos.y - playerSize.y / 2,
   };
 }
-display(() => `playerPos: ${stringifyVector(playerPos)}`);
-display(() => `playerV: ${stringifyVector(playerV)}`);
+display(() => `playerPos: ${vectorStringify(playerPos)}`);
+display(() => `playerV: ${vectorStringify(playerV)}`);
 
 // Interaction
 export const $isPressing = ref(false);
@@ -36,7 +36,8 @@ export const $isFocusingOnPlayer = ref(true);
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
-display(() => `camera: ${stringifyVector(cameraCenter)}`);
+display(() => `camera: ${vectorStringify(cameraCenter)}`);
+display(() => `camera zoom: ${$cameraZoom.$}`)
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
