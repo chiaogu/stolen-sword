@@ -12,6 +12,19 @@ export const vectorOp = (callback, vectors, output = {}) => {
   output.y = callback(...vectors.map(({ y }) => y));
   return output;
 };
+
+export const object = (x, y, w, h) => ({
+  p: vector(x, y),
+  s: vector(w, h),
+  v: vector(0, 0)
+});
+export const getObjectBoundary = ({ p, s }) => ({
+  l: p.x - s.x / 2,
+  t: p.y + s.y / 2,
+  r: p.x + s.x / 2,
+  b: p.y - s.y / 2,
+})
+
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);

@@ -1,6 +1,6 @@
 import { NORAML_TIME_RATIO } from './constants';
 import { display } from './modules/display';
-import { vectorStringify, vector } from './utils';
+import { vectorStringify, vector, object, getObjectBoundary } from './utils';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
   get: (object) => object[0],
@@ -14,13 +14,9 @@ const ref = defaultValue => new Proxy({ 0: defaultValue }, {
 export const playerPos = vector(0, 100);
 export const playerV = vector(0, 0);
 export const playerSize = vector(30, 30);
+export const player = object(0, 0, 30, 30);
 export function getPlayerBoundary() {
-  return {
-    l: playerPos.x - playerSize.x / 2,
-    t: playerPos.y + playerSize.y / 2,
-    r: playerPos.x + playerSize.x / 2,
-    b: playerPos.y - playerSize.y / 2,
-  };
+  return getObjectBoundary(object(playerPos.x, playerPos.y, playerSize.x, playerSize.y));
 }
 display(() => `playerPos: ${vectorStringify(playerPos)}`);
 display(() => `playerV: ${vectorStringify(playerV)}`);

@@ -5,13 +5,15 @@ import camera from './camera';
 import display from './display';
 import physic from './physic';
 import background from './background';
+import enemies from './enemies';
 
 export default [
   background,
   interaction,
   time,
+  enemies,
   player,
-  physic,
   camera,
+  physic,
   display,
 ];
