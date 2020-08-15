@@ -1,6 +1,6 @@
 import { NORAML_TIME_RATIO } from './constants';
 import { display } from './modules/display';
-import { vectorStringify, vector, object, getObjectBoundary } from './utils';
+import { vectorStringify, vector, object } from './utils';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
   get: (object) => object[0],
@@ -11,15 +11,9 @@ const ref = defaultValue => new Proxy({ 0: defaultValue }, {
 });
 
 // Player
-export const playerPos = vector(0, 100);
-export const playerV = vector(0, 0);
-export const playerSize = vector(30, 30);
 export const player = object(0, 0, 30, 30);
-export function getPlayerBoundary() {
-  return getObjectBoundary(object(playerPos.x, playerPos.y, playerSize.x, playerSize.y));
-}
-display(() => `playerPos: ${vectorStringify(playerPos)}`);
-display(() => `playerV: ${vectorStringify(playerV)}`);
+display(() => `playerPos: ${vectorStringify(player.p)}`);
+display(() => `playerV: ${vectorStringify(player.v)}`);
 
 // Interaction
 export const $isPressing = ref(false);

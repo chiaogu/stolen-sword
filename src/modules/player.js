@@ -1,22 +1,19 @@
 import{
-  playerPos,
-  playerV,
-  playerSize,
-  getPlayerBoundary,
   pressDownPos,
   cursorPos,
   $isPressing,
-  $timeRatio
+  $timeRatio,
+  player
 } from '../state';
 import { transform } from './camera';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
-import { vectorOp, vector, vectorStringify } from '../utils';
+import { vectorOp, vector, vectorStringify, getObjectBoundary } from '../utils';
 import { display } from './display';
 
 listen(PRESS_UP, () => {
   const v = getReleaseVelocity();
-  playerV.x = v.x;
-  playerV.y = v.y;
+  player.v.x = v.x;
+  player.v.y = v.y;
 });
 
 export function getReleaseVelocity() {
@@ -29,22 +26,22 @@ display(() => `releaseV: ${vectorStringify(getReleaseVelocity())}`);
 
 export default (ctx) => {
   // update position
-  vectorOp((pos, v) => pos + v * $timeRatio.$, [playerPos, playerV], playerPos);
-  emit(PLAYER_POS_CHANGE, playerPos);
+  vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);
+  emit(PLAYER_POS_CHANGE, player.p);
   
   const estimateV = getReleaseVelocity();
-  const { l, t } = getPlayerBoundary();
+  const { l, t } = getObjectBoundary(player);
   
   // draw character
   ctx.fillStyle = '#fff';
-  ctx.fillRect(...transform(vector(l, t)), transform(playerSize.x), transform(playerSize.y));
+  ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
     
   // visualize velocity
   ctx.strokeStyle = '#0f0';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(...transform(playerPos));
-  ctx.lineTo(...transform(vectorOp((pos, v) => pos + v * 5, [playerPos, playerV])));
+  ctx.moveTo(...transform(player.p));
+  ctx.lineTo(...transform(vectorOp((pos, v) => pos + v * 5, [player.p, player.v])));
   ctx.stroke();
   
   if($isPressing.$) {
@@ -52,8 +49,8 @@ export default (ctx) => {
     ctx.strokeStyle = '#f0f';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(...transform(playerPos));
-    ctx.lineTo(...transform(vectorOp((pos, v) => pos + v * 10, [playerPos, estimateV])));
+    ctx.moveTo(...transform(player.p));
+    ctx.lineTo(...transform(vectorOp((pos, v) => pos + v * 10, [player.p, estimateV])));
     ctx.stroke();
   } 
 };

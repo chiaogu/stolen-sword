@@ -9,11 +9,11 @@ import enemies from './enemies';
 
 export default [
   background,
-  interaction,
   time,
   enemies,
   player,
   camera,
   physic,
   display,
+  interaction,
 ];
