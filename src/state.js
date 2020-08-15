@@ -37,7 +37,7 @@ export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `camera: ${vectorStringify(cameraCenter)}`);
-display(() => `camera zoom: ${$cameraZoom.$}`)
+display(() => `cameraZoom: ${$cameraZoom.$}`)
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);

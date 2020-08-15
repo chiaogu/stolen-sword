@@ -1,4 +1,10 @@
 export const toFixed = value => value;
+export const toZero = (value, step) => {
+  const abs = Math.abs(value);
+  const scalar = value / abs;
+  const diff = abs - step;
+  return diff < 0 ? 0 : diff * scalar;
+}
 export const vector = (x, y) => ({ x, y });
 export const vectorStringify = vector => `${vector.x.toFixed()},${vector.y.toFixed()}`;
 export const vectorOp = (callback, vectors, output = {}) => {

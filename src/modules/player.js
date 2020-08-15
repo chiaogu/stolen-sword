@@ -6,12 +6,12 @@ import{
   pressDownPos,
   cursorPos,
   $isPressing,
-  $timeRatio,
-  $cameraZoom
+  $timeRatio
 } from '../state';
 import { transform } from './camera';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
-import { vectorOp, vector } from '../utils';
+import { vectorOp, vector, vectorStringify } from '../utils';
+import { display } from './display';
 
 listen(PRESS_UP, () => {
   const v = getReleaseVelocity();
@@ -25,6 +25,7 @@ export function getReleaseVelocity() {
     (cursorPos.y - pressDownPos.y) / 15,
   )
 }
+display(() => `releaseV: ${vectorStringify(getReleaseVelocity())}`);
 
 export default (ctx) => {
   // update position
