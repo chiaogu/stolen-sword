@@ -6,10 +6,10 @@ const G = 0.4;
 
 export default (ctx) => {
   // gravity pulling
-  playerV[1] -= G;
-  if(getPlayerBoundary()[3] + playerV[1] * $timeRatio.$ <= groundY) {
-    playerV[1] = 0;
-    playerPos[1] = playerSize[1] / 2;
+  playerV.y -= G;
+  if(getPlayerBoundary().b + playerV.y * $timeRatio.$ <= groundY) {
+    playerV.y = 0;
+    playerPos.y = playerSize.y / 2;
   }
 
   // draw ground

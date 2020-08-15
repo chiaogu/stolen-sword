@@ -1,6 +1,6 @@
 import { NORAML_TIME_RATIO } from './constants';
 import { display } from './modules/display';
-import { toFixed } from './utils';
+import { stringifyVector, vector } from './utils';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
   get: (object) => object[0],
@@ -11,32 +11,32 @@ const ref = defaultValue => new Proxy({ 0: defaultValue }, {
 });
 
 // Player
-export const playerPos = [0, 100];
-export const playerV = [0, 0];
-export const playerSize = [30, 30];
+export const playerPos = vector(0, 100);
+export const playerV = vector(0, 0);
+export const playerSize = vector(30, 30);
 export function getPlayerBoundary() {
-  return [
-    playerPos[0] - playerSize[0] / 2,
-    playerPos[1] + playerSize[1] / 2,
-    playerPos[0] + playerSize[0] / 2,
-    playerPos[1] - playerSize[1] / 2,
-  ];
+  return {
+    l: playerPos.x - playerSize.x / 2,
+    t: playerPos.y + playerSize.y / 2,
+    r: playerPos.x + playerSize.x / 2,
+    b: playerPos.y - playerSize.y / 2,
+  };
 }
-display(() => `playerPos: ${playerPos.map(toFixed)}`);
-display(() => `playerV: ${playerV.map(toFixed)}`);
+display(() => `playerPos: ${stringifyVector(playerPos)}`);
+display(() => `playerV: ${stringifyVector(playerV)}`);
 
 // Interaction
 export const $isPressing = ref(false);
-export const cursorPos = [0,0];
-export const pressDownPos = [0,0];
+export const cursorPos = vector(0, 0);
+export const pressDownPos = vector(0, 0);
 export const pressingKeys = new Set();
 
 // Camera
 export const $isFocusingOnPlayer = ref(true);
-export const cameraCenter = [0, 0];
-export const cameraFrameSize = [window.innerWidth, window.innerHeight];
+export const cameraCenter = vector(0, 0);
+export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
-display(() => `camera: ${cameraCenter.map(toFixed)}`);
+display(() => `camera: ${stringifyVector(cameraCenter)}`);
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);

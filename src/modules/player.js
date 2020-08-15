@@ -13,30 +13,30 @@ import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 
 listen(PRESS_UP, () => {
   const v = getReleaseVelocity();
-  playerV[0] = v[0];
-  playerV[1] = v[1];
+  playerV.x = v[0];
+  playerV.y = v[1];
 });
 
 function getReleaseVelocity() {
   const factor = 5;
   return [
-    (pressDownPos[0] - cursorPos[0]) / factor,
-    (cursorPos[1] - pressDownPos[1]) / factor,
+    (pressDownPos.x - cursorPos.x) / factor,
+    (cursorPos.y - pressDownPos.y) / factor,
   ]
 }
 
 export default (ctx) => {
   // update position
-  playerPos[0] += playerV[0] * $timeRatio.$;
-  playerPos[1] += playerV[1] * $timeRatio.$; 
+  playerPos.x += playerV.x * $timeRatio.$;
+  playerPos.y += playerV.y * $timeRatio.$; 
   emit(PLAYER_POS_CHANGE, playerPos);
   
   const estimateV = getReleaseVelocity();
-  const [l, t] = getPlayerBoundary();
+  const { l, t } = getPlayerBoundary();
   
   // draw character
   ctx.fillStyle = '#fff';
-  ctx.fillRect(...transform([l, t]), ...playerSize);
+  ctx.fillRect(...transform([l, t]), transform(playerSize.x), transform(playerSize.y));
     
   // visualize velocity
   ctx.strokeStyle = '#0f0';
@@ -44,8 +44,8 @@ export default (ctx) => {
   ctx.beginPath();
   ctx.moveTo(...transform(playerPos));
   ctx.lineTo(...transform([
-    playerPos[0] + playerV[0] * 5,
-    playerPos[1] + playerV[1] * 5
+    playerPos.x + playerV.x * 5,
+    playerPos.y + playerV.y * 5
   ]));
   ctx.stroke();
   
@@ -56,8 +56,8 @@ export default (ctx) => {
     ctx.beginPath();
     ctx.moveTo(...transform(playerPos));
     ctx.lineTo(...transform([
-      playerPos[0] + estimateV[0] * 10,
-      playerPos[1] + estimateV[1] * 10
+      playerPos.x + estimateV[0] * 10,
+      playerPos.y + estimateV[1] * 10
     ]));
     ctx.stroke();
   } 

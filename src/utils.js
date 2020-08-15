@@ -1,4 +1,6 @@
-export const toFixed = value => value.toFixed();
+export const toFixed = value => value;
+export const vector = (x, y) => ({ x, y });
+export const stringifyVector = vector => `${vector.x.toFixed()},${vector.y.toFixed()}`;
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);

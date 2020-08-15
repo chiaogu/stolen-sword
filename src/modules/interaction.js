@@ -5,13 +5,13 @@ window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
 
 function onPressMove({ clientX, clientY }) {
-  cursorPos[0] = clientX;
-  cursorPos[1] = clientY;
+  cursorPos.x = clientX;
+  cursorPos.y = clientY;
 }
 
 function onPressDown({ clientX, clientY }) {
-  pressDownPos[0] = clientX;
-  pressDownPos[1] = clientY;
+  pressDownPos.x = clientX;
+  pressDownPos.y = clientY;
   $isPressing.$ = true;
   emit(PRESS_DONW);
 }
@@ -29,15 +29,15 @@ export default ctx => {
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(cursorPos, ...cursorPos);
+  ctx.fillText(`${cursorPos.x}, ${cursorPos.y}`, cursorPos.x, cursorPos.y);
   
   if($isPressing.$) {
     // visualize drag track
     ctx.strokeStyle = '#0ff';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(...pressDownPos);
-    ctx.lineTo(...cursorPos);
+    ctx.moveTo(pressDownPos.x, pressDownPos.y);
+    ctx.lineTo(cursorPos.x, cursorPos.y);
     ctx.stroke();
   }
 }
