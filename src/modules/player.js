@@ -6,11 +6,10 @@ import{
   pressDownPos,
   cursorPos,
   $isPressing,
+  $timeRatio
 } from '../state';
-import { timeRatio } from './time';
 import { transform } from './camera';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
-
 
 listen(PRESS_UP, () => {
   const v = getReleaseVelocity();
@@ -19,7 +18,7 @@ listen(PRESS_UP, () => {
 });
 
 function getReleaseVelocity() {
-  const factor = 15;
+  const factor = 5;
   return [
     (pressDownPos[0] - cursorPos[0]) / factor,
     (cursorPos[1] - pressDownPos[1]) / factor,
@@ -28,8 +27,8 @@ function getReleaseVelocity() {
 
 export default (ctx) => {
   // update position
-  playerPos[0] += playerV[0] * timeRatio;
-  playerPos[1] += playerV[1] * timeRatio; 
+  playerPos[0] += playerV[0] * $timeRatio.$;
+  playerPos[1] += playerV[1] * $timeRatio.$; 
   emit(PLAYER_POS_CHANGE, playerPos);
   
   const estimateV = getReleaseVelocity();
@@ -38,6 +37,17 @@ export default (ctx) => {
   // draw character
   ctx.fillStyle = '#fff';
   ctx.fillRect(...transform([l, t]), ...playerSize);
+    
+  // visualize velocity
+  ctx.strokeStyle = '#0f0';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(...transform(playerPos));
+  ctx.lineTo(...transform([
+    playerPos[0] + playerV[0] * 5,
+    playerPos[1] + playerV[1] * 5
+  ]));
+  ctx.stroke();
   
   if($isPressing.$) {
     // visualize force direction

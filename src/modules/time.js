@@ -1,14 +1,11 @@
 import { PRESS_DONW, PRESS_UP, listen } from '../events';
+import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO } from '../constants';
+import { $timeRatio } from '../state'
 
 const FRAME_DURAITON = 16;
-const SLOW_DOWN_DURATION = 500;
-const SLOW_MOTION_TIME_RATIO = 0.05;
-const NORAML_TIME_RATIO = 1;
 const animations = [];
 let animationId = 0;
 let cancelTimeRatioAnimation
-
-export let timeRatio = NORAML_TIME_RATIO;
 
 function removeAnimation(id) {
   const index = animations.findIndex(([_id]) => _id === id);
@@ -17,13 +14,13 @@ function removeAnimation(id) {
 
 listen(PRESS_DONW, () => {
   cancelTimeRatioAnimation = animateTo(ratio => {
-    timeRatio = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
+    $timeRatio.$ = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
   }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t)
 });
 
 listen(PRESS_UP, () => {
   if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
-  timeRatio = NORAML_TIME_RATIO;
+  $timeRatio.$ = NORAML_TIME_RATIO;
 });
 
 export function animateTo(callback, duration = 1, timingFunc = v => v) {

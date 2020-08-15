@@ -1,3 +1,4 @@
+import { NORAML_TIME_RATIO } from './constants';
 import { display } from './modules/display';
 import { toFixed } from './utils';
 
@@ -21,12 +22,21 @@ export function getPlayerBoundary() {
     playerPos[1] - playerSize[1] / 2,
   ];
 }
-
-display(() => `pos: ${playerPos.map(toFixed)}`);
-display(() => `v: ${playerV.map(toFixed)}`);
+display(() => `playerPos: ${playerPos.map(toFixed)}`);
+display(() => `playerV: ${playerV.map(toFixed)}`);
 
 // Interaction
 export const $isPressing = ref(false);
 export const cursorPos = [0,0];
 export const pressDownPos = [0,0];
 export const pressingKeys = new Set();
+
+// Camera
+export const $isFocusingOnPlayer = ref(true);
+export const cameraCenter = [0, 0];
+export const cameraFrameSize = [window.innerWidth, window.innerHeight];
+export const $cameraZoom = ref(1);
+display(() => `camera: ${cameraCenter.map(toFixed)}`);
+
+// Time
+export const $timeRatio = ref(NORAML_TIME_RATIO);
