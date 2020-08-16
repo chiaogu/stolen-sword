@@ -18,7 +18,7 @@ listen(PRESS_UP, () => {
 
 export function getReleaseVelocity() {
   return vector(
-    (pressDownPos.x - cursorPos.x) / 10,
+    (pressDownPos.x - cursorPos.x) / 15,
     (cursorPos.y - pressDownPos.y) / 15,
   )
 }

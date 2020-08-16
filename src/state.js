@@ -34,3 +34,9 @@ export const $timeRatio = ref(NORAML_TIME_RATIO);
 
 // Enemies
 export const enemies = [];
+
+// Ground
+export const grounds = [
+  object(0, -40, 1000, 50),
+  ...Array(10).fill().map((_, i) => object(i % 2 === 0 ? -100 : -400, 200 * (i + 1), 100, 100))
+];

@@ -11,9 +11,9 @@ export default [
   background,
   time,
   enemies,
-  player,
   camera,
   physic,
+  player,
   display,
   interaction,
 ];
