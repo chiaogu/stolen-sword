@@ -31,3 +31,6 @@ display(() => `cameraZoom: ${$cameraZoom.$}`)
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
+
+// Enemies
+export const enemies = [];

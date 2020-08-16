@@ -1,6 +1,7 @@
-import { $timeRatio, player } from '../state';
+import { $timeRatio, player, enemies } from '../state';
 import { transform } from './camera';
-import { vector, toZero, getObjectBoundary } from '../utils';
+import { vector, toZero, getObjectBoundary, isCollided, vectorOp } from '../utils';
+import { KEY_ENEMY_IS_COLLIDED, KEY_ENEMY_IS_PENETRABLE } from '../constants';
 
 const GROUND_Y = 0;
 const G = 0.4;
@@ -27,4 +28,16 @@ export default (ctx) => {
   ctx.moveTo(0, transformedGround[1]);
   ctx.lineTo(window.innerWidth, transformedGround[1]);
   ctx.stroke();
+  
+  // collision
+  enemies.map(enemy => {
+    const _isCollided = isCollided(enemy, player);
+    if(enemy[KEY_ENEMY_IS_PENETRABLE]) {
+      enemy[KEY_ENEMY_IS_COLLIDED] = _isCollided;
+    } else {
+      if(_isCollided) {
+        vectorOp(v => v *= -0.5, [player.v], player.v)
+      }
+    }
+  })
 };

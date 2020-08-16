@@ -1,8 +1,7 @@
 import { PRESS_DONW, PRESS_UP, listen } from '../events';
-import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO } from '../constants';
+import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO, FRAME_DURAITON } from '../constants';
 import { $timeRatio } from '../state'
 
-const FRAME_DURAITON = 16;
 const animations = [];
 let animationId = 0;
 let cancelTimeRatioAnimation

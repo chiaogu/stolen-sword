@@ -23,7 +23,16 @@ export const getObjectBoundary = ({ p, s }) => ({
   t: p.y + s.y / 2,
   r: p.x + s.x / 2,
   b: p.y - s.y / 2,
-})
+});
+
+export const isCollided = (objectA, objectB) => {
+  const boundaryA = getObjectBoundary(objectA);
+  const boundaryB = getObjectBoundary(objectB);
+  return boundaryA.l + objectA.v.x < boundaryB.r + objectB.v.x &&
+    boundaryA.r + objectA.v.x > boundaryB.l + objectB.v.x &&
+    boundaryA.t + objectA.v.y > boundaryB.b + objectB.v.y &&
+    boundaryA.b + objectA.v.y < boundaryB.t + objectB.v.y;
+}
 
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
