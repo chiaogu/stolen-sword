@@ -10,6 +10,10 @@ export const SIDE_B = 'b';
 export const SIDE_L = 'l';
 
 export const SLOW_DOWN_DURATION = 500;
-export const SLOW_MOTION_TIME_RATIO = 0.02;
+export const SLOW_MOTION_TIME_RATIO = 0.05;
 export const NORAML_TIME_RATIO = 1;
 export const FRAME_DURAITON = 16;
+
+export const G = 0.4;
+export const GROUND_FRICTION = 0.2;
+export const WALL_FRICTION = 0.2;

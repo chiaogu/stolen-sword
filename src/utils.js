@@ -1,10 +1,11 @@
+import { $timeRatio } from './state';
 import { SIDE_T, SIDE_R, SIDE_B, SIDE_L } from './constants';
 
-export const toZero = (value, step) => {
-  const abs = Math.abs(value);
-  const scalar = value / (abs || 1);
-  const diff = abs - Math.abs(step);
-  return diff < 0 ? 0 : diff * scalar;
+export const approach = (value, target, step) => {
+  step = Math.abs(step);
+  const diff = Math.abs(value - target);
+  const sign = (value - target) / (diff || 1);
+  return diff > step ? value - step * sign : target;
 }
 export const radiansToDegrees = radians => radians * 180 / Math.PI;
 export const vector = (x, y) => ({ x, y });
@@ -28,23 +29,36 @@ export const getObjectBoundary = ({ p, s }) => ({
   [SIDE_B]: p.y - s.y / 2,
 });
 
-export const collision = (objectA, objectB) => {
+const basicCollision = (objectA, objectB) => {
   const boundaryA = getObjectBoundary(objectA);
   const boundaryB = getObjectBoundary(objectB);
-  const isCollided = 
-    boundaryA.l + objectA.v.x < boundaryB.r + objectB.v.x &&
-    boundaryA.r + objectA.v.x > boundaryB.l + objectB.v.x &&
-    boundaryA.t + objectA.v.y > boundaryB.b + objectB.v.y &&
-    boundaryA.b + objectA.v.y < boundaryB.t + objectB.v.y;
-  if(!isCollided) return;
+  return boundaryA.l + objectA.v.x * $timeRatio.$ < boundaryB.r + objectB.v.x * $timeRatio.$ &&
+    boundaryA.r + objectA.v.x * $timeRatio.$ > boundaryB.l + objectB.v.x * $timeRatio.$ &&
+    boundaryA.t + objectA.v.y * $timeRatio.$ > boundaryB.b + objectB.v.y * $timeRatio.$ &&
+    boundaryA.b + objectA.v.y * $timeRatio.$ < boundaryB.t + objectB.v.y * $timeRatio.$;
+}
+
+const advCollision = (objectA, objectB) => {
+  const boundaryA = getObjectBoundary(objectA);
+  const boundaryNextA = getObjectBoundary(objectA);
   
+};
+
+const getClosetSide = (objectA, objectB) => {
   const angle = radiansToDegrees(vectorAngle(objectB.p, objectA.p));
+  const boundaryB = getObjectBoundary(objectB);
   const ltAngle = radiansToDegrees(vectorAngle(objectB.p, vector(boundaryB.l, boundaryB.t)));
   const rtAngle = 180 - ltAngle;
   if(angle > rtAngle && angle < ltAngle) return SIDE_T;
   if(angle > ltAngle || angle < -ltAngle) return SIDE_L;
   if(angle < -rtAngle && angle > -ltAngle) return SIDE_B;
   if(angle > -rtAngle || angle < -rtAngle) return SIDE_R;
+}
+    
+export const collision = (objectA, objectB) => {
+  const isCollided = basicCollision(objectA, objectB)
+  if(isCollided) return getClosetSide(objectA, objectB);
+  
 }
 
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
