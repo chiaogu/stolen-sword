@@ -14,18 +14,24 @@ import {
   GROUND_FRICTION,
   WALL_FRICTION,
 } from '../constants';
+import { listen, PLAYER_POS_CHANGE } from '../events';
+
+listen(PLAYER_POS_CHANGE, () => {
+  platforms[0].p.x = player.p.x;
+  vectorOp(pos => pos, [player.p], );
+});
 
 export default (ctx) => {
   // platform collision
   platforms.map(platform => {
     vectorOp((pos, v) => pos + v  * $timeRatio.$, [platform.p, platform.v], platform.p);
     
-    const groundBoundary = getObjectBoundary(platform);
+    const platformBoundary = getObjectBoundary(platform);
     const collidedSide = collision(player, platform, $timeRatio.$);
     if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
       player.v.y = platform.v.y;
       player.p.y =
-        groundBoundary[collidedSide] +
+        platformBoundary[collidedSide] +
         (player.s.y / 2) * (collidedSide === SIDE_T ? 1 : -1);
       player.v.x = approach(
         player.v.x,
@@ -35,7 +41,7 @@ export default (ctx) => {
     } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
       player.v.x = platform.v.x;
       player.p.x =
-        groundBoundary[collidedSide] +
+        platformBoundary[collidedSide] +
         (player.s.x / 2 - 1) * (collidedSide === SIDE_R ? 1 : -1);
       player.v.y = approach(
         player.v.y,
@@ -47,7 +53,7 @@ export default (ctx) => {
     // draw platform
     ctx.strokeStyle = '#fff';
     ctx.strokeRect(
-      ...transform(vector(groundBoundary.l, groundBoundary.t)),
+      ...transform(vector(platformBoundary.l, platformBoundary.t)),
       transform(platform.s.x),
       transform(platform.s.y)
     );

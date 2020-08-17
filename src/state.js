@@ -47,7 +47,7 @@ export const enemies = [];
 
 // Platforms
 export const platforms = [
-  object(0, -40, 1000, 20),
+  object(0, -40, cameraFrameSize.x * 0.9, 0),
   object(-100, 0, 10, 500),
   ...Array(10).fill().map((_, i) => object(i % 2 === 0 ? -300 : -600, 200 * (i + 1), 300, 100))
 ];

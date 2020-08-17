@@ -1,51 +1,90 @@
-import { object, getObjectBoundary, vector, vectorOp, collision } from '../utils'
+import {
+  object,
+  getObjectBoundary,
+  vector,
+  collision,
+} from '../utils';
 import { enemies, $timeRatio, player, transform } from '../state';
-import { KEY_ENEMY_IS_COLLIDED, KEY_ENEMY_IS_PENETRABLE, KEY_ENEMY_FRAME, FRAME_DURAITON, SIDE_T } from '../constants'
+import {
+  KEY_ENEMY_IS_COLLIDED,
+  KEY_ENEMY_IS_PENETRABLE,
+  KEY_ENEMY_FRAME,
+  FRAME_DURAITON,
+  SIDE_T,
+  SIDE_B,
+  SIDE_L,
+  SIDE_R
+} from '../constants';
 
-const SWITCH_MODE_INTERVAL = 5000;
+const SWITCH_MODE_INTERVAL = 3000;
 
-// enemies.push({
-//   ...object(300, 300, 100, 100),
-//   [KEY_ENEMY_FRAME]: 0
-// });
+enemies.push({
+  ...object(300, 300, 100, 100),
+  [KEY_ENEMY_FRAME]: 0,
+});
 
-export default ctx => {
-  enemies.map(enemy => {
+const isOnTime = (enemy, interval) =>
+  enemy[KEY_ENEMY_FRAME] % Math.round(interval / FRAME_DURAITON / $timeRatio.$) === 0;
+
+export default (ctx) => {
+  enemies.map((enemy) => {
     enemy[KEY_ENEMY_FRAME] += 1;
-    
-    if(enemy[KEY_ENEMY_FRAME] % Math.round(SWITCH_MODE_INTERVAL / FRAME_DURAITON / $timeRatio.$) === 0) {
-      enemy[SIDE_T] = false;
-      // enemy[KEY_ENEMY_IS_PENETRABLE] = !enemy[KEY_ENEMY_IS_PENETRABLE];
+
+    if (isOnTime(enemy, SWITCH_MODE_INTERVAL)) {
+      enemy[KEY_ENEMY_IS_COLLIDED] = false;
+      enemy[KEY_ENEMY_IS_PENETRABLE] = !enemy[KEY_ENEMY_IS_PENETRABLE];
     }
-    
+
     // collision
-    const _isCollided = collision(enemy, player, $timeRatio.$);
-    if (enemy[KEY_ENEMY_IS_PENETRABLE]) {
-      enemy[KEY_ENEMY_IS_COLLIDED] = _isCollided;
-    } else {
-      if (_isCollided) {
-        vectorOp(
-          (v) => {
-            // console.log(Math.abs(v) <= G  * $timeRatio.$);
-            // if(Math.abs(v) <= G  * $timeRatio.$)
-            return 0;
-            // return v * -0.5;
-          },
-          [player.v],
-          player.v
-        );
+    const enemyBoundary = getObjectBoundary(enemy);
+    const collidedSide = collision(player, enemy, $timeRatio.$);
+    if (!enemy[KEY_ENEMY_IS_PENETRABLE]) {
+      if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
+        player.v.y *= -0.5;
+        player.p.y =
+          enemyBoundary[collidedSide] +
+          (player.s.y / 2) * (collidedSide === SIDE_T ? 1 : -1);
+      } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
+        player.v.x *= -0.5;
+        player.p.x =
+          enemyBoundary[collidedSide] +
+          (player.s.x / 2) * (collidedSide === SIDE_R ? 1 : -1);
       }
+    } else {
+      enemy[KEY_ENEMY_IS_COLLIDED] = !!collidedSide;
     }
-    
+      
+    // const _isCollided = collision(enemy, player, $timeRatio.$);
+    // if (enemy[KEY_ENEMY_IS_PENETRABLE]) {
+    //   enemy[KEY_ENEMY_IS_COLLIDED] = _isCollided;
+    // } else {
+    //   if (_isCollided) {
+    //     vectorOp(
+    //       (v) => {
+    //         // console.log(Math.abs(v) <= G  * $timeRatio.$);
+    //         // if(Math.abs(v) <= G  * $timeRatio.$)
+    //         return 0;
+    //         // return v * -0.5;
+    //       },
+    //       [player.v],
+    //       player.v
+    //     );
+    //   }
+    // }
+
     // draw enemy
-    if(enemy[KEY_ENEMY_IS_COLLIDED]) {
+    if (enemy[KEY_ENEMY_IS_COLLIDED]) {
       ctx.fillStyle = '#f00';
-    } else if(enemy[SIDE_T]) {
+    } else if (enemy[KEY_ENEMY_IS_PENETRABLE]) {
       ctx.fillStyle = '#ff0';
     } else {
       ctx.fillStyle = '#0ff';
     }
     const { l, t } = getObjectBoundary(enemy);
-    ctx.fillRect(...transform(vector(l, t)), transform(enemy.s.x), transform(enemy.s.y));
-  })
-}
+    ctx.fillRect(
+      ...transform(vector(l, t)),
+      transform(enemy.s.x),
+      transform(enemy.s.y)
+    );
+  });
+};
