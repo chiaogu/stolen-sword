@@ -3,16 +3,16 @@ import player from './player';
 import time from './time';
 import camera from './camera';
 import display from './display';
-import physic from './physic';
 import background from './background';
 import enemies from './enemies';
+import platforms from './platforms';
 
 export default [
   background,
   time,
   enemies,
   camera,
-  physic,
+  platforms,
   player,
   display,
   interaction,

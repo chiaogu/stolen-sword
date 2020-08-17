@@ -28,6 +28,16 @@ export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `camera: ${vectorStringify(cameraCenter)}`);
 display(() => `cameraZoom: ${$cameraZoom.$}`)
+export function transform(value) {
+  if(typeof value === 'number') {
+    return value * $cameraZoom.$;
+  } else {
+    return [
+      cameraFrameSize.x / 2 - (cameraCenter.x - value.x) * $cameraZoom.$,
+      cameraFrameSize.y / 2 + (cameraCenter.y - value.y) * $cameraZoom.$,
+    ];
+  }
+}
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
@@ -35,8 +45,9 @@ export const $timeRatio = ref(NORAML_TIME_RATIO);
 // Enemies
 export const enemies = [];
 
-// Ground
-export const grounds = [
+// Platforms
+export const platforms = [
   object(0, -40, 1000, 20),
+  object(-100, 0, 10, 500),
   ...Array(10).fill().map((_, i) => object(i % 2 === 0 ? -300 : -600, 200 * (i + 1), 300, 100))
 ];

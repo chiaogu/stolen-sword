@@ -3,11 +3,12 @@ import{
   cursorPos,
   $isPressing,
   $timeRatio,
-  player
+  player,
+  transform,
 } from '../state';
-import { transform } from './camera';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import { vectorOp, vector, vectorStringify, getObjectBoundary } from '../utils';
+import { G } from '../constants';
 import { display } from './display';
 
 listen(PRESS_UP, () => {
@@ -25,6 +26,9 @@ export function getReleaseVelocity() {
 display(() => `releaseV: ${vectorStringify(getReleaseVelocity())}`);
 
 export default (ctx) => {
+  // gravity pulling
+  player.v.y -= G * $timeRatio.$;
+  
   // update position
   vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);
   emit(PLAYER_POS_CHANGE, player.p);
@@ -32,9 +36,12 @@ export default (ctx) => {
   const estimateV = getReleaseVelocity();
   const { l, t } = getObjectBoundary(player);
   
+  const nextB = vectorOp((pos, v) => pos + v, [player.p, player.v]);
   // draw character
   ctx.fillStyle = '#fff';
   ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
+  ctx.fillStyle = '#fff';
+  ctx.strokeRect(...transform(vector(nextB.x - transform(player.s.x / 2), nextB.y + transform(player.s.y / 2))), transform(player.s.x), transform(player.s.y));
     
   // visualize velocity
   ctx.strokeStyle = '#0f0';
