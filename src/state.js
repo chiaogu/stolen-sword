@@ -1,6 +1,6 @@
-import { NORAML_TIME_RATIO } from './constants';
+import { NORAML_TIME_RATIO, G } from './constants';
 import { display } from './modules/display';
-import { vectorStringify, vector, object } from './utils';
+import { vectorStringify, vector, object, vectorOp, vectorDistance } from './utils';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
   get: (object) => object[0],
@@ -12,6 +12,44 @@ const ref = defaultValue => new Proxy({ 0: defaultValue }, {
 
 // Player
 export const player = object(0, 0, 30, 30);
+export const $dash = ref(1);
+export function getReleaseVelocity() {
+  return vector(
+    (pressDownPos.x - cursorPos.x) / 15,
+    (cursorPos.y - pressDownPos.y) / 15,
+  )
+}
+export function playerTrajectory() {
+  const path = [vectorOp(p => p, [player.p])];
+  const estimateV = getReleaseVelocity();
+  let distance = 0;
+  while(distance < 300) {
+    const lastP = path[path.length - 1];
+    const nextP = vectorOp((pos, v) => pos + v, [lastP, estimateV]);
+    distance += vectorDistance(lastP, nextP)
+    estimateV.y -= G;
+    path.push(nextP);
+  }
+  return path;
+}
+export function dash() {
+  if(isAbleToDash()) {
+    const v = getReleaseVelocity();
+    player.v.x = v.x;
+    player.v.y = v.y;
+    $dash.$--;
+  }
+}
+export function resetDash() {
+  setDash(1);
+}
+export function setDash(value) {
+  $dash.$ = value;
+}
+export function isAbleToDash() {
+  return $dash.$ > 0;
+}
+
 display(() => `playerPos: ${vectorStringify(player.p)}`);
 display(() => `playerV: ${vectorStringify(player.v)}`);
 

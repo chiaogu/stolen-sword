@@ -4,7 +4,7 @@ import {
   vector,
   collision,
 } from '../utils';
-import { enemies, $timeRatio, player, transform } from '../state';
+import { enemies, $timeRatio, player, transform, setDash } from '../state';
 import {
   KEY_ENEMY_IS_COLLIDED,
   KEY_ENEMY_IS_PENETRABLE,
@@ -40,38 +40,23 @@ export default (ctx) => {
     const collidedSide = collision(player, enemy, $timeRatio.$);
     if (!enemy[KEY_ENEMY_IS_PENETRABLE]) {
       if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
+        setDash(1);
         player.v.y *= -0.5;
         player.p.y =
           enemyBoundary[collidedSide] +
           (player.s.y / 2) * (collidedSide === SIDE_T ? 1 : -1);
       } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
+        setDash(1);
         player.v.x *= -0.5;
         player.p.x =
           enemyBoundary[collidedSide] +
           (player.s.x / 2) * (collidedSide === SIDE_R ? 1 : -1);
       }
     } else {
+      if(!!collidedSide) setDash(1);;
       enemy[KEY_ENEMY_IS_COLLIDED] = !!collidedSide;
     }
-      
-    // const _isCollided = collision(enemy, player, $timeRatio.$);
-    // if (enemy[KEY_ENEMY_IS_PENETRABLE]) {
-    //   enemy[KEY_ENEMY_IS_COLLIDED] = _isCollided;
-    // } else {
-    //   if (_isCollided) {
-    //     vectorOp(
-    //       (v) => {
-    //         // console.log(Math.abs(v) <= G  * $timeRatio.$);
-    //         // if(Math.abs(v) <= G  * $timeRatio.$)
-    //         return 0;
-    //         // return v * -0.5;
-    //       },
-    //       [player.v],
-    //       player.v
-    //     );
-    //   }
-    // }
-
+    
     // draw enemy
     if (enemy[KEY_ENEMY_IS_COLLIDED]) {
       ctx.fillStyle = '#f00';

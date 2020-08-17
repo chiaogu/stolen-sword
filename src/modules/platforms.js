@@ -1,4 +1,4 @@
-import { $timeRatio, player, platforms, transform } from '../state';
+import { $timeRatio, player, platforms, transform, resetDash } from '../state';
 import {
   vector,
   approach,
@@ -25,10 +25,10 @@ export default (ctx) => {
   // platform collision
   platforms.map(platform => {
     vectorOp((pos, v) => pos + v  * $timeRatio.$, [platform.p, platform.v], platform.p);
-    
     const platformBoundary = getObjectBoundary(platform);
     const collidedSide = collision(player, platform, $timeRatio.$);
     if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
+      resetDash();
       player.v.y = platform.v.y;
       player.p.y =
         platformBoundary[collidedSide] +
@@ -39,6 +39,7 @@ export default (ctx) => {
         (platform.v.x - player.v.x) * GROUND_FRICTION
       )
     } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
+      resetDash();
       player.v.x = platform.v.x;
       player.p.x =
         platformBoundary[collidedSide] +

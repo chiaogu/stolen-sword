@@ -1,5 +1,5 @@
 import { PRESS_DONW, PRESS_UP, emit } from '../events';
-import { cursorPos, pressDownPos, pressingKeys, $isPressing, cameraCenter, $cameraZoom } from '../state';
+import { cursorPos, pressDownPos, pressingKeys, $isPressing, cameraCenter, $cameraZoom, enemies } from '../state';
 
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));

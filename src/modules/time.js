@@ -1,6 +1,6 @@
 import { PRESS_DONW, PRESS_UP, listen } from '../events';
 import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO, FRAME_DURAITON } from '../constants';
-import { $timeRatio } from '../state'
+import { $timeRatio, isAbleToDash } from '../state'
 
 const animations = [];
 let animationId = 0;
@@ -11,16 +11,22 @@ function removeAnimation(id) {
   if(index !== -1) animations.splice(index, 1);
 }
 
-listen(PRESS_DONW, () => {
+export function slowDown() {
   cancelTimeRatioAnimation = animateTo(ratio => {
     $timeRatio.$ = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
-  }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t)
-});
+  }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t);
+}
 
-listen(PRESS_UP, () => {
+export function backToNormal() {
   if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
   $timeRatio.$ = NORAML_TIME_RATIO;
+}
+
+listen(PRESS_DONW, () => {
+  if(isAbleToDash()) slowDown();
 });
+
+listen(PRESS_UP, backToNormal);
 
 export function animateTo(callback, duration = 1, timingFunc = v => v) {
   let frame = 0;
