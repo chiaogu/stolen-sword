@@ -27,8 +27,8 @@ export default (ctx) => {
     vectorOp((pos, v) => pos + v  * $timeRatio.$, [platform.p, platform.v], platform.p);
     const platformBoundary = getObjectBoundary(platform);
     const collidedSide = collision(player, platform, $timeRatio.$);
+    if(collidedSide === SIDE_T) resetDash();
     if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
-      resetDash();
       player.v.y = platform.v.y;
       player.p.y =
         platformBoundary[collidedSide] +

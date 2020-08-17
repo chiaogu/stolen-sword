@@ -101,6 +101,8 @@ export const intersection = (a, b, c, d) => {
   }
 };
 
+export const isFloatEqual = (floatA, floatB) => Math.round(floatA * 1000) == Math.round(floatB * 1000);
+
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);

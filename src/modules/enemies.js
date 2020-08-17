@@ -53,7 +53,7 @@ export default (ctx) => {
           (player.s.x / 2) * (collidedSide === SIDE_R ? 1 : -1);
       }
     } else {
-      if(!!collidedSide) setDash(1);;
+      if(!!collidedSide) setDash(1);
       enemy[KEY_ENEMY_IS_COLLIDED] = !!collidedSide;
     }
     

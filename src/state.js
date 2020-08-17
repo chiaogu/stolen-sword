@@ -1,6 +1,6 @@
-import { NORAML_TIME_RATIO, G } from './constants';
-import { display } from './modules/display';
+import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO, FRAME_DURAITON, G, DEFAULT_DASH } from './constants';
 import { vectorStringify, vector, object, vectorOp, vectorDistance } from './utils';
+import { display } from './modules/display';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
   get: (object) => object[0],
@@ -12,7 +12,7 @@ const ref = defaultValue => new Proxy({ 0: defaultValue }, {
 
 // Player
 export const player = object(0, 0, 30, 30);
-export const $dash = ref(1);
+export const $dash = ref(DEFAULT_DASH);
 export function getReleaseVelocity() {
   return vector(
     (pressDownPos.x - cursorPos.x) / 15,
@@ -41,9 +41,10 @@ export function dash() {
   }
 }
 export function resetDash() {
-  setDash(1);
+  setDash(DEFAULT_DASH);
 }
 export function setDash(value) {
+  if($isPressing.$ && $dash.$ !== value) slowDown();
   $dash.$ = value;
 }
 export function isAbleToDash() {
@@ -79,6 +80,40 @@ export function transform(value) {
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
+display(() => `timeRatio: ${$timeRatio.$}`);
+export const animations = [];
+let animationId = 0;
+let cancelTimeRatioAnimation
+
+export function removeAnimation(id) {
+  const index = animations.findIndex(([_id]) => _id === id);
+  if(index !== -1) animations.splice(index, 1);
+}
+
+export function animateTo(callback, duration = 1, timingFunc = v => v) {
+  let frame = 0;
+  return stepTo(
+    () => callback(timingFunc(Math.min(Math.max(frame++ * FRAME_DURAITON / duration, 0), 1))),
+    () => frame * FRAME_DURAITON > duration
+  );
+}
+
+export function stepTo(callback, shouldStop) {
+  const id = animationId++;
+  animations.push([id, callback, shouldStop]);
+  return () => removeAnimation(id);
+}
+
+export function slowDown() {
+  cancelTimeRatioAnimation = animateTo(ratio => {
+    $timeRatio.$ = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
+  }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t);
+}
+
+export function backToNormal() {
+  if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
+  $timeRatio.$ = NORAML_TIME_RATIO;
+}
 
 // Enemies
 export const enemies = [];

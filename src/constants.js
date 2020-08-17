@@ -16,4 +16,6 @@ export const FRAME_DURAITON = 16;
 
 export const G = 0.4;
 export const GROUND_FRICTION = 0.2;
-export const WALL_FRICTION = 0.2;
+export const WALL_FRICTION = 0.1;
+
+export const DEFAULT_DASH = 2;

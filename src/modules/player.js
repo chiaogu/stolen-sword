@@ -6,6 +6,7 @@ import{
   transform,
   playerTrajectory,
   dash,
+  $dash,
   isAbleToDash,
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
@@ -26,7 +27,7 @@ export default (ctx) => {
   emit(PLAYER_POS_CHANGE, player.p);
   
   // draw character
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = $dash.$ === 0 ? '#f00' : '#fff';
   const { l, t } = getObjectBoundary(player);
   ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
     
