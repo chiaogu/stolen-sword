@@ -25,10 +25,15 @@ export default (ctx) => {
   // platform collision
   platforms.map(platform => {
     vectorOp((pos, v) => pos + v  * $timeRatio.$, [platform.p, platform.v], platform.p);
+    const playerBoundary = getObjectBoundary(player);
     const platformBoundary = getObjectBoundary(platform);
     const collidedSide = collision(player, platform, $timeRatio.$);
     if(collidedSide === SIDE_T) resetDash();
-    if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
+    if (
+      (collidedSide === SIDE_B || collidedSide === SIDE_T) && 
+      playerBoundary.l < platformBoundary.r - 1 &&
+      playerBoundary.r > platformBoundary.l + 1
+    ) {
       player.v.y = platform.v.y;
       player.p.y =
         platformBoundary[collidedSide] +
@@ -36,7 +41,7 @@ export default (ctx) => {
       player.v.x = approach(
         player.v.x,
         platform.v.x,
-        (platform.v.x - player.v.x) * GROUND_FRICTION
+        (platform.v.x - player.v.x) * GROUND_FRICTION * $timeRatio.$
       )
     } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
       resetDash();
@@ -47,7 +52,7 @@ export default (ctx) => {
       player.v.y = approach(
         player.v.y,
         platform.v.y,
-        (platform.v.y - player.v.y) * WALL_FRICTION
+        (platform.v.y - player.v.y) * WALL_FRICTION * $timeRatio.$
       );
     }
     

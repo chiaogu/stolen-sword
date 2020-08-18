@@ -1,5 +1,5 @@
-import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO, FRAME_DURAITON, G, DEFAULT_DASH } from './constants';
-import { vectorStringify, vector, object, vectorOp, vectorDistance } from './utils';
+import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO, FRAME_DURAITON, G, DEFAULT_DASH, MINIMUM_DASH_VELOCITY } from './constants';
+import { vectorStringify, vector, object, vectorOp, vectorDistance, vectorMagnitude } from './utils';
 import { display } from './modules/display';
 
 const ref = defaultValue => new Proxy({ 0: defaultValue }, {
@@ -13,6 +13,7 @@ const ref = defaultValue => new Proxy({ 0: defaultValue }, {
 // Player
 export const player = object(0, 0, 30, 30);
 export const $dash = ref(DEFAULT_DASH);
+export const $trajectoryLineOpacity = ref(0);
 export function getReleaseVelocity() {
   return vector(
     (pressDownPos.x - cursorPos.x) / 15,
@@ -33,7 +34,7 @@ export function playerTrajectory() {
   return path;
 }
 export function dash() {
-  if(isAbleToDash()) {
+  if(isAbleToDash() && isReleaseVelocityEnough()) {
     const v = getReleaseVelocity();
     player.v.x = v.x;
     player.v.y = v.y;
@@ -49,6 +50,9 @@ export function setDash(value) {
 }
 export function isAbleToDash() {
   return $dash.$ > 0;
+}
+export function isReleaseVelocityEnough() {
+  return vectorMagnitude(getReleaseVelocity()) >= MINIMUM_DASH_VELOCITY;
 }
 
 display(() => `playerPos: ${vectorStringify(player.p)}`);
@@ -121,6 +125,6 @@ export const enemies = [];
 // Platforms
 export const platforms = [
   object(0, -40, cameraFrameSize.x * 0.9, 0),
-  object(-100, 0, 10, 500),
-  ...Array(10).fill().map((_, i) => object(i % 2 === 0 ? -300 : -600, 200 * (i + 1), 300, 100))
+  object(-100, 0, 10, 5000),
+  ...Array(10).fill().map((_, i) => object(i % 2 === 0 ? -300 : -800, 200 * (i + 1), 300, 100))
 ];

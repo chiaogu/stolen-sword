@@ -19,6 +19,7 @@ export const vectorOp = (callback, vectors, output = {}) => {
 };
 export const vectorDistance = (vectorA, vectorB) =>
   Math.hypot(vectorA.x - vectorB.x, vectorA.y - vectorB.y);
+export const vectorMagnitude = vectorA => vectorDistance(vectorA, vector(0, 0));
 
 export const object = (x, y, w, h) => ({
   p: vector(x, y),
@@ -100,8 +101,6 @@ export const intersection = (a, b, c, d) => {
     return vector(a.x + uA * (b.x - a.x), a.y + uA * (b.y - a.y));
   }
 };
-
-export const isFloatEqual = (floatA, floatB) => Math.round(floatA * 1000) == Math.round(floatB * 1000);
 
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);

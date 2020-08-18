@@ -4,7 +4,7 @@ const id = () => _id++;
 
 export const PLAYER_POS_CHANGE = id();
 export const PRESS_UP = id();
-export const PRESS_DONW = id();
+export const PRESS_DOWN = id();
 
 export function listen(key, callback) {
   if(!listeners[key]) listeners[key] = [];

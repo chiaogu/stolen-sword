@@ -1,7 +1,7 @@
-import { PRESS_DONW, PRESS_UP, listen } from '../events';
+import { PRESS_DOWN, PRESS_UP, listen } from '../events';
 import { removeAnimation, isAbleToDash, backToNormal, slowDown, animations } from '../state'
 
-listen(PRESS_DONW, () => {
+listen(PRESS_DOWN, () => {
   if(isAbleToDash()) slowDown();
 });
 

@@ -1,4 +1,4 @@
-import { PRESS_DONW, PRESS_UP, emit } from '../events';
+import { PRESS_DOWN, PRESS_UP, emit } from '../events';
 import { cursorPos, pressDownPos, pressingKeys, $isPressing, cameraCenter, $cameraZoom, enemies } from '../state';
 
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
@@ -13,7 +13,7 @@ function onPressDown({ clientX, clientY }) {
   pressDownPos.x = clientX;
   pressDownPos.y = clientY;
   $isPressing.$ = true;
-  emit(PRESS_DONW);
+  emit(PRESS_DOWN);
 }
 
 function onPressUp() {

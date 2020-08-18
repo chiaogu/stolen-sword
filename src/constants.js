@@ -19,3 +19,4 @@ export const GROUND_FRICTION = 0.2;
 export const WALL_FRICTION = 0.1;
 
 export const DEFAULT_DASH = 2;
+export const MINIMUM_DASH_VELOCITY = 5;
