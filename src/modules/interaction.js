@@ -1,5 +1,5 @@
 import { PRESS_DOWN, PRESS_UP, emit } from '../events';
-import { cursorPos, pressDownPos, pressingKeys, $isPressing, cameraCenter, $cameraZoom, enemies } from '../state';
+import { cursorPos, pressDownPos, pressingKeys, $isPressing } from '../state';
 
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
@@ -40,11 +40,4 @@ export default ctx => {
     ctx.lineTo(cursorPos.x, cursorPos.y);
     ctx.stroke();
   }
-  
-  if(pressingKeys.has('w')) cameraCenter.y += 10;
-  if(pressingKeys.has('a')) cameraCenter.x -= 10;
-  if(pressingKeys.has('s')) cameraCenter.y -= 10;
-  if(pressingKeys.has('d')) cameraCenter.x += 10;
-  if(pressingKeys.has('q')) $cameraZoom.$ += 0.01;
-  if(pressingKeys.has('e')) $cameraZoom.$ -= 0.01;
 }

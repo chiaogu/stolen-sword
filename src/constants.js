@@ -5,6 +5,7 @@ export const KEY_ENEMY_IS_COLLIDED = key();
 export const KEY_ENEMY_IS_PENETRABLE = key();
 export const KEY_STAGE_PLATFORMS = key();
 export const KEY_STAGE_ENEMIES = key();
+export const KEY_STAGE_CAMERA_TYPE = key();
 export const KEY_PLATFORM_TYPE = key();
 export const KEY_ENEMY_TYPE = key();
 
@@ -27,3 +28,6 @@ export const MINIMUM_DASH_VELOCITY = 5;
 
 export const PLATFORM_TYPE_STANDARD = key();
 export const PLATFORM_TYPE_X_FOLLOW_PLAYER = key();
+export const CAMERA_TYPE_FOCUS_ON_PLAYER = key();
+export const CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN = key();
+export const CAMERA_TYPE_GOD_MODE = key();

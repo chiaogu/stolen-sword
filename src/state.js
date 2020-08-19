@@ -1,14 +1,35 @@
-import { SLOW_DOWN_DURATION, SLOW_MOTION_TIME_RATIO, NORAML_TIME_RATIO, FRAME_DURAITON, G, DEFAULT_DASH, MINIMUM_DASH_VELOCITY } from './constants';
-import { vectorStringify, vector, object, vectorOp, vectorDistance, vectorMagnitude } from './utils';
+import {
+  SLOW_DOWN_DURATION,
+  SLOW_MOTION_TIME_RATIO,
+  NORAML_TIME_RATIO,
+  FRAME_DURAITON,
+  G,
+  DEFAULT_DASH,
+  MINIMUM_DASH_VELOCITY,
+  CAMERA_TYPE_FOCUS_ON_PLAYER,
+  CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN,
+} from './constants';
+import {
+  vectorStringify,
+  vector,
+  object,
+  vectorOp,
+  vectorDistance,
+  vectorMagnitude,
+} from './utils';
 import { display } from './modules/display';
 
-const ref = defaultValue => new Proxy({ 0: defaultValue }, {
-  get: (object) => object[0],
-  set: (object, p, value) => {
-    object[0] = value;
-    return true;
-  }
-});
+const ref = (defaultValue) =>
+  new Proxy(
+    { 0: defaultValue },
+    {
+      get: (object) => object[0],
+      set: (object, p, value) => {
+        object[0] = value;
+        return true;
+      },
+    }
+  );
 
 // Player
 export const player = object(0, 0, 30, 30);
@@ -17,24 +38,24 @@ export const $trajectoryLineOpacity = ref(0);
 export function getReleaseVelocity() {
   return vector(
     (pressDownPos.x - cursorPos.x) / 15,
-    (cursorPos.y - pressDownPos.y) / 15,
-  )
+    (cursorPos.y - pressDownPos.y) / 15
+  );
 }
 export function playerTrajectory() {
-  const path = [vectorOp(p => p, [player.p])];
+  const path = [vectorOp((p) => p, [player.p])];
   const estimateV = getReleaseVelocity();
   let distance = 0;
-  while(distance < 300) {
+  while (distance < 300) {
     const lastP = path[path.length - 1];
     const nextP = vectorOp((pos, v) => pos + v, [lastP, estimateV]);
-    distance += vectorDistance(lastP, nextP)
+    distance += vectorDistance(lastP, nextP);
     estimateV.y -= G;
     path.push(nextP);
   }
   return path;
 }
 export function dash() {
-  if(isAbleToDash() && isReleaseVelocityEnough()) {
+  if (isAbleToDash() && isReleaseVelocityEnough()) {
     const v = getReleaseVelocity();
     player.v.x = v.x;
     player.v.y = v.y;
@@ -45,7 +66,7 @@ export function resetDash() {
   setDash(DEFAULT_DASH);
 }
 export function setDash(value) {
-  if($isPressing.$ && $dash.$ !== value) slowDown();
+  if ($isPressing.$ && $dash.$ !== value) slowDown();
   $dash.$ = value;
 }
 export function isAbleToDash() {
@@ -65,14 +86,14 @@ export const pressDownPos = vector(0, 0);
 export const pressingKeys = new Set();
 
 // Camera
-export const $isFocusingOnPlayer = ref(true);
+export const $cameraType = ref(CAMERA_TYPE_FOCUS_ON_PLAYER);
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `camera: ${vectorStringify(cameraCenter)}`);
-display(() => `cameraZoom: ${$cameraZoom.$}`)
+display(() => `cameraZoom: ${$cameraZoom.$}`);
 export function transform(value) {
-  if(typeof value === 'number') {
+  if (typeof value === 'number') {
     return value * $cameraZoom.$;
   } else {
     return [
@@ -87,17 +108,22 @@ export const $timeRatio = ref(NORAML_TIME_RATIO);
 display(() => `timeRatio: ${$timeRatio.$}`);
 export const animations = [];
 let animationId = 0;
-let cancelTimeRatioAnimation
+let cancelTimeRatioAnimation;
 
 export function removeAnimation(id) {
   const index = animations.findIndex(([_id]) => _id === id);
-  if(index !== -1) animations.splice(index, 1);
+  if (index !== -1) animations.splice(index, 1);
 }
 
-export function animateTo(callback, duration = 1, timingFunc = v => v) {
+export function animateTo(callback, duration = 1, timingFunc = (v) => v) {
   let frame = 0;
   return stepTo(
-    () => callback(timingFunc(Math.min(Math.max(frame++ * FRAME_DURAITON / duration, 0), 1))),
+    () =>
+      callback(
+        timingFunc(
+          Math.min(Math.max((frame++ * FRAME_DURAITON) / duration, 0), 1)
+        )
+      ),
     () => frame * FRAME_DURAITON > duration
   );
 }
@@ -109,13 +135,19 @@ export function stepTo(callback, shouldStop) {
 }
 
 export function slowDown() {
-  cancelTimeRatioAnimation = animateTo(ratio => {
-    $timeRatio.$ = NORAML_TIME_RATIO - (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
-  }, SLOW_DOWN_DURATION, t => 1 + --t * t * t * t * t);
+  cancelTimeRatioAnimation = animateTo(
+    (ratio) => {
+      $timeRatio.$ =
+        NORAML_TIME_RATIO -
+        (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
+    },
+    SLOW_DOWN_DURATION,
+    (t) => 1 + --t * t * t * t * t
+  );
 }
 
 export function backToNormal() {
-  if(cancelTimeRatioAnimation) cancelTimeRatioAnimation();
+  if (cancelTimeRatioAnimation) cancelTimeRatioAnimation();
   $timeRatio.$ = NORAML_TIME_RATIO;
 }
 
