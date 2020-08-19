@@ -60,17 +60,19 @@ const isGoingThrough = (objectA, objectB, timeRatio) => {
     objectA.v,
   ]);
   const boundaryB = getObjectBoundary(objectB);
-  
   for (let [x1, y1, x2, y2] of SIDES) {
-    return intersection(
+    const isIntersected = intersection(
       objectA.p,
       nextAPos,
       vector(boundaryB[x1], boundaryB[y1]),
       vector(boundaryB[x2], boundaryB[y2])
     );
+    if(isIntersected) return true;
   }
   return false;
 };
+
+// ?? thin wall can be penetrated
 export const collision = (objectA, objectB, timeRatio) => {
   if(isOverlap(objectA, objectB, timeRatio)) return getClosetSide(objectA, objectB);
   if(isGoingThrough(objectA, objectB, timeRatio)) return getClosetSide(objectA, objectB);

@@ -1,5 +1,6 @@
 import { PRESS_DOWN, PRESS_UP, listen } from '../events';
-import { removeAnimation, isAbleToDash, backToNormal, slowDown, animations } from '../state'
+import { removeAnimation, isAbleToDash, backToNormal, slowDown, animations, $timeRatio } from '../state'
+import { NORAML_TIME_RATIO } from '../constants';
 
 listen(PRESS_DOWN, () => {
   if(isAbleToDash()) slowDown();
@@ -7,6 +8,9 @@ listen(PRESS_DOWN, () => {
 
 listen(PRESS_UP, backToNormal);
 
+window.addEventListener('keydown', ({ key }) => {
+  if(key === 'Escape') $timeRatio.$ = $timeRatio.$ === 0 ? NORAML_TIME_RATIO : 0;
+});
 
 export default (ctx) => {
   // execute animation
