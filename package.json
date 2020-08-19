@@ -12,10 +12,16 @@
     "advzip-bin": "^2.0.0",
     "filesize": "^6.1.0",
     "html-minifier-terser": "^5.1.1",
+    "husky": "^4.2.5",
     "rollup": "^2.23.1",
     "rollup-plugin-browsersync": "^1.1.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-filesize": "^9.0.2",
     "rollup-plugin-terser": "^7.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run build"
+    }
   }
 }
