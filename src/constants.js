@@ -1,12 +1,16 @@
 let _id = 0;
 const key = () => _id++;
+
+export const KEY_ENEMY_TYPE = key();
 export const KEY_ENEMY_FRAME = key();
 export const KEY_ENEMY_IS_COLLIDED = key();
 export const KEY_ENEMY_IS_PENETRABLE = key();
+export const KEY_ENEMY_DEATH_FRAME = key();
+
 export const KEY_STAGE_INITIATE = key();
 export const KEY_STAGE_LOOP = key();
+
 export const KEY_PLATFORM_TYPE = key();
-export const KEY_ENEMY_TYPE = key();
 export const KEY_PLATFORM_X_FOLLOW = key();
 export const KEY_PLATFORM_Y_FOLLOW = key();
 
@@ -24,7 +28,7 @@ export const G = 0.4;
 export const GROUND_FRICTION = 0.2;
 export const WALL_FRICTION = 0.15;
 
-export const MAX_RELEASE_VELOCITY = 25;
+export const MAX_RELEASE_VELOCITY = 20;
 export const DRAG_FORCE_FACTOR = 15;
 export const DEFAULT_DASH = 2;
 export const MINIMUM_DASH_VELOCITY = 2;
