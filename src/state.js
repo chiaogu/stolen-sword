@@ -161,8 +161,10 @@ export function backToNormal() {
   $timeRatio.$ = NORAML_TIME_RATIO;
 }
 
-// Enemies
+// Stage
 export const enemies = [];
-
-// Platforms
 export const platforms = [];
+export const $stageWave = ref();
+export const $stage = ref();
+
+display(() => `stageWave: ${$stageWave.$}`)

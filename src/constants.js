@@ -9,6 +9,9 @@ export const KEY_ENEMY_DEATH_FRAME = key();
 
 export const KEY_STAGE_INITIATE = key();
 export const KEY_STAGE_LOOP = key();
+export const KEY_STAGE_SET_WAVE = key();
+export const KEY_STAGE_IS_WAVE_CLEAN = key();
+export const KEY_STAGE_IS_STAGE_CLEAN = key();
 
 export const KEY_PLATFORM_TYPE = key();
 export const KEY_PLATFORM_X_FOLLOW = key();
