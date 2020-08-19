@@ -18,10 +18,10 @@ import {
 
 const SWITCH_MODE_INTERVAL = 3000;
 
-enemies.push({
-  ...object(300, 300, 100, 100),
-  [KEY_ENEMY_FRAME]: 0,
-});
+// enemies.push({
+//   ...object(300, 300, 100, 100),
+//   [KEY_ENEMY_FRAME]: 0,
+// });
 
 const isOnTime = (enemy, interval) =>
   enemy[KEY_ENEMY_FRAME] % Math.round(interval / FRAME_DURAITON / $timeRatio.$) === 0;

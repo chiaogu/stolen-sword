@@ -123,8 +123,4 @@ export function backToNormal() {
 export const enemies = [];
 
 // Platforms
-export const platforms = [
-  object(0, -40, cameraFrameSize.x * 0.9, 0),
-  object(-100, 0, 10, 5000),
-  ...Array(10).fill().map((_, i) => object(i % 2 === 0 ? -300 : -800, 200 * (i + 1), 300, 100))
-];
+export const platforms = [];

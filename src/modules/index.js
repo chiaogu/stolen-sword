@@ -6,6 +6,7 @@ import display from './display';
 import background from './background';
 import enemies from './enemies';
 import platforms from './platforms';
+import stage from './stage';
 
 export default [
   background,
@@ -16,4 +17,5 @@ export default [
   player,
   display,
   interaction,
+  stage,
 ];

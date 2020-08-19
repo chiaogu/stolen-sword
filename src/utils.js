@@ -1,4 +1,12 @@
-import { SIDE_T, SIDE_R, SIDE_B, SIDE_L } from './constants';
+import {
+  SIDE_T,
+  SIDE_R,
+  SIDE_B,
+  SIDE_L,
+  KEY_PLATFORM_TYPE,
+  KEY_ENEMY_TYPE,
+  KEY_ENEMY_FRAME,
+} from './constants';
 
 export const approach = (value, target, step) => {
   step = Math.abs(step);
@@ -19,7 +27,8 @@ export const vectorOp = (callback, vectors, output = {}) => {
 };
 export const vectorDistance = (vectorA, vectorB) =>
   Math.hypot(vectorA.x - vectorB.x, vectorA.y - vectorB.y);
-export const vectorMagnitude = vectorA => vectorDistance(vectorA, vector(0, 0));
+export const vectorMagnitude = (vectorA) =>
+  vectorDistance(vectorA, vector(0, 0));
 
 export const object = (x, y, w, h) => ({
   p: vector(x, y),
@@ -52,7 +61,7 @@ const SIDES = [
   [SIDE_L, SIDE_T, SIDE_R, SIDE_T],
   [SIDE_R, SIDE_T, SIDE_R, SIDE_B],
   [SIDE_R, SIDE_B, SIDE_L, SIDE_B],
-  [SIDE_L, SIDE_B, SIDE_L, SIDE_T]
+  [SIDE_L, SIDE_B, SIDE_L, SIDE_T],
 ];
 const isGoingThrough = (objectA, objectB, timeRatio) => {
   const nextAPos = vectorOp((pos, v) => pos + v * timeRatio, [
@@ -67,15 +76,17 @@ const isGoingThrough = (objectA, objectB, timeRatio) => {
       vector(boundaryB[x1], boundaryB[y1]),
       vector(boundaryB[x2], boundaryB[y2])
     );
-    if(isIntersected) return true;
+    if (isIntersected) return true;
   }
   return false;
 };
 
 // ?? thin wall can be penetrated
 export const collision = (objectA, objectB, timeRatio) => {
-  if(isOverlap(objectA, objectB, timeRatio)) return getClosetSide(objectA, objectB);
-  if(isGoingThrough(objectA, objectB, timeRatio)) return getClosetSide(objectA, objectB);
+  if (isOverlap(objectA, objectB, timeRatio))
+    return getClosetSide(objectA, objectB);
+  if (isGoingThrough(objectA, objectB, timeRatio))
+    return getClosetSide(objectA, objectB);
 };
 
 export const getClosetSide = (objectA, objectB) => {
@@ -104,6 +115,16 @@ export const intersection = (a, b, c, d) => {
   }
 };
 
+export const platform = (type, x, y, w, h) => ({
+  ...object(x, y, w, h),
+  [KEY_PLATFORM_TYPE]: type,
+});
+
+export const enemy = (type, x, y, w, h) => ({
+  ...object(x, y, w, h),
+  [KEY_ENEMY_TYPE]: type,
+  [KEY_ENEMY_FRAME]: 0,
+});
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);
