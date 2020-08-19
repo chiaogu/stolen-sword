@@ -7,7 +7,6 @@ import{
   playerTrajectory,
   $dash,
   isAbleToDash,
-  $trajectoryLineOpacity,
   isReleaseVelocityEnough,
   dash
 } from '../state';

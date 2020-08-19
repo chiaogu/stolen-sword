@@ -6,6 +6,7 @@ import {
   KEY_PLATFORM_TYPE,
   KEY_ENEMY_TYPE,
   KEY_ENEMY_FRAME,
+  KEY_ENEMY_IS_PENETRABLE,
 } from './constants';
 
 export const approach = (value, target, step) => {
@@ -115,15 +116,17 @@ export const intersection = (a, b, c, d) => {
   }
 };
 
-export const platform = (type, x, y, w, h) => ({
+export const platform = (type, x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   [KEY_PLATFORM_TYPE]: type,
+  ...options
 });
 
 export const enemy = (type, x, y, w, h) => ({
   ...object(x, y, w, h),
   [KEY_ENEMY_TYPE]: type,
   [KEY_ENEMY_FRAME]: 0,
+  [KEY_ENEMY_IS_PENETRABLE]: true
 });
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);

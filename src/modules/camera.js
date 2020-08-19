@@ -5,16 +5,16 @@ import {
   $cameraType,
   player,
   pressingKeys,
+  cameraFramePadding,
 } from '../state';
 import { PLAYER_POS_CHANGE, listen } from '../events';
-import { vector, vectorOp } from '../utils';
+import { vectorOp } from '../utils';
 import {
   CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN,
   CAMERA_TYPE_FOCUS_ON_PLAYER,
   CAMERA_TYPE_GOD_MODE,
 } from '../constants';
 
-const padding = vector(60, 60);
 
 function focusOnPlayer() {
   vectorOp((playerPos) => playerPos, [player.p], cameraCenter);
@@ -29,7 +29,7 @@ function focusWhenOutOfScreen() {
         Math.max(playerPos + playerSize - offset, cameraCenter)
       );
     },
-    [player.p, padding, cameraCenter, cameraFrameSize, player.s],
+    [player.p, cameraFramePadding, cameraCenter, cameraFrameSize, player.s],
     cameraCenter
   );
 }

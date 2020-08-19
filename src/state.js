@@ -7,7 +7,9 @@ import {
   DEFAULT_DASH,
   MINIMUM_DASH_VELOCITY,
   CAMERA_TYPE_FOCUS_ON_PLAYER,
-  CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN,
+  DRAG_FORCE_FACTOR,
+  MAX_RELEASE_VELOCITY,
+  TRAJECTORY_LINE_LENGTH
 } from './constants';
 import {
   vectorStringify,
@@ -32,20 +34,23 @@ const ref = (defaultValue) =>
   );
 
 // Player
-export const player = object(0, 0, 30, 30);
+export const player = object(0, 0, 20, 20);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
 export function getReleaseVelocity() {
-  return vector(
-    (pressDownPos.x - cursorPos.x) / 15,
-    (cursorPos.y - pressDownPos.y) / 15
+  const v = vector(
+    (pressDownPos.x - cursorPos.x) / DRAG_FORCE_FACTOR,
+    (cursorPos.y - pressDownPos.y) / DRAG_FORCE_FACTOR
   );
+  const vm = vectorMagnitude(v);
+  if(vm > MAX_RELEASE_VELOCITY) vectorOp(v => v * MAX_RELEASE_VELOCITY / vm, [v], v);
+  return v;
 }
 export function playerTrajectory() {
   const path = [vectorOp((p) => p, [player.p])];
   const estimateV = getReleaseVelocity();
   let distance = 0;
-  while (distance < 300) {
+  while (distance < TRAJECTORY_LINE_LENGTH) {
     const lastP = path[path.length - 1];
     const nextP = vectorOp((pos, v) => pos + v, [lastP, estimateV]);
     distance += vectorDistance(lastP, nextP);
@@ -89,6 +94,7 @@ export const pressingKeys = new Set();
 export const $cameraType = ref(CAMERA_TYPE_FOCUS_ON_PLAYER);
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
+export const cameraFramePadding = vector(0, 0);
 export const $cameraZoom = ref(1);
 display(() => `camera: ${vectorStringify(cameraCenter)}`);
 display(() => `cameraZoom: ${$cameraZoom.$}`);
@@ -135,6 +141,7 @@ export function stepTo(callback, shouldStop) {
 }
 
 export function slowDown() {
+  if(cancelTimeRatioAnimation) return;
   cancelTimeRatioAnimation = animateTo(
     (ratio) => {
       $timeRatio.$ =
@@ -147,7 +154,10 @@ export function slowDown() {
 }
 
 export function backToNormal() {
-  if (cancelTimeRatioAnimation) cancelTimeRatioAnimation();
+  if (cancelTimeRatioAnimation) {
+    cancelTimeRatioAnimation();
+    cancelTimeRatioAnimation = undefined;
+  }
   $timeRatio.$ = NORAML_TIME_RATIO;
 }
 
