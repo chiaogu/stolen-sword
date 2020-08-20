@@ -130,10 +130,12 @@ export const enemy = (x, y, w, h, options) => ({
 });
 
 export const isEventOnTime = (frame, interval) =>
-  Math.round(frame) % Math.round(interval / FRAME_DURAITON) === 0;
+  Math.round(frame) > 0 && Math.round(frame) % Math.round(interval / FRAME_DURAITON) === 0;
 
 export const getEventRatio = (frame, duration) => 
   frame % Math.round(duration / FRAME_DURAITON) / Math.round(duration / FRAME_DURAITON);
+  
+export const alternateProgress = process => Math.abs(process - 0.5) * 2;
   
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);

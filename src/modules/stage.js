@@ -1,9 +1,8 @@
 import {
   KEY_STAGE_INITIATE,
   KEY_STAGE_LOOP,
-  KEY_STAGE_SET_WAVE,
-  KEY_STAGE_IS_WAVE_CLEAN,
-  KEY_STAGE_IS_STAGE_CLEAN,
+  KEY_STAGE_WAVES,
+  KEY_STAGE_IS_WAVE_CLEAN
 } from '../constants';
 import {
   enemies,
@@ -18,14 +17,15 @@ import { display } from './display';
 import stage1 from '../stages/stage1';
 import playground from '../stages/playground';
 
-function setStage(stage) {
+function setStage(stageIndex) {
   reset();
-  $stage.$ = stage;
-  stage[KEY_STAGE_INITIATE]();
+  currentStage = stageIndex;
+  $stage.$ = stages[stageIndex];
+  $stage.$[KEY_STAGE_INITIATE]();
 }
 
 function nextStage() {
-  setStage(stages[++currentStage]);
+  setStage(currentStage + 1);
 }
 
 function reset() {
@@ -38,8 +38,8 @@ function reset() {
 }
 
 window.addEventListener('keydown', ({ key }) => {
-  if (key === '1') setStage(playground);
-  if (key === '2') setStage(stage1);
+  if (key === '1') setStage(0);
+  if (key === '2') setStage(1);
 });
 
 let currentStage = -1;
@@ -52,12 +52,13 @@ nextStage();
 export default (ctx) => {
   if($stage.$) {
     if($stage.$[KEY_STAGE_LOOP]) $stage.$[KEY_STAGE_LOOP]();
-    if($stage.$[KEY_STAGE_IS_STAGE_CLEAN] && $stage.$[KEY_STAGE_IS_STAGE_CLEAN]()) {
-      nextStage();
-    }
     if($stage.$[KEY_STAGE_IS_WAVE_CLEAN] && $stage.$[KEY_STAGE_IS_WAVE_CLEAN]()) {
-      $stageWave.$++;
-      $stage.$[KEY_STAGE_SET_WAVE]();
+      if($stageWave.$ === $stage.$[KEY_STAGE_WAVES].length - 1) {
+        nextStage();
+      } else {
+        enemies.splice(0, enemies.length);
+        $stage.$[KEY_STAGE_WAVES][++$stageWave.$]();
+      }
     }
   }
 };

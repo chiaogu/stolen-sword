@@ -9,7 +9,7 @@ import {
   CAMERA_TYPE_FOCUS_ON_PLAYER,
   DRAG_FORCE_FACTOR,
   MAX_RELEASE_VELOCITY,
-  TRAJECTORY_LINE_LENGTH
+  TRAJECTORY_LINE_LENGTH,
 } from './constants';
 import {
   vectorStringify,
@@ -44,7 +44,8 @@ export function getReleaseVelocity() {
     (cursorPos.y - pressDownPos.y) / DRAG_FORCE_FACTOR
   );
   const vm = vectorMagnitude(v);
-  if(vm > MAX_RELEASE_VELOCITY) vectorOp(v => v * MAX_RELEASE_VELOCITY / vm, [v], v);
+  if (vm > MAX_RELEASE_VELOCITY)
+    vectorOp((v) => (v * MAX_RELEASE_VELOCITY) / vm, [v], v);
   return v;
 }
 export function playerTrajectory() {
@@ -110,6 +111,13 @@ export function transform(value) {
   }
 }
 
+export function detransform(target) {
+  return vector(
+    cameraCenter.x - (cameraFrameSize.x / 2 - target.x) / $cameraZoom.$,
+    cameraCenter.y + (cameraFrameSize.y / 2 - target.y) / $cameraZoom.$
+  );
+}
+
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
 display(() => `timeRatio: ${$timeRatio.$}`);
@@ -142,7 +150,7 @@ export function stepTo(callback, shouldStop) {
 }
 
 export function slowDown() {
-  if(cancelTimeRatioAnimation) return;
+  if (cancelTimeRatioAnimation) return;
   cancelTimeRatioAnimation = animateTo(
     (ratio) => {
       $timeRatio.$ =
@@ -168,4 +176,4 @@ export const platforms = [];
 export const $stageWave = ref();
 export const $stage = ref();
 
-display(() => `stageWave: ${$stageWave.$}`)
+display(() => `stageWave: ${$stageWave.$}`);

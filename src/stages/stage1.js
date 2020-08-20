@@ -5,9 +5,8 @@ import {
   KEY_STAGE_INITIATE,
   KEY_PLATFORM_X_FOLLOW,
   KEY_PLATFORM_Y_FOLLOW,
-  KEY_STAGE_SET_WAVE,
   KEY_STAGE_IS_WAVE_CLEAN,
-  KEY_STAGE_IS_STAGE_CLEAN,
+  KEY_STAGE_WAVES,
   KEY_ENEMY_MOVEMENT,
   KEY_ENEMY_MOVEMENT_DURATION,
 } from '../constants';
@@ -18,9 +17,8 @@ import {
   cameraFramePadding,
   player,
   cameraCenter,
-  $stageWave,
 } from '../state';
-import { platform, enemy, vectorOp } from '../utils';
+import { platform, enemy, alternateProgress } from '../utils';
 import { easeInOutCubic } from '../easing';
 
 export default {
@@ -42,24 +40,45 @@ export default {
       })
     );
   },
-  [KEY_STAGE_SET_WAVE]() {
-    enemies.splice(0, enemies.length);
-    if($stageWave.$ === 0) {
-      enemies.push(enemy(200, 300, 50, 50, {
+  [KEY_STAGE_WAVES]: [
+    () => enemies.push(
+      enemy(200, 300, 50, 50, {
         [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
         [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          progress = easeInOutCubic(1 - Math.abs(progress - 0.5) * 2);
-          vectorOp(initialPos => initialPos + progress * 100 - 50, [initialPos], pos);
+          const theta = progress * 2 * Math.PI;
+          pos.x = initialPos.x + 20 * Math.cos(theta);
+          pos.y = initialPos.y + 10 * Math.sin(theta);
         }
-      }));
-    } else if($stageWave.$ === 1) {
-      enemies.push(enemy(300, 300, 50, 50), enemy(-300, 600, 50, 50));
-    }
-  },
+      })
+    ),
+    () => enemies.push(
+      enemy(-300, 600, 50, 50, {
+        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
+        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
+          const theta = progress * 2 * Math.PI;
+          pos.x = initialPos.x + 20 * Math.cos(theta);
+          pos.y = initialPos.y + 10 * Math.sin(theta);
+        }
+      })
+    ),
+    () => enemies.push(
+      enemy(0, 600, 50, 50, {
+        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
+        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
+          const theta = progress * 2 * Math.PI;
+          pos.x = initialPos.x + 20 * Math.cos(theta);
+          pos.y = initialPos.y + 10 * Math.sin(theta);
+        }
+      }),
+      enemy(0, 1100, 50, 50, {
+        [KEY_ENEMY_MOVEMENT_DURATION]: 6000,
+        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
+          pos.y = initialPos.y + easeInOutCubic(alternateProgress(progress)) * -150
+        }
+      })
+    ),
+  ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0;
-  },
-  [KEY_STAGE_IS_STAGE_CLEAN]() {
-    return $stageWave.$ === 2 && enemies.length === 0;
-  },
+  }
 };
