@@ -4,9 +4,9 @@ import {
   SIDE_B,
   SIDE_L,
   KEY_PLATFORM_TYPE,
-  KEY_ENEMY_TYPE,
   KEY_ENEMY_FRAME,
-  KEY_ENEMY_IS_PENETRABLE,
+  FRAME_DURAITON,
+  KEY_ENEMY_INITIAL_POS
 } from './constants';
 
 export const approach = (value, target, step) => {
@@ -116,18 +116,25 @@ export const intersection = (a, b, c, d) => {
   }
 };
 
-export const platform = (type, x, y, w, h, options = {}) => ({
+export const platform = (type, x, y, w, h, options) => ({
   ...object(x, y, w, h),
   [KEY_PLATFORM_TYPE]: type,
   ...options
 });
 
-export const enemy = (type, x, y, w, h) => ({
+export const enemy = (x, y, w, h, options) => ({
   ...object(x, y, w, h),
-  [KEY_ENEMY_TYPE]: type,
+  [KEY_ENEMY_INITIAL_POS]: vector(x, y),
   [KEY_ENEMY_FRAME]: 0,
-  [KEY_ENEMY_IS_PENETRABLE]: true
+  ...options
 });
+
+export const isEventOnTime = (frame, interval) =>
+  Math.round(frame) % Math.round(interval / FRAME_DURAITON) === 0;
+
+export const getEventRatio = (frame, duration) => 
+  frame % Math.round(duration / FRAME_DURAITON) / Math.round(duration / FRAME_DURAITON);
+  
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);

@@ -20,6 +20,7 @@ import {
   vectorMagnitude,
 } from './utils';
 import { display } from './modules/display';
+import { easeOutQuint } from './easing';
 
 const ref = (defaultValue) =>
   new Proxy(
@@ -149,7 +150,7 @@ export function slowDown() {
         (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
     },
     SLOW_DOWN_DURATION,
-    (t) => 1 + --t * t * t * t * t
+    easeOutQuint
   );
 }
 

@@ -3,29 +3,26 @@ import {
   getObjectBoundary,
   vector,
   collision,
+  isEventOnTime,
+  getEventRatio
 } from '../utils';
 import { enemies, $timeRatio, player, transform, setDash } from '../state';
 import {
   KEY_ENEMY_IS_COLLIDED,
-  KEY_ENEMY_IS_PENETRABLE,
+  KEY_ENEMY_IS_INVINCIBLE,
   KEY_ENEMY_FRAME,
-  FRAME_DURAITON,
+  KEY_ENEMY_MOVEMENT,
   SIDE_T,
   SIDE_B,
   SIDE_L,
   SIDE_R,
-  KEY_ENEMY_DEATH_FRAME
+  KEY_ENEMY_DEATH_FRAME,
+  KEY_ENEMY_MOVEMENT_DURATION,
+  KEY_ENEMY_INITIAL_POS
 } from '../constants';
 
 const SWITCH_MODE_INTERVAL = 3000;
 const DEATH_ANIMATION_DURATION = 500;
-
-const isEventOnTime = (frame, interval) =>
-  Math.round(frame) % Math.round(interval / FRAME_DURAITON) === 0;
-
-const getEventRatio = (frame, duration) => 
-  Math.round(frame) / Math.round(duration / FRAME_DURAITON)
-  
   
 function handleCollision(enemy) {
   const enemyBoundary = getObjectBoundary(enemy);
@@ -33,7 +30,7 @@ function handleCollision(enemy) {
   enemy[KEY_ENEMY_IS_COLLIDED] = !!collidedSide;
   if(enemy[KEY_ENEMY_DEATH_FRAME]) return;
   
-  if (!enemy[KEY_ENEMY_IS_PENETRABLE]) {
+  if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
     bounceBack(enemy, enemyBoundary, collidedSide);
   } else {
     if(!!collidedSide) underAttack(enemy, enemyBoundary, collidedSide);
@@ -77,10 +74,14 @@ export default (ctx) => {
     // collision
     handleCollision(enemy);
     
+    if(enemy[KEY_ENEMY_MOVEMENT] && enemy[KEY_ENEMY_MOVEMENT_DURATION]) {
+      enemy[KEY_ENEMY_MOVEMENT](enemy.p, enemy[KEY_ENEMY_INITIAL_POS], getEventRatio(enemy[KEY_ENEMY_FRAME], enemy[KEY_ENEMY_MOVEMENT_DURATION]));
+    }
+    
     // draw enemy
     if (enemy[KEY_ENEMY_IS_COLLIDED]) {
       ctx.fillStyle = '#f00';
-    } else if (!enemy[KEY_ENEMY_IS_PENETRABLE]) {
+    } else if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
       ctx.fillStyle = '#0ff';
     } else if(enemy[KEY_ENEMY_DEATH_FRAME]) {
       ctx.fillStyle = `rgba(255,255,0, ${1 - getEventRatio(enemy[KEY_ENEMY_FRAME] - enemy[KEY_ENEMY_DEATH_FRAME], DEATH_ANIMATION_DURATION)}`;
