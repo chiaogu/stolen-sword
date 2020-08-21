@@ -13,6 +13,7 @@ import {
   CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN,
   CAMERA_TYPE_FOCUS_ON_PLAYER,
   CAMERA_TYPE_GOD_MODE,
+  DEFAULT_FRAME_HEIGHT
 } from '../constants';
 
 
@@ -55,8 +56,8 @@ window.addEventListener('keydown', ({ key }) => {
 });
 
 export default (ctx) => {
-  cameraFrameSize.x = ctx.canvas.width;
-  cameraFrameSize.y = ctx.canvas.height;
+  cameraFrameSize.x = Math.floor(ctx.canvas.width / window.devicePixelRatio);
+  cameraFrameSize.y = Math.floor(ctx.canvas.height / window.devicePixelRatio);
 
   if (pressingKeys.has('w')) cameraCenter.y += 10;
   if (pressingKeys.has('a')) cameraCenter.x -= 10;

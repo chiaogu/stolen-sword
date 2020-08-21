@@ -31,6 +31,7 @@ export const SIDE_R = 'r';
 export const SIDE_B = 'b';
 export const SIDE_L = 'l';
 
+export const DEFAULT_FRAME_HEIGHT = 667;
 export const SLOW_DOWN_DURATION = 500;
 export const SLOW_MOTION_TIME_RATIO = 0.05;
 export const NORAML_TIME_RATIO = 1;

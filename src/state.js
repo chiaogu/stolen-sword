@@ -10,6 +10,7 @@ import {
   DRAG_FORCE_FACTOR,
   MAX_RELEASE_VELOCITY,
   TRAJECTORY_LINE_LENGTH,
+  DEFAULT_FRAME_HEIGHT
 } from './constants';
 import {
   vectorStringify,
@@ -100,13 +101,15 @@ export const cameraFramePadding = vector(0, 0);
 export const $cameraZoom = ref(1);
 display(() => `camera: ${vectorStringify(cameraCenter)}`);
 display(() => `cameraZoom: ${$cameraZoom.$}`);
+
 export function transform(value) {
+  const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
   if (typeof value === 'number') {
-    return value * $cameraZoom.$;
+    return value * $cameraZoom.$ * scale;
   } else {
     return [
-      cameraFrameSize.x / 2 - (cameraCenter.x - value.x) * $cameraZoom.$,
-      cameraFrameSize.y / 2 + (cameraCenter.y - value.y) * $cameraZoom.$,
+      cameraFrameSize.x / 2 - (cameraCenter.x - value.x) * $cameraZoom.$ * scale,
+      cameraFrameSize.y / 2 + (cameraCenter.y - value.y) * $cameraZoom.$ * scale,
     ];
   }
 }
