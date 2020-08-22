@@ -1,5 +1,3 @@
-import { cameraFrameSize } from "../state";
-
 const info = [];
 
 export function display(getValue, isVisible = () => true) {
@@ -11,6 +9,6 @@ export default ctx => {
     if(!isVisible()) return;
     ctx.font = `20px`;
     ctx.fillStyle = '#fff';
-    ctx.fillText(getValue(), 10, cameraFrameSize.y - 15 * index - 20);
+    ctx.fillText(getValue(), 10, Math.floor(ctx.canvas.height / window.devicePixelRatio) - 15 * index - 20);
   });
 }

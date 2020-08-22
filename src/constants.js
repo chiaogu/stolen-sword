@@ -1,9 +1,10 @@
 let _id = 0;
-const key = () => _id++;
+export const key = () => _id++;
 
 export const KEY_ENEMY_TYPE = key();
 export const KEY_ENEMY_IS_INVINCIBLE = key();
-export const KEY_ENEMY_DEATH_FRAME = key();
+export const KEY_ENEMY_DEAD_FRAME = key();
+export const KEY_ENEMY_IS_DEAD = key();
 
 export const KEY_STAGE_INITIATE = key();
 export const KEY_STAGE_LOOP = key();
@@ -20,6 +21,9 @@ export const KEY_OBJECT_FRAME = key();
 export const KEY_OBJECT_INITIAL_POS = key();
 export const KEY_OBJECT_ON_COLLIDED = key();
 export const KEY_OBJECT_IS_COLLIDED = key();
+export const KEY_OBJECT_EVENT_GET_OFFSET = key();
+export const KEY_OBJECT_EVENT_IS_REPEAT = key();
+export const KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME = key();
 
 export const PLATFORM_TYPE_STANDARD = key();
 export const PLATFORM_TYPE_BOUNDARY = key();

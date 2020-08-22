@@ -8,7 +8,8 @@ import {
   platforms,
   cameraFrameSize,
 } from '../state';
-import { platform, enemy } from '../utils';
+import { platform } from '../utils';
+import { enemy } from '../enemy';
 
 export default {
   [KEY_STAGE_INITIATE]() {

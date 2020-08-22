@@ -46,8 +46,8 @@ export default ctx => {
     ctx.strokeStyle = '#0ff';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(pressDownPos.x, pressDownPos.y);
-    ctx.lineTo(cursorPos.x, cursorPos.y);
+    ctx.moveTo(pressDownPos.x - leftOffset, pressDownPos.y);
+    ctx.lineTo(cursorPos.x - leftOffset, cursorPos.y);
     ctx.stroke();
   }
 }

@@ -19,10 +19,11 @@ import {
   detransform,
   $cameraLoop
 } from '../state';
-import { platform, enemy, alternateProgress, objectEvent, vectorOp } from '../utils';
+import { platform, alternateProgress, objectAction, vectorOp } from '../utils';
+import { enemy } from '../enemy';
 import { easeInOutCubic } from '../easing';
 
-const circularMovement = (duration, xRadius, yRadius) => objectEvent(duration, (enemy, progress) => {
+const circularMovement = (duration, xRadius, yRadius) => objectAction(duration, (enemy, progress) => {
   const theta = progress * 2 * Math.PI;
   enemy.p.x = enemy[KEY_OBJECT_INITIAL_POS].x + xRadius * Math.cos(theta);
   enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + yRadius * Math.sin(theta);
