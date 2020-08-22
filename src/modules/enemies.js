@@ -5,29 +5,25 @@ import {
   collision,
   isEventOnTime,
   getEventRatio,
+  objectEvent
 } from '../utils';
 import { enemies, $timeRatio, player, transform, setDash } from '../state';
 import {
-  KEY_ENEMY_IS_COLLIDED,
+  KEY_OBJECT_IS_COLLIDED,
   KEY_ENEMY_IS_INVINCIBLE,
-  KEY_ENEMY_FRAME,
-  KEY_ENEMY_MOVEMENT,
+  KEY_OBJECT_FRAME,
   SIDE_T,
   SIDE_B,
   SIDE_L,
   SIDE_R,
   KEY_ENEMY_DEATH_FRAME,
-  KEY_ENEMY_MOVEMENT_DURATION,
-  KEY_ENEMY_INITIAL_POS,
+  KEY_OBJECT_INITIAL_POS,
+  ENEMY_DEATH_ANIMATION_DURATION
 } from '../constants';
 
 const SWITCH_MODE_INTERVAL = 3000;
-const DEATH_ANIMATION_DURATION = 500;
 
-function handleCollision(enemy) {
-  const enemyBoundary = getObjectBoundary(enemy);
-  const collidedSide = collision(player, enemy, $timeRatio.$);
-  enemy[KEY_ENEMY_IS_COLLIDED] = !!collidedSide;
+export function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (enemy[KEY_ENEMY_DEATH_FRAME]) return;
 
   if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
@@ -55,43 +51,20 @@ function bounceBack(enemy, enemyBoundary, collidedSide) {
 
 function underAttack(enemy, enemyBoundary, collidedSide) {
   setDash(1);
-  enemy[KEY_ENEMY_DEATH_FRAME] = enemy[KEY_ENEMY_FRAME];
+  enemy[KEY_ENEMY_DEATH_FRAME] = enemy[KEY_OBJECT_FRAME];
 }
 
 export default (ctx) => {
   for (let i = enemies.length - 1; i >= 0; i--) {
     const enemy = enemies[i];
-    if (
-      isEventOnTime(
-        enemy[KEY_ENEMY_FRAME] - enemy[KEY_ENEMY_DEATH_FRAME],
-        DEATH_ANIMATION_DURATION
-      )
-    ) {
-      enemies.splice(i, 1);
-      continue;
-    }
 
-    // if (isEventOnTime(enemy[KEY_ENEMY_FRAME], SWITCH_MODE_INTERVAL)) {
-    //   enemy[KEY_ENEMY_IS_COLLIDED] = false;
+    // if (isEventOnTime(enemy[KEY_OBJECT_FRAME], SWITCH_MODE_INTERVAL)) {
+    //   enemy[KEY_OBJECT_IS_COLLIDED] = false;
     //   enemy[KEY_ENEMY_IS_PENETRABLE] = !enemy[KEY_ENEMY_IS_PENETRABLE];
     // }
 
-    // collision
-    handleCollision(enemy);
-
-    if (enemy[KEY_ENEMY_MOVEMENT] && enemy[KEY_ENEMY_MOVEMENT_DURATION]) {
-      enemy[KEY_ENEMY_MOVEMENT](
-        enemy.p,
-        enemy[KEY_ENEMY_INITIAL_POS],
-        getEventRatio(
-          enemy[KEY_ENEMY_FRAME],
-          enemy[KEY_ENEMY_MOVEMENT_DURATION]
-        )
-      );
-    }
-
     // draw enemy
-    if (enemy[KEY_ENEMY_IS_COLLIDED]) {
+    if (enemy[KEY_OBJECT_IS_COLLIDED]) {
       ctx.fillStyle = '#f00';
     } else if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
       ctx.fillStyle = '#0ff';
@@ -99,8 +72,8 @@ export default (ctx) => {
       ctx.fillStyle = `rgba(255,255,0, ${
         1 -
         getEventRatio(
-          enemy[KEY_ENEMY_FRAME] - enemy[KEY_ENEMY_DEATH_FRAME],
-          DEATH_ANIMATION_DURATION
+          enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEATH_FRAME],
+          ENEMY_DEATH_ANIMATION_DURATION
         )
       }`;
     } else {
@@ -113,7 +86,5 @@ export default (ctx) => {
       transform(enemy.s.x),
       transform(enemy.s.y)
     );
-
-    enemy[KEY_ENEMY_FRAME] += 1 * $timeRatio.$;
   }
 };

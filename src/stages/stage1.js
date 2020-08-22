@@ -7,9 +7,9 @@ import {
   KEY_PLATFORM_Y_FOLLOW,
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_WAVES,
-  KEY_ENEMY_MOVEMENT,
-  KEY_ENEMY_MOVEMENT_DURATION,
-  KEY_PLATFORM_LOOP
+  KEY_PLATFORM_LOOP,
+  KEY_OBJECT_INITIAL_POS,
+  KEY_OBJECT_ON_UPDATE
 } from '../constants';
 import {
   enemies,
@@ -21,8 +21,14 @@ import {
   cameraFrameSize,
   detransform,
 } from '../state';
-import { platform, enemy, alternateProgress } from '../utils';
+import { platform, enemy, alternateProgress, objectEvent } from '../utils';
 import { easeInOutCubic } from '../easing';
+
+const circularMovement = (duration, xRadius, yRadius) => objectEvent(duration, (enemy, progress) => {
+  const theta = progress * 2 * Math.PI;
+  enemy.p.x = enemy[KEY_OBJECT_INITIAL_POS].x + xRadius * Math.cos(theta);
+  enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + yRadius * Math.sin(theta);
+});
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -52,30 +58,21 @@ export default {
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
       enemy(50, 200, 30, 30, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
-        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          const theta = progress * 2 * Math.PI;
-          pos.x = initialPos.x + 20 * Math.cos(theta);
-          pos.y = initialPos.y + 10 * Math.sin(theta);
-        }
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(3000, 20, 10)
+        ]
       })
     ),
     () => enemies.push(
       enemy(-75, 400, 30, 30, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 5000,
-        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          const theta = progress * 2 * Math.PI;
-          pos.x = initialPos.x + 20 * Math.cos(theta);
-          pos.y = initialPos.y + 10 * Math.sin(theta);
-        }
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(5000, 20, 10)
+        ]
       }),
       enemy(75, 350, 30, 30, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
-        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          const theta = progress * 2 * Math.PI;
-          pos.x = initialPos.x + 20 * Math.cos(theta);
-          pos.y = initialPos.y + 10 * Math.sin(theta);
-        }
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(3000, 20, 10)
+        ]
       })
     ),
   ],

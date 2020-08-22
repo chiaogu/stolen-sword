@@ -4,10 +4,12 @@ import {
   SIDE_B,
   SIDE_L,
   KEY_PLATFORM_TYPE,
-  KEY_ENEMY_FRAME,
   FRAME_DURAITON,
-  KEY_ENEMY_INITIAL_POS
+  KEY_OBJECT_FRAME,
+  KEY_OBJECT_INITIAL_POS,
+  KEY_OBJECT_ON_COLLIDED
 } from './constants';
+import { handleCollision } from './modules/enemies';
 
 export const approach = (value, target, step) => {
   step = Math.abs(step);
@@ -35,6 +37,8 @@ export const object = (x, y, w, h) => ({
   p: vector(x, y),
   s: vector(w, h),
   v: vector(0, 0),
+  [KEY_OBJECT_FRAME]: 0,
+  [KEY_OBJECT_INITIAL_POS]: vector(x, y)
 });
 export const getObjectBoundary = ({ p, s }) => ({
   [SIDE_L]: p.x - s.x / 2,
@@ -124,9 +128,8 @@ export const platform = (type, x, y, w, h, options) => ({
 
 export const enemy = (x, y, w, h, options) => ({
   ...object(x, y, w, h),
-  [KEY_ENEMY_INITIAL_POS]: vector(x, y),
-  [KEY_ENEMY_FRAME]: 0,
-  ...options
+  ...options,
+  [KEY_OBJECT_ON_COLLIDED]: handleCollision
 });
 
 export const isEventOnTime = (frame, interval) =>
@@ -136,7 +139,13 @@ export const getEventRatio = (frame, duration) =>
   frame % Math.round(duration / FRAME_DURAITON) / Math.round(duration / FRAME_DURAITON);
   
 export const alternateProgress = process => Math.abs(process - 0.5) * 2;
-  
+
+export const objectEvent = (interval, callback) => object => 
+  callback(object, getEventRatio(
+    object[KEY_OBJECT_FRAME],
+    interval
+  ));
+
 // export const addWindowEventListenr = (...args) => window.addEventListener(...args);
 // export const beginPath = (ctx, ...args) => ctx.beginPath(...args);
 // export const moveTo = (ctx, ...args) => ctx.moveTo(...args);
