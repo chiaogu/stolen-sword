@@ -1,8 +1,8 @@
 import { PRESS_DOWN, PRESS_UP, emit } from '../events';
-import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform } from '../state';
+import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform, cameraFrameSize } from '../state';
 import { vector } from '../utils';
 
-const leftOffset = document.querySelector("canvas").getBoundingClientRect().left;
+const canvas = document.querySelector("canvas");
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
 
@@ -28,12 +28,18 @@ window.addEventListener('mousedown', onPressDown);
 window.addEventListener('mouseup', onPressUp);
 
 export default ctx => {
+  const leftOffset = canvas.getBoundingClientRect().left;
+  let x = cursorPos.x - leftOffset;
+  let y = cursorPos.y - 10;
+  if(x > cameraFrameSize.x - 40) x -= 40;
+  if(y < 40) y += 60;
+  
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(`${(cursorPos.x  - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 10);
+  ctx.fillText(`${(cursorPos.x  - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`, x, y);
   const worldPos = detransform(vector(cursorPos.x  - leftOffset, cursorPos.y));
-  ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 25);
+  ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, x, y - 15);
   
   if($isPressing.$) {
     // visualize drag track

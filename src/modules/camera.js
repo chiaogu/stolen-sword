@@ -2,57 +2,13 @@ import {
   cameraCenter,
   cameraFrameSize,
   $cameraZoom,
-  $cameraType,
-  player,
   pressingKeys,
-  cameraFramePadding,
+  $cameraLoop,
 } from '../state';
 import { PLAYER_POS_CHANGE, listen } from '../events';
-import { vectorOp } from '../utils';
-import {
-  CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN,
-  CAMERA_TYPE_FOCUS_ON_PLAYER,
-  CAMERA_TYPE_GOD_MODE,
-  DEFAULT_FRAME_HEIGHT
-} from '../constants';
-
-
-function focusOnPlayer() {
-  vectorOp((playerPos) => playerPos, [player.p], cameraCenter);
-}
-
-function focusWhenOutOfScreen() {
-  vectorOp(
-    (playerPos, padding, cameraCenter, frameSize, playerSize) => {
-      const offset = (frameSize / 2 - padding) / $cameraZoom.$;
-      return Math.min(
-        playerPos - playerSize / 2 + offset,
-        Math.max(playerPos + playerSize / 2 - offset, cameraCenter)
-      );
-    },
-    [player.p, cameraFramePadding, cameraCenter, cameraFrameSize, player.s],
-    cameraCenter
-  );
-}
 
 listen(PLAYER_POS_CHANGE, () => {
-  if ($cameraType.$ === CAMERA_TYPE_FOCUS_ON_PLAYER) {
-    focusOnPlayer();
-  } else if ($cameraType.$ === CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN) {
-    focusWhenOutOfScreen();
-  }
-});
-
-let tempType;
-window.addEventListener('keydown', ({ key }) => {
-  if (key === 'Shift') {
-    if ($cameraType.$ === CAMERA_TYPE_GOD_MODE) {
-      $cameraType.$ = tempType;
-    } else {
-      tempType = $cameraType.$;
-      $cameraType.$ = CAMERA_TYPE_GOD_MODE;
-    }
-  }
+  if($cameraLoop.$) $cameraLoop.$();
 });
 
 export default (ctx) => {

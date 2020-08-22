@@ -6,7 +6,6 @@ import {
   G,
   DEFAULT_DASH,
   MINIMUM_DASH_VELOCITY,
-  CAMERA_TYPE_FOCUS_ON_PLAYER,
   DRAG_FORCE_FACTOR,
   MAX_RELEASE_VELOCITY,
   TRAJECTORY_LINE_LENGTH,
@@ -94,10 +93,9 @@ export const pressDownPos = vector(0, 0);
 export const pressingKeys = new Set();
 
 // Camera
-export const $cameraType = ref(CAMERA_TYPE_FOCUS_ON_PLAYER);
+export const $cameraLoop = ref();
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
-export const cameraFramePadding = vector(0, 0);
 export const $cameraZoom = ref(1);
 display(() => `camera: ${vectorStringify(cameraCenter)}`);
 display(() => `cameraZoom: ${$cameraZoom.$}`);

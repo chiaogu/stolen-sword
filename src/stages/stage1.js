@@ -1,6 +1,5 @@
 import {
   PLATFORM_TYPE_STANDARD,
-  CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN,
   PLATFORM_TYPE_BOUNDARY,
   KEY_STAGE_INITIATE,
   KEY_PLATFORM_X_FOLLOW,
@@ -14,14 +13,13 @@ import {
 import {
   enemies,
   platforms,
-  $cameraType,
-  cameraFramePadding,
   player,
   cameraCenter,
   cameraFrameSize,
   detransform,
+  $cameraLoop
 } from '../state';
-import { platform, enemy, alternateProgress, objectEvent } from '../utils';
+import { platform, enemy, alternateProgress, objectEvent, vectorOp } from '../utils';
 import { easeInOutCubic } from '../easing';
 
 const circularMovement = (duration, xRadius, yRadius) => objectEvent(duration, (enemy, progress) => {
@@ -32,11 +30,13 @@ const circularMovement = (duration, xRadius, yRadius) => objectEvent(duration, (
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    $cameraType.$ = CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN;
-    cameraFramePadding.x = 0;
-    cameraFramePadding.y = 200;
-    cameraCenter.y = 304;
     player.p.x = 0;
+    cameraCenter.y = player.p.y + 200;
+    $cameraLoop.$ = () => {
+      cameraCenter.y = Math.min(player.p.y - player.s.y / 2 + 200,
+        Math.max(player.p.y + player.s.y / 2 - 200, cameraCenter.y)
+      )
+    }
     platforms.push(
       platform(PLATFORM_TYPE_STANDARD, 0, -player.s.y / 2, player.s.x * 2, 0, {
         [KEY_PLATFORM_X_FOLLOW]: true,
@@ -64,12 +64,12 @@ export default {
       })
     ),
     () => enemies.push(
-      enemy(-75, 400, 30, 30, {
+      enemy(-100, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           circularMovement(5000, 20, 10)
         ]
       }),
-      enemy(75, 350, 30, 30, {
+      enemy(75, 450, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           circularMovement(3000, 20, 10)
         ]

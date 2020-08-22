@@ -1,6 +1,5 @@
 import {
   PLATFORM_TYPE_STANDARD,
-  CAMERA_TYPE_FOCUS_ON_PLAYER,
   KEY_STAGE_INITIATE,
   KEY_PLATFORM_X_FOLLOW,
 } from '../constants';
@@ -8,13 +7,11 @@ import {
   enemies,
   platforms,
   cameraFrameSize,
-  $cameraType
 } from '../state';
 import { platform, enemy } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    $cameraType.$ = CAMERA_TYPE_FOCUS_ON_PLAYER;
     enemies.push(enemy(300, 300, 100, 100));
     platforms.push(
       platform(PLATFORM_TYPE_STANDARD, -200, 0, 10, 5000),

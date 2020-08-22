@@ -24,10 +24,6 @@ export const KEY_OBJECT_IS_COLLIDED = key();
 export const PLATFORM_TYPE_STANDARD = key();
 export const PLATFORM_TYPE_BOUNDARY = key();
 
-export const CAMERA_TYPE_FOCUS_ON_PLAYER = key();
-export const CAMERA_TYPE_FOLLOW_PLAYER_WHEN_OUT_OF_SCREEN = key();
-export const CAMERA_TYPE_GOD_MODE = key();
-
 export const SIDE_T = 't';
 export const SIDE_R = 'r';
 export const SIDE_B = 'b';
@@ -43,7 +39,7 @@ export const G = 0.4;
 export const GROUND_FRICTION = 0.2;
 export const WALL_FRICTION = 0.15;
 
-export const MAX_RELEASE_VELOCITY = 20;
+export const MAX_RELEASE_VELOCITY = 15;
 export const DRAG_FORCE_FACTOR = 15;
 export const DEFAULT_DASH = 2;
 export const MINIMUM_DASH_VELOCITY = 2;
