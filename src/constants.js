@@ -46,4 +46,4 @@ export const MAX_RELEASE_VELOCITY = 20;
 export const DRAG_FORCE_FACTOR = 15;
 export const DEFAULT_DASH = 2;
 export const MINIMUM_DASH_VELOCITY = 2;
-export const TRAJECTORY_LINE_LENGTH = 400;
+export const TRAJECTORY_LINE_LENGTH = 200;

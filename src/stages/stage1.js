@@ -35,13 +35,13 @@ export default {
       platform(PLATFORM_TYPE_STANDARD, 0, -player.s.y / 2, player.s.x * 2, 0, {
         [KEY_PLATFORM_X_FOLLOW]: true,
       }),
-      platform(PLATFORM_TYPE_BOUNDARY, 0, 0, 0, player.s.y * 2, {
+      platform(PLATFORM_TYPE_BOUNDARY, 100, 0, 0, player.s.y * 2, {
         [KEY_PLATFORM_Y_FOLLOW]: true,
         [KEY_PLATFORM_LOOP](platform) {
           platform.p.x = detransform(-cameraFrameSize.x / 2);
         }
       }),
-      platform(PLATFORM_TYPE_BOUNDARY, 0, 0, 0, player.s.y * 2, {
+      platform(PLATFORM_TYPE_BOUNDARY, -100, 0, 0, player.s.y * 2, {
         [KEY_PLATFORM_Y_FOLLOW]: true,
         [KEY_PLATFORM_LOOP](platform) {
           platform.p.x = detransform(cameraFrameSize.x / 2);
@@ -51,7 +51,7 @@ export default {
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
-      enemy(200, 300, 50, 50, {
+      enemy(50, 200, 30, 30, {
         [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
         [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
           const theta = progress * 2 * Math.PI;
@@ -61,17 +61,7 @@ export default {
       })
     ),
     () => enemies.push(
-      enemy(-300, 600, 50, 50, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
-        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          const theta = progress * 2 * Math.PI;
-          pos.x = initialPos.x + 20 * Math.cos(theta);
-          pos.y = initialPos.y + 10 * Math.sin(theta);
-        }
-      })
-    ),
-    () => enemies.push(
-      enemy(0, 600, 50, 50, {
+      enemy(-75, 400, 30, 30, {
         [KEY_ENEMY_MOVEMENT_DURATION]: 5000,
         [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
           const theta = progress * 2 * Math.PI;
@@ -79,22 +69,14 @@ export default {
           pos.y = initialPos.y + 10 * Math.sin(theta);
         }
       }),
-      enemy(-200, 550, 50, 50, {
+      enemy(75, 350, 30, 30, {
         [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
         [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          const theta = (1 - progress) * 2 * Math.PI;
-          pos.x = initialPos.x + 30 * Math.cos(theta);
+          const theta = progress * 2 * Math.PI;
+          pos.x = initialPos.x + 20 * Math.cos(theta);
           pos.y = initialPos.y + 10 * Math.sin(theta);
         }
-      }),
-      enemy(200, 600, 50, 50, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 4000,
-        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          const theta = progress * 2 * Math.PI;
-          pos.x = initialPos.x + 10 * Math.cos(theta);
-          pos.y = initialPos.y + 30 * Math.sin(theta);
-        }
-      }),
+      })
     ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {

@@ -19,8 +19,6 @@ listen(PRESS_UP, () => {
   dash();
 });
 
-display(() => `releaseV: ${vectorStringify(getReleaseVelocity())}`);
-
 export default (ctx) => {
   // gravity pulling
   player.v.y -= G * $timeRatio.$;

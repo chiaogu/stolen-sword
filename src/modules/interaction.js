@@ -1,5 +1,6 @@
 import { PRESS_DOWN, PRESS_UP, emit } from '../events';
 import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform } from '../state';
+import { vector } from '../utils';
 
 const leftOffset = document.querySelector("canvas").getBoundingClientRect().left;
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
@@ -30,8 +31,8 @@ export default ctx => {
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(`${cursorPos.x.toFixed()}, ${cursorPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 10);
-  const worldPos = detransform(cursorPos);
+  ctx.fillText(`${(cursorPos.x  - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 10);
+  const worldPos = detransform(vector(cursorPos.x  - leftOffset, cursorPos.y));
   ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 25);
   
   if($isPressing.$) {
