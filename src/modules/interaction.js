@@ -1,6 +1,7 @@
 import { PRESS_DOWN, PRESS_UP, emit } from '../events';
 import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform } from '../state';
 
+const leftOffset = document.querySelector("canvas").getBoundingClientRect().left;
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
 
@@ -29,9 +30,9 @@ export default ctx => {
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(`${cursorPos.x.toFixed()}, ${cursorPos.y.toFixed()}`, cursorPos.x, cursorPos.y - 10);
+  ctx.fillText(`${cursorPos.x.toFixed()}, ${cursorPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 10);
   const worldPos = detransform(cursorPos);
-  ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, cursorPos.x, cursorPos.y - 25);
+  ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, cursorPos.x - leftOffset, cursorPos.y - 25);
   
   if($isPressing.$) {
     // visualize drag track

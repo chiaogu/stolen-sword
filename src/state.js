@@ -115,10 +115,15 @@ export function transform(value) {
 }
 
 export function detransform(target) {
-  return vector(
-    cameraCenter.x - (cameraFrameSize.x / 2 - target.x) / $cameraZoom.$,
-    cameraCenter.y + (cameraFrameSize.y / 2 - target.y) / $cameraZoom.$
-  );
+  const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
+  if (typeof target === 'number') {
+    return target / $cameraZoom.$ / scale;
+  } else {
+    return vector(
+      cameraCenter.x - (cameraFrameSize.x / 2 - target.x) / $cameraZoom.$ / scale,
+      cameraCenter.y + (cameraFrameSize.y / 2 - target.y) / $cameraZoom.$ / scale
+    );
+  }
 }
 
 // Time

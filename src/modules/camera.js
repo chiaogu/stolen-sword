@@ -26,8 +26,8 @@ function focusWhenOutOfScreen() {
     (playerPos, padding, cameraCenter, frameSize, playerSize) => {
       const offset = (frameSize / 2 - padding) / $cameraZoom.$;
       return Math.min(
-        playerPos - playerSize + offset,
-        Math.max(playerPos + playerSize - offset, cameraCenter)
+        playerPos - playerSize / 2 + offset,
+        Math.max(playerPos + playerSize / 2 - offset, cameraCenter)
       );
     },
     [player.p, cameraFramePadding, cameraCenter, cameraFrameSize, player.s],

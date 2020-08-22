@@ -9,6 +9,7 @@ import {
   KEY_STAGE_WAVES,
   KEY_ENEMY_MOVEMENT,
   KEY_ENEMY_MOVEMENT_DURATION,
+  KEY_PLATFORM_LOOP
 } from '../constants';
 import {
   enemies,
@@ -17,6 +18,8 @@ import {
   cameraFramePadding,
   player,
   cameraCenter,
+  cameraFrameSize,
+  detransform,
 } from '../state';
 import { platform, enemy, alternateProgress } from '../utils';
 import { easeInOutCubic } from '../easing';
@@ -27,16 +30,22 @@ export default {
     cameraFramePadding.x = 0;
     cameraFramePadding.y = 200;
     cameraCenter.y = 304;
-    player.p.x = -200;
+    player.p.x = 0;
     platforms.push(
       platform(PLATFORM_TYPE_STANDARD, 0, -player.s.y / 2, player.s.x * 2, 0, {
         [KEY_PLATFORM_X_FOLLOW]: true,
       }),
-      platform(PLATFORM_TYPE_BOUNDARY, -500, 0, 0, player.s.y * 2, {
+      platform(PLATFORM_TYPE_BOUNDARY, 0, 0, 0, player.s.y * 2, {
         [KEY_PLATFORM_Y_FOLLOW]: true,
+        [KEY_PLATFORM_LOOP](platform) {
+          platform.p.x = detransform(-cameraFrameSize.x / 2);
+        }
       }),
-      platform(PLATFORM_TYPE_BOUNDARY, 500, 0, 0, player.s.y * 2, {
+      platform(PLATFORM_TYPE_BOUNDARY, 0, 0, 0, player.s.y * 2, {
         [KEY_PLATFORM_Y_FOLLOW]: true,
+        [KEY_PLATFORM_LOOP](platform) {
+          platform.p.x = detransform(cameraFrameSize.x / 2);
+        }
       })
     );
   },
@@ -63,19 +72,29 @@ export default {
     ),
     () => enemies.push(
       enemy(0, 600, 50, 50, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
+        [KEY_ENEMY_MOVEMENT_DURATION]: 5000,
         [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
           const theta = progress * 2 * Math.PI;
           pos.x = initialPos.x + 20 * Math.cos(theta);
           pos.y = initialPos.y + 10 * Math.sin(theta);
         }
       }),
-      enemy(0, 1100, 50, 50, {
-        [KEY_ENEMY_MOVEMENT_DURATION]: 6000,
+      enemy(-200, 550, 50, 50, {
+        [KEY_ENEMY_MOVEMENT_DURATION]: 3000,
         [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
-          pos.y = initialPos.y + easeInOutCubic(alternateProgress(progress)) * -150
+          const theta = (1 - progress) * 2 * Math.PI;
+          pos.x = initialPos.x + 30 * Math.cos(theta);
+          pos.y = initialPos.y + 10 * Math.sin(theta);
         }
-      })
+      }),
+      enemy(200, 600, 50, 50, {
+        [KEY_ENEMY_MOVEMENT_DURATION]: 4000,
+        [KEY_ENEMY_MOVEMENT](pos, initialPos, progress) {
+          const theta = progress * 2 * Math.PI;
+          pos.x = initialPos.x + 10 * Math.cos(theta);
+          pos.y = initialPos.y + 30 * Math.sin(theta);
+        }
+      }),
     ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {

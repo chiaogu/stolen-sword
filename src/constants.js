@@ -18,6 +18,7 @@ export const KEY_STAGE_WAVES = key();
 export const KEY_PLATFORM_TYPE = key();
 export const KEY_PLATFORM_X_FOLLOW = key();
 export const KEY_PLATFORM_Y_FOLLOW = key();
+export const KEY_PLATFORM_LOOP = key();
 
 export const PLATFORM_TYPE_STANDARD = key();
 export const PLATFORM_TYPE_BOUNDARY = key();

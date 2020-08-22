@@ -17,7 +17,8 @@ import {
   KEY_PLATFORM_TYPE,
   PLATFORM_TYPE_BOUNDARY,
   KEY_PLATFORM_X_FOLLOW,
-  KEY_PLATFORM_Y_FOLLOW
+  KEY_PLATFORM_Y_FOLLOW,
+  KEY_PLATFORM_LOOP
 } from '../constants';
 import { listen, PLAYER_POS_CHANGE } from '../events';
 
@@ -90,6 +91,8 @@ export default (ctx) => {
     const platformBoundary = getObjectBoundary(platform);
     const collidedSide = collision(player, platform, $timeRatio.$);
     handleCollision(platform[KEY_PLATFORM_TYPE], platform, platformBoundary, collidedSide);
+    
+    if(platform[KEY_PLATFORM_LOOP]) platform[KEY_PLATFORM_LOOP](platform);
     
     // draw platform
     ctx.strokeStyle = '#fff';

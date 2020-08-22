@@ -3,7 +3,7 @@ import { cameraCenter, cameraFrameSize } from '../state';
 const interval = 200;
 
 export default ctx => {
-  ctx.clearRect(0, 0, cameraFrameSize.x, cameraFrameSize.y);
+  ctx.clearRect(0, 0, cameraFrameSize.x + 1, cameraFrameSize.y);
   // const count = Math.round(Math.max(cameraFrameSize.x / interval, cameraFrameSize.y / interval));
   // const offset = [cameraCenter.x % interval, cameraCenter.y % interval];
   
