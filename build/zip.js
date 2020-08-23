@@ -13,7 +13,7 @@ const zip = () => ({
     zip.writeZip(zipPath);
     execFile(path.join(__dirname, 'ect'), ['-8', '-zip', zipPath], (err, stdout, stderr) => {
       console.log(err ? stderr : stdout);
-      console.log('File size:', filesize(fs.statSync(zipPath).size));
+      console.log(`File size: ${filesize(fs.statSync(zipPath).size)}\n`);
     });
   }
 });
