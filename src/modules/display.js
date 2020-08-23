@@ -5,7 +5,7 @@ export function display(getValue, isVisible = () => true) {
 }
 
 export default ctx => {
-  info.map(([getValue, isVisible], index) => {
+  info.forEach(([getValue, isVisible], index) => {
     if(!isVisible()) return;
     ctx.font = `20px`;
     ctx.fillStyle = '#fff';

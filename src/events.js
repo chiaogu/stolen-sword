@@ -12,5 +12,5 @@ export function listen(key, callback) {
 }
 
 export function emit(key, value) {
-  if(listeners[key]) listeners[key].map(callback => callback(value));
+  if(listeners[key]) listeners[key].forEach(callback => callback(value));
 }

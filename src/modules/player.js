@@ -46,7 +46,7 @@ export default (ctx) => {
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(...transform(player.p));
-    playerTrajectory().map(pos => {
+    playerTrajectory().forEach(pos => {
       ctx.lineTo(...transform(vector(pos.x, pos.y)));
       // ctx.strokeRect(...transform(vector(pos.x - player.s.x / 2, pos.y + player.s.y / 2)), transform(player.s.x), transform(player.s.y));
     })

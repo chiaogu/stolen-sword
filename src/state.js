@@ -183,3 +183,4 @@ export const $stageWave = ref();
 export const $stage = ref();
 
 display(() => `stageWave: ${$stageWave.$}`);
+display(() => `enemies: ${enemies.length}`);

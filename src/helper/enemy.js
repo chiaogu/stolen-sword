@@ -2,6 +2,7 @@ import {
   KEY_OBJECT_FRAME,
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
+  KEY_OBJECT_ON_DEAD,
   KEY_OBJECT_IS_COLLIDED,
   KEY_ENEMY_IS_INVINCIBLE, 
   KEY_ENEMY_DEAD_FRAME,
@@ -9,12 +10,14 @@ import {
   KEY_ENEMY_IS_DEAD,
   KEY_OBJECT_EVENT_IS_REPEAT,
   KEY_OBJECT_EVENT_GET_OFFSET,
+  KEY_ENEMY_COMPUND_CHILDREN,
   SIDE_T,
   SIDE_B,
   SIDE_L,
-  SIDE_R
+  SIDE_R,
+  KEY_ENEMY_COMPUND_GENERATE_CHILDREN
 } from '../constants';
-import { transform, setDash, player } from '../state';
+import { transform, setDash, player, enemies } from '../state';
 import { object, getObjectBoundary, vector, getActionProgress, objectEvent } from '../utils';
 
 export function handleCollision(enemy, enemyBoundary, collidedSide) {
@@ -81,6 +84,7 @@ const switchMode = objectEvent(enemy => {
 
 const dead = objectEvent(enemy => {
   enemy[KEY_ENEMY_IS_DEAD] = true;
+  if(enemy[KEY_OBJECT_ON_DEAD]) enemy[KEY_OBJECT_ON_DEAD](enemy);
 }, ENEMY_DEATH_ANIMATION_DURATION, {
   [KEY_OBJECT_EVENT_IS_REPEAT]: false,
   [KEY_OBJECT_EVENT_GET_OFFSET]: enemy => enemy[KEY_ENEMY_DEAD_FRAME]
@@ -91,8 +95,35 @@ export const enemy = (x, y, w, h, options = {}) => ({
   ...options,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_OBJECT_ON_UPDATE]: [
-    draw,
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    draw,
   ]
 });
+
+export const compund = (x, y, w, h, options = {}) => {
+  function checkChildren(enemy) {
+    const children = enemy[KEY_ENEMY_COMPUND_CHILDREN];
+    for (let i = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN].length - 1; i >= 0; i--) {
+      const child = children[i];
+      if(!enemy[KEY_ENEMY_DEAD_FRAME]) {
+        if(!child || child[KEY_ENEMY_IS_DEAD]) {
+          const newChild = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN][i]();
+          if(child) newChild[KEY_OBJECT_FRAME] = child[KEY_OBJECT_FRAME];
+          children[i] = newChild;
+          enemies.push(newChild);
+        }
+      } else {
+        child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
+      }
+    }
+  }
+  return enemy(x, y, w, h, {
+    ...options,
+    [KEY_OBJECT_ON_UPDATE]: [
+      checkChildren,
+      ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    ],
+    [KEY_ENEMY_COMPUND_CHILDREN]: []
+  });
+};

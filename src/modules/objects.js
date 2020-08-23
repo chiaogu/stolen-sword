@@ -17,7 +17,7 @@ function objectLoop(object, ctx) {
   const collidedSide = collision(player, object, $timeRatio.$);
   object[KEY_OBJECT_IS_COLLIDED] = !!collidedSide;
   if(collidedSide && object[KEY_OBJECT_ON_COLLIDED]) object[KEY_OBJECT_ON_COLLIDED](object, objBoundary, collidedSide);
-  if(object[KEY_OBJECT_ON_UPDATE]) object[KEY_OBJECT_ON_UPDATE].map(onUpdate => onUpdate(object, ctx))
+  if(object[KEY_OBJECT_ON_UPDATE]) object[KEY_OBJECT_ON_UPDATE].forEach(onUpdate => onUpdate(object, ctx))
   object[KEY_OBJECT_FRAME] += 1 * $timeRatio.$;
 }
 
