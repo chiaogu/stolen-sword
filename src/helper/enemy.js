@@ -13,9 +13,9 @@ import {
   SIDE_B,
   SIDE_L,
   SIDE_R
-} from './constants';
-import { transform, setDash, player } from './state';
-import { object, getObjectBoundary, vector, getActionProgress, objectEvent } from './utils';
+} from '../constants';
+import { transform, setDash, player } from '../state';
+import { object, getObjectBoundary, vector, getActionProgress, objectEvent } from '../utils';
 
 export function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (enemy[KEY_ENEMY_DEAD_FRAME]) return;

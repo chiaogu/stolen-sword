@@ -1,27 +1,21 @@
 import {
-  PLATFORM_TYPE_STANDARD,
-  PLATFORM_TYPE_BOUNDARY,
   KEY_STAGE_INITIATE,
-  KEY_PLATFORM_X_FOLLOW,
-  KEY_PLATFORM_Y_FOLLOW,
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_WAVES,
-  KEY_PLATFORM_LOOP,
+  DEFAULT_FRAME_WIDTH,
   KEY_OBJECT_INITIAL_POS,
-  KEY_OBJECT_ON_UPDATE
+  KEY_OBJECT_ON_UPDATE,
 } from '../constants';
 import {
   enemies,
   platforms,
   player,
   cameraCenter,
-  cameraFrameSize,
-  detransform,
   $cameraLoop
 } from '../state';
-import { platform, alternateProgress, objectAction, vectorOp } from '../utils';
-import { enemy } from '../enemy';
-import { easeInOutCubic } from '../easing';
+import { objectAction } from '../utils';
+import { enemy } from '../helper/enemy';
+import { boundary, followPlayerX, followPlayerY } from '../helper/platform';
 
 const circularMovement = (duration, xRadius, yRadius) => objectAction(duration, (enemy, progress) => {
   const theta = progress * 2 * Math.PI;
@@ -39,20 +33,14 @@ export default {
       )
     }
     platforms.push(
-      platform(PLATFORM_TYPE_STANDARD, 0, -player.s.y / 2, player.s.x * 2, 0, {
-        [KEY_PLATFORM_X_FOLLOW]: true,
+      boundary(0, -player.s.y / 2, player.s.x * 2, 0, {
+        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
-      platform(PLATFORM_TYPE_BOUNDARY, 100, 0, 0, player.s.y * 2, {
-        [KEY_PLATFORM_Y_FOLLOW]: true,
-        [KEY_PLATFORM_LOOP](platform) {
-          platform.p.x = detransform(-cameraFrameSize.x / 2);
-        }
+      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 2, {
+        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      platform(PLATFORM_TYPE_BOUNDARY, -100, 0, 0, player.s.y * 2, {
-        [KEY_PLATFORM_Y_FOLLOW]: true,
-        [KEY_PLATFORM_LOOP](platform) {
-          platform.p.x = detransform(cameraFrameSize.x / 2);
-        }
+      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 2, {
+        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       })
     );
   },

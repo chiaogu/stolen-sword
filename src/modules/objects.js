@@ -2,7 +2,7 @@ import {
   getObjectBoundary,
   collision,
 } from '../utils';
-import { enemies, $timeRatio, player } from '../state';
+import { enemies, platforms, $timeRatio, player } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
   KEY_OBJECT_FRAME,
@@ -26,5 +26,8 @@ export default (ctx) => {
     // remove enemy when dead
     if (enemies[i][KEY_ENEMY_IS_DEAD]) enemies.splice(i, 1);
     else objectLoop(enemies[i], ctx);
+  }
+  for (let i = platforms.length - 1; i >= 0; i--) {
+    objectLoop(platforms[i], ctx);
   }
 }

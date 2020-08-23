@@ -1,29 +1,27 @@
 import {
-  PLATFORM_TYPE_STANDARD,
   KEY_STAGE_INITIATE,
-  KEY_PLATFORM_X_FOLLOW,
+  KEY_OBJECT_ON_UPDATE
 } from '../constants';
 import {
   enemies,
   platforms,
   cameraFrameSize,
 } from '../state';
-import { platform } from '../utils';
-import { enemy } from '../enemy';
+import { enemy } from '../helper/enemy';
+import { platform, followPlayerX } from '../helper/platform';
 
 export default {
   [KEY_STAGE_INITIATE]() {
     enemies.push(enemy(300, 300, 100, 100));
     platforms.push(
-      platform(PLATFORM_TYPE_STANDARD, -200, 0, 10, 5000),
-      platform(PLATFORM_TYPE_STANDARD, 0, -40, cameraFrameSize.x * 0.9, 0, {
-        [KEY_PLATFORM_X_FOLLOW]: true,
+      platform(-200, 0, 10, 5000),
+      platform(0, -40, cameraFrameSize.x * 0.9, 0, {
+        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
       ...Array(10)
         .fill()
         .map((_, i) =>
           platform(
-            PLATFORM_TYPE_STANDARD,
             i % 2 === 0 ? -300 : -800,
             200 * (i + 1),
             300,

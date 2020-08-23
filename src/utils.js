@@ -3,7 +3,6 @@ import {
   SIDE_R,
   SIDE_B,
   SIDE_L,
-  KEY_PLATFORM_TYPE,
   FRAME_DURAITON,
   KEY_OBJECT_FRAME,
   KEY_OBJECT_INITIAL_POS,
@@ -120,12 +119,6 @@ export const getClosetSide = (objectA, objectB) => {
   if (angle < -rtAngle && angle > -ltAngle) return SIDE_B;
   if (angle > -rtAngle || angle < -rtAngle) return SIDE_R;
 };
-
-export const platform = (type, x, y, w, h, options) => ({
-  ...object(x, y, w, h),
-  [KEY_PLATFORM_TYPE]: type,
-  ...options,
-});
 
 export const getActionProgress = (frame, duration, repeat = true) =>
   (repeat ? frame % Math.round(duration / FRAME_DURAITON) : frame) /
