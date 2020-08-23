@@ -9,7 +9,6 @@
   "author": "Ian Chiao",
   "devDependencies": {
     "adm-zip": "^0.4.16",
-    "advzip-bin": "^2.0.0",
     "filesize": "^6.1.0",
     "html-minifier-terser": "^5.1.1",
     "husky": "^4.2.5",
