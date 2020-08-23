@@ -10,7 +10,8 @@ import {
   player,
   cameraCenter,
   $stageWave,
-  $stage
+  $stage,
+  projectiles
 } from '../state';
 import { vectorOp } from '../utils';
 import { display } from './display';
@@ -35,6 +36,7 @@ function reset() {
   $stageWave.$ = -1;
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
+  projectiles.splice(0, platforms.length);
 }
 
 window.addEventListener('keydown', ({ key }) => {

@@ -6,11 +6,6 @@ import { transform, setDash, player, projectiles, $timeRatio, getReleaseVelocity
 import { object, getObjectBoundary, vector, getActionProgress, objectEvent, vectorOp, vectorStringify } from '../utils';
 import { listen, PRESS_DOWN, PRESS_UP } from '../events';
 
-listen(PRESS_UP, () => {
-  const v = getReleaseVelocity();
-  projectiles.push(projectile(0, 200, 10, 10, v.x, v.y));
-})
-
 function handleCollision(projectile, projectileBoundary, collidedSide) {
 
 }
@@ -30,8 +25,8 @@ function move(projectile) {
   vectorOp((pos, v) => pos + v * $timeRatio.$, [projectile.p, projectile.v], projectile.p);
 }
 
-export const projectile = (x, y, w, h, vx, vy, options = {}) => ({
-  ...object(x, y, w, h, vx, vy),
+export const projectile = (pos, size, v, options = {}) => ({
+  ...object(pos.x, pos.y, size.x, size.y, v.x, v.y),
   ...options,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_OBJECT_ON_UPDATE]: [

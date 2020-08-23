@@ -15,7 +15,7 @@ import {
   $cameraLoop
 } from '../state';
 import { objectAction } from '../utils';
-import { enemy, compund } from '../helper/enemy';
+import { enemy, compund, shooter } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 
 const circularMovement = (duration, xRadius, yRadius) => objectAction(duration, (enemy, progress) => {
@@ -46,36 +46,43 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
+    // () => enemies.push(
+    //   enemy(50, 200, 30, 30, {
+    //     [KEY_OBJECT_ON_UPDATE]:[
+    //       circularMovement(3000, 10, 5)
+    //     ]
+    //   })
+    // ),
+    // () => enemies.push(
+    //   enemy(-100, 350, 30, 30, {
+    //     [KEY_OBJECT_ON_UPDATE]:[
+    //       circularMovement(5000, 10, 5)
+    //     ]
+    //   }),
+    //   enemy(75, 450, 30, 30, {
+    //     [KEY_OBJECT_ON_UPDATE]:[
+    //       circularMovement(3000, 10, 5)
+    //     ]
+    //   })
+    // ),
+    // () => enemies.push(
+    //   compund(0, 530, 30, 30, {
+    //     [KEY_OBJECT_ON_UPDATE]:[
+    //       circularMovement(5000, 10, 0)
+    //     ],
+    //     [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
+    //       () => enemy(0, 300, 30, 30, {
+    //         [KEY_OBJECT_ON_UPDATE]:[
+    //           circularMovement(6000, 100, 50)
+    //         ]
+    //       })
+    //     ]
+    //   })
+    // ),
     () => enemies.push(
-      enemy(50, 200, 30, 30, {
+      shooter(0, 250, {
         [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(3000, 10, 5)
-        ]
-      })
-    ),
-    () => enemies.push(
-      enemy(-100, 350, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(5000, 10, 5)
-        ]
-      }),
-      enemy(75, 450, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(3000, 10, 5)
-        ]
-      })
-    ),
-    () => enemies.push(
-      compund(0, 530, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(5000, 10, 0)
-        ],
-        [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
-          () => enemy(0, 300, 30, 30, {
-            [KEY_OBJECT_ON_UPDATE]:[
-              circularMovement(6000, 100, 50)
-            ]
-          })
+          circularMovement(10000, 80, 0)
         ]
       })
     ),

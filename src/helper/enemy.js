@@ -17,9 +17,9 @@ import {
   SIDE_R,
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN
 } from '../constants';
-import { transform, setDash, player, enemies } from '../state';
-import { object, getObjectBoundary, vector, getActionProgress, objectEvent } from '../utils';
-import '../helper/projectile';
+import { transform, setDash, player, enemies, projectiles } from '../state';
+import { object, getObjectBoundary, vector, getActionProgress, objectEvent, vectorOp, vectorMagnitude, vectorStringify, vectorAngle, radiansToDegrees } from '../utils';
+import { projectile } from '../helper/projectile';
 
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (enemy[KEY_ENEMY_DEAD_FRAME]) return;
@@ -126,5 +126,23 @@ export const compund = (x, y, w, h, options = {}) => {
       ...(options[KEY_OBJECT_ON_UPDATE] || []),
     ],
     [KEY_ENEMY_COMPUND_CHILDREN]: []
+  });
+};
+
+export const shooter = (x, y, options) => {
+  const fire = objectEvent(enemy => {
+    if(!enemy[KEY_ENEMY_DEAD_FRAME]) {
+      const v = vectorOp((enemyP, playerP) => playerP - enemyP, [enemy.p, player.p]);
+      const vm = vectorMagnitude(v);
+      vectorOp(v => v / vm * 2 , [v], v);
+      projectiles.push(projectile(enemy.p, vector(10, 10), v));
+    }
+  }, 3000);
+  
+  return enemy(x, y, 30, 30, {
+    [KEY_OBJECT_ON_UPDATE]: [
+      fire,
+      ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    ],
   });
 };
