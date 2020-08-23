@@ -33,7 +33,6 @@ export default ctx => {
   let y = cursorPos.y - 10;
   if(x > cameraFrameSize.x - 40) x -= 40;
   if(y < 40) y += 60;
-  
     
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';

@@ -2,7 +2,7 @@ import {
   getObjectBoundary,
   collision,
 } from '../utils';
-import { enemies, platforms, $timeRatio, player } from '../state';
+import { enemies, platforms, $timeRatio, player, projectiles, isOutOfScreen } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
   KEY_OBJECT_FRAME,
@@ -29,5 +29,9 @@ export default (ctx) => {
   }
   for (let i = platforms.length - 1; i >= 0; i--) {
     objectLoop(platforms[i], ctx);
+  }
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    if (isOutOfScreen(projectiles[i])) projectiles.splice(i, 1);
+    else objectLoop(projectiles[i], ctx);
   }
 }

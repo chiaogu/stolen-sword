@@ -9,7 +9,8 @@ import {
   DRAG_FORCE_FACTOR,
   MAX_RELEASE_VELOCITY,
   TRAJECTORY_LINE_LENGTH,
-  DEFAULT_FRAME_HEIGHT
+  DEFAULT_FRAME_HEIGHT,
+  DEFAULT_FRAME_WIDTH
 } from './constants';
 import {
   vectorStringify,
@@ -18,6 +19,7 @@ import {
   vectorOp,
   vectorDistance,
   vectorMagnitude,
+  getObjectBoundary,
 } from './utils';
 import { display } from './modules/display';
 import { easeOutQuint } from './easing';
@@ -124,6 +126,14 @@ export function detransform(target) {
   }
 }
 
+export function isOutOfScreen(object) {
+  const canvasPos = transform(object.p);
+  return canvasPos[0] < 0 ||
+    canvasPos[1] < 0 ||
+    canvasPos[0] > cameraFrameSize.x ||
+    canvasPos[1] > cameraFrameSize.y;
+}
+
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
 display(() => `timeRatio: ${$timeRatio.$}`);
@@ -178,9 +188,10 @@ export function backToNormal() {
 
 // Stage
 export const enemies = [];
+export const projectiles = [];
 export const platforms = [];
 export const $stageWave = ref();
 export const $stage = ref();
 
 display(() => `stageWave: ${$stageWave.$}`);
-display(() => `enemies: ${enemies.length}`);
+display(() => `projectiles: ${projectiles.length}`);

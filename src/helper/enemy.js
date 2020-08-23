@@ -19,8 +19,9 @@ import {
 } from '../constants';
 import { transform, setDash, player, enemies } from '../state';
 import { object, getObjectBoundary, vector, getActionProgress, objectEvent } from '../utils';
+import '../helper/projectile';
 
-export function handleCollision(enemy, enemyBoundary, collidedSide) {
+function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (enemy[KEY_ENEMY_DEAD_FRAME]) return;
 
   if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {

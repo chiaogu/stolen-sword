@@ -46,10 +46,10 @@ export const intersection = (a, b, c, d) => {
   }
 };
 
-export const object = (x, y, w, h) => ({
+export const object = (x, y, w, h, vx = 0, vy = 0) => ({
   p: vector(x, y),
   s: vector(w, h),
-  v: vector(0, 0),
+  v: vector(vx, vy),
   [KEY_OBJECT_FRAME]: 0,
   [KEY_OBJECT_INITIAL_POS]: vector(x, y),
 });
