@@ -39,8 +39,13 @@ const ref = (defaultValue) =>
 
 // Player
 export const player = object(0, 0, 20, 20);
+export const $health = ref(1);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
+
+display(() => `health: ${$health.$}`);
+display(() => `dash: ${$dash.$}`);
+
 export function getReleaseVelocity() {
   const v = vector(
     (pressDownPos.x - cursorPos.x) / DRAG_FORCE_FACTOR,
@@ -91,8 +96,6 @@ export function isPlayerInvincibleAfterDamage() {
     PLAYER_DAMAGE_INVINCIBLE_DURAION / FRAME_DURAITON;
 }
 
-display(() => `playerPos: ${vectorStringify(player.p)}`);
-display(() => `playerV: ${vectorStringify(player.v)}`);
 
 // Interaction
 export const $isPressing = ref(false);
@@ -105,7 +108,6 @@ export const $cameraLoop = ref();
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
-display(() => `camera: ${vectorStringify(cameraCenter)}`);
 display(() => `cameraZoom: ${$cameraZoom.$}`);
 
 export function transform(value) {
@@ -142,7 +144,7 @@ export function isOutOfScreen(object) {
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
-display(() => `timeRatio: ${$timeRatio.$}`);
+display(() => `timeRatio: ${$timeRatio.$.toFixed(3)}`);
 export const animations = [];
 let animationId = 0;
 let cancelTimeRatioAnimation;
@@ -196,8 +198,8 @@ export function backToNormal() {
 export const enemies = [];
 export const projectiles = [];
 export const platforms = [];
-export const $stageWave = ref();
-export const $stage = ref();
+export const $stageWave = ref(-1);
+export const $stage = ref(-1);
 
-display(() => `stageWave: ${$stageWave.$}`);
-display(() => `projectiles: ${projectiles.length}`);
+display(() => `stage: ${$stage.$}`)
+display(() => `wave: ${$stageWave.$}`);

@@ -11,6 +11,7 @@ import {
   $timeRatio,
   $dash,
   isPlayerInvincibleAfterDamage,
+  $health
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp } from '../utils';
 
@@ -19,6 +20,7 @@ function handleCollision(projectile, projectileBoundary, collidedSide) {
     player.v = vector((-1 * player.v.x) / Math.abs(player.v.x || 1), 5);
     player[KEY_PLAYER_DAMAGE_FRAME] = player[KEY_OBJECT_FRAME];
     setDash(Math.max($dash.$, 1));
+    $health.$--;
   }
 }
 
