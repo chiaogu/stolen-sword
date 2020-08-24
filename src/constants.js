@@ -24,6 +24,7 @@ export const KEY_OBJECT_EVENT_IS_REPEAT = key();
 export const KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME = key();
 
 export const KEY_PLAYER_DAMAGE_FRAME = key();
+export const KEY_PLAYER_DEATH_FRAME = key();
 
 export const SIDE_T = 't';
 export const SIDE_R = 'r';
@@ -49,3 +50,4 @@ export const TRAJECTORY_LINE_LENGTH = 200;
 
 export const ENEMY_DEATH_ANIMATION_DURATION = 500;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 500;
+export const PLAYER_DEATH_ANIMATION_DURATION = 2000;

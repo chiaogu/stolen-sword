@@ -1,27 +1,16 @@
 import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
-  KEY_PLAYER_DAMAGE_FRAME,
-  KEY_OBJECT_FRAME,
 } from '../constants';
 import {
   transform,
-  setDash,
-  player,
   $timeRatio,
-  $dash,
-  isPlayerInvincibleAfterDamage,
-  $health
+  playerDamage
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp } from '../utils';
 
 function handleCollision(projectile, projectileBoundary, collidedSide) {
-  if (collidedSide && !isPlayerInvincibleAfterDamage()) {
-    player.v = vector((-1 * player.v.x) / Math.abs(player.v.x || 1), 5);
-    player[KEY_PLAYER_DAMAGE_FRAME] = player[KEY_OBJECT_FRAME];
-    setDash(Math.max($dash.$, 1));
-    $health.$--;
-  }
+  if (collidedSide) playerDamage();
 }
 
 function draw(projectile, ctx) {

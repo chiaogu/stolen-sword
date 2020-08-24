@@ -12,10 +12,10 @@ import {
   DEFAULT_FRAME_HEIGHT,
   KEY_PLAYER_DAMAGE_FRAME,
   KEY_OBJECT_FRAME,
-  PLAYER_DAMAGE_INVINCIBLE_DURAION
+  PLAYER_DAMAGE_INVINCIBLE_DURAION,
+  KEY_PLAYER_DEATH_FRAME
 } from './constants';
 import {
-  vectorStringify,
   vector,
   object,
   vectorOp,
@@ -39,7 +39,7 @@ const ref = (defaultValue) =>
 
 // Player
 export const player = object(0, 0, 20, 20);
-export const $health = ref(1);
+export const $health = ref(2);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
 
@@ -77,6 +77,18 @@ export function dash() {
     $dash.$--;
   }
 }
+export function playerDamage() {
+  if(!isPlayerInvincibleAfterDamage()) {
+    if($health.$ > 0) {
+      player.v = vector((-1 * player.v.x) / Math.abs(player.v.x || 1), 5);
+    }
+    if($health.$ > 1) {
+      player[KEY_PLAYER_DAMAGE_FRAME] = player[KEY_OBJECT_FRAME];
+      setDash(Math.max($dash.$, 1));
+    }
+    $health.$ = Math.max(0, $health.$ - 1);
+  }
+}
 export function resetDash() {
   setDash(DEFAULT_DASH);
 }
@@ -85,7 +97,7 @@ export function setDash(value) {
   $dash.$ = value;
 }
 export function isAbleToDash() {
-  return $dash.$ > 0;
+  return $dash.$ > 0 && !player[KEY_PLAYER_DEATH_FRAME];
 }
 export function isReleaseVelocityEnough() {
   return vectorMagnitude(getReleaseVelocity()) >= MINIMUM_DASH_VELOCITY;
