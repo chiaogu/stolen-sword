@@ -8,27 +8,27 @@ import{
   $dash,
   isAbleToDash,
   isReleaseVelocityEnough,
-  dash
+  dash,
+  isPlayerInvincibleAfterDamage,
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import { vectorOp, vector, vectorStringify, getObjectBoundary } from '../utils';
-import { G } from '../constants';
+import { G, KEY_OBJECT_ON_UPDATE, KEY_OBJECT_FRAME } from '../constants';
 import { display } from './display';
 
 listen(PRESS_UP, () => {
   dash();
 });
 
-export default (ctx) => {
-  // gravity pulling
-  player.v.y -= G * $timeRatio.$;
-  
-  // update position
-  vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);
-  emit(PLAYER_POS_CHANGE, player.p);
-  
+function draw(player, ctx) {
   // draw character
-  ctx.fillStyle = $dash.$ === 0 ? '#f00' : '#fff';
+  if(isPlayerInvincibleAfterDamage()) {
+    ctx.fillStyle = Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3 ? 'rgba(255,255,255, 0.1)' : '#fff';
+  } else if($dash.$ === 0) {
+    ctx.fillStyle = '#444';
+  } else {
+    ctx.fillStyle = '#fff';
+  }
   const { l, t } = getObjectBoundary(player);
   ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
     
@@ -52,4 +52,18 @@ export default (ctx) => {
     })
     ctx.stroke();
   } 
-};
+}
+
+function update(player) {
+  // gravity pulling
+  player.v.y -= G * $timeRatio.$;
+  
+  // update position
+  vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);
+  emit(PLAYER_POS_CHANGE, player.p);
+}
+
+player[KEY_OBJECT_ON_UPDATE] = [
+  update,
+  draw
+]

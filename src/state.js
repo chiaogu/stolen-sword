@@ -10,7 +10,9 @@ import {
   MAX_RELEASE_VELOCITY,
   TRAJECTORY_LINE_LENGTH,
   DEFAULT_FRAME_HEIGHT,
-  DEFAULT_FRAME_WIDTH
+  KEY_PLAYER_DAMAGE_FRAME,
+  KEY_OBJECT_FRAME,
+  PLAYER_DAMAGE_INVINCIBLE_DURAION
 } from './constants';
 import {
   vectorStringify,
@@ -19,7 +21,6 @@ import {
   vectorOp,
   vectorDistance,
   vectorMagnitude,
-  getObjectBoundary,
 } from './utils';
 import { display } from './modules/display';
 import { easeOutQuint } from './easing';
@@ -83,6 +84,11 @@ export function isAbleToDash() {
 }
 export function isReleaseVelocityEnough() {
   return vectorMagnitude(getReleaseVelocity()) >= MINIMUM_DASH_VELOCITY;
+}
+export function isPlayerInvincibleAfterDamage() {
+  return player[KEY_PLAYER_DAMAGE_FRAME] &&
+  player[KEY_OBJECT_FRAME] - player[KEY_PLAYER_DAMAGE_FRAME] <=
+    PLAYER_DAMAGE_INVINCIBLE_DURAION / FRAME_DURAITON;
 }
 
 display(() => `playerPos: ${vectorStringify(player.p)}`);
@@ -165,7 +171,7 @@ export function stepTo(callback, shouldStop) {
   return () => removeAnimation(id);
 }
 
-export function slowDown() {
+export function slowDown(duration = SLOW_DOWN_DURATION) {
   if (cancelTimeRatioAnimation) return;
   cancelTimeRatioAnimation = animateTo(
     (ratio) => {
@@ -173,7 +179,7 @@ export function slowDown() {
         NORAML_TIME_RATIO -
         (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
     },
-    SLOW_DOWN_DURATION,
+    duration,
     easeOutQuint
   );
 }

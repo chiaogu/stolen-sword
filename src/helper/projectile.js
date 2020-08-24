@@ -1,18 +1,30 @@
 import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
+  KEY_PLAYER_DAMAGE_FRAME,
+  KEY_OBJECT_FRAME,
 } from '../constants';
-import { transform, setDash, player, projectiles, $timeRatio, getReleaseVelocity } from '../state';
-import { object, getObjectBoundary, vector, getActionProgress, objectEvent, vectorOp, vectorStringify } from '../utils';
-import { listen, PRESS_DOWN, PRESS_UP } from '../events';
+import {
+  transform,
+  setDash,
+  player,
+  $timeRatio,
+  $dash,
+  isPlayerInvincibleAfterDamage,
+} from '../state';
+import { object, getObjectBoundary, vector, vectorOp } from '../utils';
 
 function handleCollision(projectile, projectileBoundary, collidedSide) {
-
+  if (collidedSide && !isPlayerInvincibleAfterDamage()) {
+    player.v = vector((-1 * player.v.x) / Math.abs(player.v.x || 1), 5);
+    player[KEY_PLAYER_DAMAGE_FRAME] = player[KEY_OBJECT_FRAME];
+    setDash(Math.max($dash.$, 1));
+  }
 }
 
 function draw(projectile, ctx) {
   ctx.fillStyle = '#f00';
-  
+
   const { l, t } = getObjectBoundary(projectile);
   ctx.fillRect(
     ...transform(vector(l, t)),
@@ -22,7 +34,11 @@ function draw(projectile, ctx) {
 }
 
 function move(projectile) {
-  vectorOp((pos, v) => pos + v * $timeRatio.$, [projectile.p, projectile.v], projectile.p);
+  vectorOp(
+    (pos, v) => pos + v * $timeRatio.$,
+    [projectile.p, projectile.v],
+    projectile.p
+  );
 }
 
 export const projectile = (pos, size, v, options = {}) => ({
@@ -33,5 +49,5 @@ export const projectile = (pos, size, v, options = {}) => ({
     move,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
     draw,
-  ]
+  ],
 });

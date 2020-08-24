@@ -23,7 +23,6 @@ function resize() {
 }
 
 window.addEventListener('resize', resize);
-window.matchMedia(`(min-resolution: ${window.devicePixelRatio}dppx), (max-resolution: ${window.devicePixelRatio}dppx)`).addListener(resize);
 resize();
 
 !function tick() { 

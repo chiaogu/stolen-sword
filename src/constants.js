@@ -5,6 +5,8 @@ export const KEY_ENEMY_TYPE = key();
 export const KEY_ENEMY_IS_INVINCIBLE = key();
 export const KEY_ENEMY_DEAD_FRAME = key();
 export const KEY_ENEMY_IS_DEAD = key();
+export const KEY_ENEMY_COMPUND_CHILDREN = key();
+export const KEY_ENEMY_COMPUND_GENERATE_CHILDREN = key();
 
 export const KEY_STAGE_INITIATE = key();
 export const KEY_STAGE_LOOP = key();
@@ -21,8 +23,7 @@ export const KEY_OBJECT_EVENT_GET_OFFSET = key();
 export const KEY_OBJECT_EVENT_IS_REPEAT = key();
 export const KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME = key();
 
-export const KEY_ENEMY_COMPUND_CHILDREN = key();
-export const KEY_ENEMY_COMPUND_GENERATE_CHILDREN = key();
+export const KEY_PLAYER_DAMAGE_FRAME = key();
 
 export const SIDE_T = 't';
 export const SIDE_R = 'r';
@@ -47,3 +48,4 @@ export const MINIMUM_DASH_VELOCITY = 2;
 export const TRAJECTORY_LINE_LENGTH = 200;
 
 export const ENEMY_DEATH_ANIMATION_DURATION = 500;
+export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 500;

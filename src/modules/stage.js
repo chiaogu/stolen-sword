@@ -36,7 +36,7 @@ function reset() {
   $stageWave.$ = -1;
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
-  projectiles.splice(0, platforms.length);
+  projectiles.splice(0, projectiles.length);
 }
 
 window.addEventListener('keydown', ({ key }) => {

@@ -1,18 +1,17 @@
 import interaction from './interaction';
-import player from './player';
 import time from './time';
 import camera from './camera';
 import display from './display';
 import background from './background';
 import stage from './stage';
 import objects from './objects';
+import './player';
 
 export default [
   background,
   time,
   objects,
   camera,
-  player,
   display,
   interaction,
   stage,
