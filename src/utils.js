@@ -126,8 +126,12 @@ export const getActionProgress = (frame, duration, repeat = true) =>
 
 export const alternateProgress = (process) => Math.abs(process - 0.5) * 2;
 
-export const objectAction = (interval, callback) => object =>
-  callback(object, getActionProgress(object[KEY_OBJECT_FRAME], interval));
+export const objectAction = (interval, callback, options = {}) => object => {
+  let frame = object[KEY_OBJECT_FRAME];
+  if (options[KEY_OBJECT_EVENT_GET_OFFSET])
+    frame -= options[KEY_OBJECT_EVENT_GET_OFFSET](object) || frame;
+  if(frame > 0) callback(object, getActionProgress(frame, interval));
+}
   
 export const objectEvent = (callback, interval, options = {}) => {
   const lastTriggerFrameKey = KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME + key();

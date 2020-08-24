@@ -53,6 +53,7 @@ function underAttack(enemy, enemyBoundary, collidedSide) {
 }
 
 function draw(enemy, ctx) {
+  if(enemy[KEY_OBJECT_FRAME] === 0) return;
   if (enemy[KEY_OBJECT_IS_COLLIDED]) {
     ctx.fillStyle = '#f00';
   } else if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
@@ -110,7 +111,10 @@ export const compund = (x, y, w, h, options = {}) => {
       if(!enemy[KEY_ENEMY_DEAD_FRAME]) {
         if(!child || child[KEY_ENEMY_IS_DEAD]) {
           const newChild = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN][i]();
-          if(child) newChild[KEY_OBJECT_FRAME] = child[KEY_OBJECT_FRAME];
+          if(child) {
+            newChild[KEY_OBJECT_FRAME] = child[KEY_OBJECT_FRAME];
+            newChild[KEY_OBJECT_ON_UPDATE] = child[KEY_OBJECT_ON_UPDATE];
+          }
           children[i] = newChild;
           enemies.push(newChild);
         }

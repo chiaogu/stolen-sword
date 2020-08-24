@@ -3,7 +3,6 @@ import {
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_WAVES,
   DEFAULT_FRAME_WIDTH,
-  KEY_OBJECT_INITIAL_POS,
   KEY_OBJECT_ON_UPDATE,
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_STAGE_TRANSITION
@@ -16,16 +15,11 @@ import {
   $cameraLoop,
   $cameraZoom
 } from '../state';
-import { objectAction, alternateProgress, vector, vectorOp } from '../utils';
+import { alternateProgress, vector } from '../utils';
 import { enemy, compund, shooter } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad } from '../easing';
-
-const circularMovement = (duration, xRadius, yRadius) => objectAction(duration, (enemy, progress) => {
-  const theta = progress * 2 * Math.PI;
-  enemy.p.x = enemy[KEY_OBJECT_INITIAL_POS].x + xRadius * Math.cos(theta);
-  enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + yRadius * Math.sin(theta);
-});
+import { circularMovement, slideIn } from '../animation';
 
 let tempPlayerPos;
 
@@ -54,31 +48,36 @@ export default {
     () => enemies.push(
       enemy(50, 200, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(3000, 10, 5)
+          slideIn(1000, 300, 300),
+          circularMovement(3000, 10, 5, 1000)
         ]
       })
     ),
     () => enemies.push(
       enemy(-100, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(5000, 10, 5)
+          slideIn(1000, 300, 300),
+          circularMovement(5000, 10, 5, 1000)
         ]
       }),
       enemy(75, 450, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(3000, 10, 5)
+          slideIn(1000, 300, 300),
+          circularMovement(3000, 10, 5, 1000)
         ]
       })
     ),
     () => enemies.push(
       compund(0, 530, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(5000, 10, 0)
+          slideIn(1000, 300, 300),
+          circularMovement(5000, 10, 0, 1000)
         ],
         [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
           () => enemy(0, 300, 30, 30, {
             [KEY_OBJECT_ON_UPDATE]:[
-              circularMovement(6000, 100, 50)
+              slideIn(1000, 300, 300),
+              circularMovement(6000, 100, 50, 1000)
             ]
           })
         ]
@@ -90,7 +89,7 @@ export default {
           circularMovement(10000, 80, 0)
         ]
       })
-    ),
+    )
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0;
