@@ -9,6 +9,7 @@ import {
   $stageWave,
   $stageIndex,
   revive,
+  $stageNextWave,
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -27,14 +28,16 @@ export function nextStage() {
   setStage($stageIndex.$ + 1);
 }
 
-export function nextWave() {
+export function nextWave(wave = $stageWave.$ + 1) {
+  $stageNextWave.$ = wave;
   $stage.$[KEY_STAGE_TRANSITION_FRAME] = $stage.$[KEY_OBJECT_FRAME];
+  if ($stage.$[KEY_STAGE_TRANSITION]) $stage.$[KEY_STAGE_TRANSITION](0);
 }
 
 export function setStage(stageIndex) {
-  vectorOp((_) => 0, [], player.p);
-  vectorOp((_) => 0, [], player.v);
-  vectorOp((_) => 0, [], cameraCenter);
+  vectorOp(() => 0, [], player.p);
+  vectorOp(() => 0, [], player.v);
+  vectorOp(() => 0, [], cameraCenter);
   revive();
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
@@ -52,9 +55,12 @@ function update(stage) {
       STAGE_TRANSITION_DURAION,
       false
     );
-    if(stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](progress);
+    if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](progress);
   } else {
-    if (stage[KEY_STAGE_IS_WAVE_CLEAN] && stage[KEY_STAGE_IS_WAVE_CLEAN]()) {
+    if (
+      stage[KEY_STAGE_IS_WAVE_CLEAN] &&
+      stage[KEY_STAGE_IS_WAVE_CLEAN]()
+    ) {
       if ($stageWave.$ === stage[KEY_STAGE_WAVES].length - 1) {
         nextStage();
       } else {
@@ -65,10 +71,11 @@ function update(stage) {
 }
 
 const checkTransition = objectEvent(
-  (stage) => {
+  (stage, ctx) => {
     delete stage[KEY_STAGE_TRANSITION_FRAME];
     enemies.splice(0, enemies.length);
-    stage[KEY_STAGE_WAVES][++$stageWave.$]();
+    $stageWave.$ = $stageNextWave.$;
+    stage[KEY_STAGE_WAVES][$stageWave.$]();
   },
   STAGE_TRANSITION_DURAION,
   {

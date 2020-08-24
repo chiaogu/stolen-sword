@@ -13,17 +13,21 @@ import {
   platforms,
   player,
   cameraCenter,
-  $cameraLoop
+  $cameraLoop,
+  $cameraZoom
 } from '../state';
-import { objectAction } from '../utils';
+import { objectAction, alternateProgress, vector, vectorOp } from '../utils';
 import { enemy, compund, shooter } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
+import { easeInOutQuad } from '../easing';
 
 const circularMovement = (duration, xRadius, yRadius) => objectAction(duration, (enemy, progress) => {
   const theta = progress * 2 * Math.PI;
   enemy.p.x = enemy[KEY_OBJECT_INITIAL_POS].x + xRadius * Math.cos(theta);
   enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + yRadius * Math.sin(theta);
 });
+
+let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -92,6 +96,8 @@ export default {
     return enemies.length === 0;
   },
   [KEY_STAGE_TRANSITION](progress) {
-    console.log(progress);
+    $cameraZoom.$ = 1 + (1 - easeInOutQuad(alternateProgress(progress))) * 0.2;
+    if(progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
+    else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
   }
 };

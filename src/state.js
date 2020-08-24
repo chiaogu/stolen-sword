@@ -14,7 +14,8 @@ import {
   KEY_OBJECT_FRAME,
   PLAYER_DAMAGE_INVINCIBLE_DURAION,
   KEY_PLAYER_DEATH_FRAME,
-  DEFAULT_HEALTH
+  DEFAULT_HEALTH,
+  KEY_STAGE_TRANSITION_FRAME,
 } from './constants';
 import {
   vector,
@@ -79,11 +80,11 @@ export function dash() {
   }
 }
 export function playerDamage() {
-  if(!isPlayerInvincibleAfterDamage()) {
-    if($health.$ > 0) {
+  if (!isPlayerInvincibleAfterDamage()) {
+    if ($health.$ > 0) {
       player.v = vector((-1 * player.v.x) / Math.abs(player.v.x || 1), 5);
     }
-    if($health.$ > 1) {
+    if ($health.$ > 1) {
       player[KEY_PLAYER_DAMAGE_FRAME] = player[KEY_OBJECT_FRAME];
       setDash(Math.max($dash.$, 1));
     }
@@ -103,17 +104,23 @@ export function setDash(value) {
   $dash.$ = value;
 }
 export function isAbleToDash() {
-  return $dash.$ > 0 && !player[KEY_PLAYER_DEATH_FRAME];
+  return (
+    $dash.$ > 0 &&
+    !player[KEY_PLAYER_DEATH_FRAME] &&
+    $stage.$ &&
+    !$stage.$[KEY_STAGE_TRANSITION_FRAME]
+  );
 }
 export function isReleaseVelocityEnough() {
   return vectorMagnitude(getReleaseVelocity()) >= MINIMUM_DASH_VELOCITY;
 }
 export function isPlayerInvincibleAfterDamage() {
-  return player[KEY_PLAYER_DAMAGE_FRAME] &&
-  player[KEY_OBJECT_FRAME] - player[KEY_PLAYER_DAMAGE_FRAME] <=
-    PLAYER_DAMAGE_INVINCIBLE_DURAION / FRAME_DURAITON;
+  return (
+    player[KEY_PLAYER_DAMAGE_FRAME] &&
+    player[KEY_OBJECT_FRAME] - player[KEY_PLAYER_DAMAGE_FRAME] <=
+      PLAYER_DAMAGE_INVINCIBLE_DURAION / FRAME_DURAITON
+  );
 }
-
 
 // Interaction
 export const $isPressing = ref(false);
@@ -134,8 +141,10 @@ export function transform(value) {
     return value * $cameraZoom.$ * scale;
   } else {
     return [
-      cameraFrameSize.x / 2 - (cameraCenter.x - value.x) * $cameraZoom.$ * scale,
-      cameraFrameSize.y / 2 + (cameraCenter.y - value.y) * $cameraZoom.$ * scale,
+      cameraFrameSize.x / 2 -
+        (cameraCenter.x - value.x) * $cameraZoom.$ * scale,
+      cameraFrameSize.y / 2 +
+        (cameraCenter.y - value.y) * $cameraZoom.$ * scale,
     ];
   }
 }
@@ -146,18 +155,22 @@ export function detransform(target) {
     return target / $cameraZoom.$ / scale;
   } else {
     return vector(
-      cameraCenter.x - (cameraFrameSize.x / 2 - target.x) / $cameraZoom.$ / scale,
-      cameraCenter.y + (cameraFrameSize.y / 2 - target.y) / $cameraZoom.$ / scale
+      cameraCenter.x -
+        (cameraFrameSize.x / 2 - target.x) / $cameraZoom.$ / scale,
+      cameraCenter.y +
+        (cameraFrameSize.y / 2 - target.y) / $cameraZoom.$ / scale
     );
   }
 }
 
 export function isOutOfScreen(object) {
   const canvasPos = transform(object.p);
-  return canvasPos[0] < 0 ||
+  return (
+    canvasPos[0] < 0 ||
     canvasPos[1] < 0 ||
     canvasPos[0] > cameraFrameSize.x ||
-    canvasPos[1] > cameraFrameSize.y;
+    canvasPos[1] > cameraFrameSize.y
+  );
 }
 
 // Time
@@ -192,16 +205,17 @@ export function stepTo(callback, shouldStop) {
 }
 
 export function slowDown(duration = SLOW_DOWN_DURATION) {
-  if (cancelTimeRatioAnimation) return;
-  cancelTimeRatioAnimation = animateTo(
-    (ratio) => {
-      $timeRatio.$ =
-        NORAML_TIME_RATIO -
-        (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
-    },
-    duration,
-    easeOutQuint
-  );
+  if (!cancelTimeRatioAnimation) {
+    cancelTimeRatioAnimation = animateTo(
+      (ratio) => {
+        $timeRatio.$ =
+          NORAML_TIME_RATIO -
+          (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
+      },
+      duration,
+      easeOutQuint
+    );
+  }
 }
 
 export function backToNormal() {
@@ -217,8 +231,9 @@ export const enemies = [];
 export const projectiles = [];
 export const platforms = [];
 export const $stageWave = ref(-1);
+export const $stageNextWave = ref(-1);
 export const $stageIndex = ref(-1);
 export const $stage = ref();
 
-display(() => `stage: ${$stageIndex.$}`)
+display(() => `stage: ${$stageIndex.$}`);
 display(() => `wave: ${$stageWave.$}`);

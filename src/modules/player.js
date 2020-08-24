@@ -10,6 +10,7 @@ import {
   dash,
   isPlayerInvincibleAfterDamage,
   $health,
+  $stageIndex,
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -17,6 +18,7 @@ import {
   vector,
   getObjectBoundary,
   getActionProgress,
+  objectEvent
 } from '../utils';
 import {
   G,
@@ -24,7 +26,9 @@ import {
   KEY_OBJECT_FRAME,
   KEY_PLAYER_DEATH_FRAME,
   PLAYER_DEATH_ANIMATION_DURATION,
+  KEY_OBJECT_EVENT_GET_OFFSET
 } from '../constants';
+import { setStage } from '../helper/stage';
 
 listen(PRESS_UP, () => {
   dash();
@@ -44,19 +48,18 @@ function draw(player, ctx) {
   }
   const { l, t } = getObjectBoundary(player);
   let height = transform(player.s.y);
-  if(player[KEY_PLAYER_DEATH_FRAME]) {
-    const deathProgress = Math.min(1, getActionProgress(
-      player[KEY_OBJECT_FRAME] - player[KEY_PLAYER_DEATH_FRAME],
-      PLAYER_DEATH_ANIMATION_DURATION,
-      false
-    ))
+  if (player[KEY_PLAYER_DEATH_FRAME]) {
+    const deathProgress = Math.min(
+      1,
+      getActionProgress(
+        player[KEY_OBJECT_FRAME] - player[KEY_PLAYER_DEATH_FRAME],
+        PLAYER_DEATH_ANIMATION_DURATION,
+        false
+      )
+    );
     height *= 1 - 0.7 * deathProgress;
   }
-  ctx.fillRect(
-    ...transform(vector(l, t)),
-    transform(player.s.x),
-    height
-  );
+  ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
 
   // visualize velocity
   ctx.strokeStyle = '#f0f';
@@ -95,4 +98,12 @@ function update(player) {
   emit(PLAYER_POS_CHANGE, player.p);
 }
 
-player[KEY_OBJECT_ON_UPDATE] = [update, draw];
+const death = objectEvent(
+  () => setStage($stageIndex.$),
+  PLAYER_DEATH_ANIMATION_DURATION,
+  {
+    [KEY_OBJECT_EVENT_GET_OFFSET]: (stage) => stage[KEY_PLAYER_DEATH_FRAME],
+  }
+);
+
+player[KEY_OBJECT_ON_UPDATE] = [death, update, draw];
