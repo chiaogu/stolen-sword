@@ -137,7 +137,7 @@ export const shooter = (x, y, options) => {
       vectorOp(v => v / vm * 2 , [v], v);
       projectiles.push(projectile(enemy.p, vector(10, 10), v));
     }
-  }, 1000);
+  }, 2000);
   
   return enemy(x, y, 30, 30, {
     [KEY_OBJECT_ON_UPDATE]: [

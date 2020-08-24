@@ -13,7 +13,8 @@ import {
   KEY_PLAYER_DAMAGE_FRAME,
   KEY_OBJECT_FRAME,
   PLAYER_DAMAGE_INVINCIBLE_DURAION,
-  KEY_PLAYER_DEATH_FRAME
+  KEY_PLAYER_DEATH_FRAME,
+  DEFAULT_HEALTH
 } from './constants';
 import {
   vector,
@@ -39,7 +40,7 @@ const ref = (defaultValue) =>
 
 // Player
 export const player = object(0, 0, 20, 20);
-export const $health = ref(2);
+export const $health = ref(DEFAULT_HEALTH);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
 
@@ -89,6 +90,11 @@ export function playerDamage() {
     $health.$ = Math.max(0, $health.$ - 1);
   }
 }
+export function revive() {
+  $health.$ = DEFAULT_HEALTH;
+  delete player[KEY_PLAYER_DEATH_FRAME];
+}
+
 export function resetDash() {
   setDash(DEFAULT_DASH);
 }
@@ -211,7 +217,8 @@ export const enemies = [];
 export const projectiles = [];
 export const platforms = [];
 export const $stageWave = ref(-1);
-export const $stage = ref(-1);
+export const $stageIndex = ref(-1);
+export const $stage = ref();
 
-display(() => `stage: ${$stage.$}`)
+display(() => `stage: ${$stageIndex.$}`)
 display(() => `wave: ${$stageWave.$}`);

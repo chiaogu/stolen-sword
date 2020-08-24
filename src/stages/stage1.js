@@ -6,6 +6,7 @@ import {
   KEY_OBJECT_INITIAL_POS,
   KEY_OBJECT_ON_UPDATE,
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
+  KEY_STAGE_TRANSITION
 } from '../constants';
 import {
   enemies,
@@ -46,39 +47,39 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    // () => enemies.push(
-    //   enemy(50, 200, 30, 30, {
-    //     [KEY_OBJECT_ON_UPDATE]:[
-    //       circularMovement(3000, 10, 5)
-    //     ]
-    //   })
-    // ),
-    // () => enemies.push(
-    //   enemy(-100, 350, 30, 30, {
-    //     [KEY_OBJECT_ON_UPDATE]:[
-    //       circularMovement(5000, 10, 5)
-    //     ]
-    //   }),
-    //   enemy(75, 450, 30, 30, {
-    //     [KEY_OBJECT_ON_UPDATE]:[
-    //       circularMovement(3000, 10, 5)
-    //     ]
-    //   })
-    // ),
-    // () => enemies.push(
-    //   compund(0, 530, 30, 30, {
-    //     [KEY_OBJECT_ON_UPDATE]:[
-    //       circularMovement(5000, 10, 0)
-    //     ],
-    //     [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
-    //       () => enemy(0, 300, 30, 30, {
-    //         [KEY_OBJECT_ON_UPDATE]:[
-    //           circularMovement(6000, 100, 50)
-    //         ]
-    //       })
-    //     ]
-    //   })
-    // ),
+    () => enemies.push(
+      enemy(50, 200, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(3000, 10, 5)
+        ]
+      })
+    ),
+    () => enemies.push(
+      enemy(-100, 350, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(5000, 10, 5)
+        ]
+      }),
+      enemy(75, 450, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(3000, 10, 5)
+        ]
+      })
+    ),
+    () => enemies.push(
+      compund(0, 530, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          circularMovement(5000, 10, 0)
+        ],
+        [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
+          () => enemy(0, 300, 30, 30, {
+            [KEY_OBJECT_ON_UPDATE]:[
+              circularMovement(6000, 100, 50)
+            ]
+          })
+        ]
+      })
+    ),
     () => enemies.push(
       shooter(0, 250, {
         [KEY_OBJECT_ON_UPDATE]:[
@@ -89,5 +90,8 @@ export default {
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0;
+  },
+  [KEY_STAGE_TRANSITION](progress) {
+    console.log(progress);
   }
 };

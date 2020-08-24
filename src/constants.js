@@ -9,9 +9,10 @@ export const KEY_ENEMY_COMPUND_CHILDREN = key();
 export const KEY_ENEMY_COMPUND_GENERATE_CHILDREN = key();
 
 export const KEY_STAGE_INITIATE = key();
-export const KEY_STAGE_LOOP = key();
 export const KEY_STAGE_IS_WAVE_CLEAN = key();
 export const KEY_STAGE_WAVES = key();
+export const KEY_STAGE_TRANSITION = key();
+export const KEY_STAGE_TRANSITION_FRAME = key();
 
 export const KEY_OBJECT_ON_UPDATE = key();
 export const KEY_OBJECT_ON_DEAD = key();
@@ -47,7 +48,9 @@ export const DRAG_FORCE_FACTOR = 15;
 export const DEFAULT_DASH = 2;
 export const MINIMUM_DASH_VELOCITY = 2;
 export const TRAJECTORY_LINE_LENGTH = 200;
+export const DEFAULT_HEALTH = 2;
 
 export const ENEMY_DEATH_ANIMATION_DURATION = 500;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 500;
 export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
+export const STAGE_TRANSITION_DURAION = 2000;

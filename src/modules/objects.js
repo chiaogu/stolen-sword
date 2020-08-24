@@ -2,7 +2,7 @@ import {
   getObjectBoundary,
   collision,
 } from '../utils';
-import { enemies, platforms, $timeRatio, player, projectiles, isOutOfScreen } from '../state';
+import { enemies, platforms, $timeRatio, player, projectiles, isOutOfScreen, $stage } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
   KEY_OBJECT_FRAME,
@@ -37,4 +37,5 @@ export default (ctx) => {
     if (isOutOfScreen(projectiles[i])) projectiles.splice(i, 1);
     else objectLoop(projectiles[i], ctx);
   }
+  if($stage.$) objectLoop($stage.$, ctx);
 }
