@@ -6,7 +6,10 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_STAGE_TRANSITION,
-  KEY_ENEMY_IS_UNTOUCHABLE
+  KEY_ENEMY_IS_UNTOUCHABLE,
+  KEY_OBJECT_INITIAL_POS,
+  KEY_OBJECT_EVENT_GET_OFFSET,
+  FRAME_DURAITON
 } from '../constants';
 import {
   enemies,
@@ -16,10 +19,10 @@ import {
   $cameraLoop,
   $cameraZoom
 } from '../state';
-import { alternateProgress, vector } from '../utils';
+import { alternateProgress, vector, objectAction } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
-import { easeInOutQuad } from '../easing';
+import { easeInOutQuad, easeOutCubic } from '../easing';
 import { circularMovement, slideIn } from '../animation';
 
 let tempPlayerPos;
@@ -47,7 +50,7 @@ export default {
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
-      enemy(50, 200, 30, 30, {
+      enemy(50, 150, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(1000, 200, 200),
           circularMovement(3000, 10, 5, 1000)
@@ -55,13 +58,13 @@ export default {
       })
     ),
     () => enemies.push(
-      enemy(-100, 350, 30, 30, {
+      enemy(-100, 300, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(1000, 200, 350),
           circularMovement(5000, 10, 5, 1000)
         ]
       }),
-      enemy(75, 450, 30, 30, {
+      enemy(75, 400, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(1000, 200, 450),
           circularMovement(3000, 10, 5, 1000)
@@ -69,7 +72,7 @@ export default {
       })
     ),
     () => enemies.push(
-      compund(0, 530, 30, 30, {
+      compund(0, 450, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(2000, 200, 330),
           circularMovement(5000, 10, 0, 2000)
@@ -85,11 +88,11 @@ export default {
       })
     ),
     () => enemies.push(
-      enemy(0, 250, 30, 30, {
+      enemy(0, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          fire(3000),
-          slideIn(1000, 200, 250),
-          circularMovement(10000, 80, 0, 1000)
+          fire(2000),
+          slideIn(2000, 200, 400),
+          circularMovement(10000, 100, 10, 2000)
         ]
       })
     ),

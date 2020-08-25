@@ -1,4 +1,4 @@
-import { $timeRatio, player, resetDash, transform } from '../state';
+import { $timeRatio, player, resetDash, transform, playerDamage } from '../state';
 import { vector, object, approach, getObjectBoundary } from '../utils';
 import {
   SIDE_T,
@@ -9,6 +9,7 @@ import {
   WALL_FRICTION,
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_ON_COLLIDED,
+  KEY_OBJECT_FRAME,
 } from '../constants';
 
 export function followPlayerX(platform) {
@@ -65,6 +66,7 @@ function handleBoundaryCollision(platform, platformBoundary, collidedSide) {
 }
 
 function draw(platform, ctx) {
+  if(platform[KEY_OBJECT_FRAME] === 0) return;
   const platformBoundary = getObjectBoundary(platform);
   ctx.strokeStyle = '#fff';
   ctx.strokeRect(
@@ -91,4 +93,11 @@ export const boundary = (x, y, w, h, options) => _platform(x, y, w, h, {
 export const platform = (x, y, w, h, options) => _platform(x, y, w, h, {
   ...options,
   [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision
+});
+
+export const penetrablePlatform = (x, y, w, h, options) => _platform(x, y, w, h, {
+  ...options,
+  [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
+    if(collidedSide === SIDE_T && player.v.y <= 0) handleStandardColiision(platform, platformBoundary, collidedSide);
+  }
 });

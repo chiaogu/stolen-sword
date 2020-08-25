@@ -24,14 +24,27 @@ import {
 } from '../constants';
 import stages from '../stages/index';
 
-export function nextStage() {
+const creatStage = (config) => ({
+  ...object(),
+  ...config,
+  [KEY_OBJECT_ON_UPDATE]: [update, checkTransition],
+});
+
+function nextStage() {
   setStage($stageIndex.$ + 1);
 }
 
-export function nextWave(wave = $stageWave.$ + 1) {
+function nextWave(wave = $stageWave.$ + 1) {
   $stageNextWave.$ = wave;
   $stage.$[KEY_STAGE_TRANSITION_FRAME] = $stage.$[KEY_OBJECT_FRAME];
   if ($stage.$[KEY_STAGE_TRANSITION]) $stage.$[KEY_STAGE_TRANSITION](0);
+}
+
+function setWave(wave) {
+  delete $stage.$[KEY_STAGE_TRANSITION_FRAME];
+  enemies.splice(0, enemies.length);
+  $stageWave.$ = wave;
+  $stage.$[KEY_STAGE_WAVES][$stageWave.$]();
 }
 
 export function setStage(stageIndex) {
@@ -71,20 +84,16 @@ function update(stage) {
 }
 
 const checkTransition = objectEvent(
-  (stage, ctx) => {
-    delete stage[KEY_STAGE_TRANSITION_FRAME];
-    enemies.splice(0, enemies.length);
-    $stageWave.$ = $stageNextWave.$;
-    stage[KEY_STAGE_WAVES][$stageWave.$]();
-  },
+  () => setWave($stageNextWave.$),
   STAGE_TRANSITION_DURAION,
   {
     [KEY_OBJECT_EVENT_GET_OFFSET]: (stage) => stage[KEY_STAGE_TRANSITION_FRAME],
   }
 );
 
-export const creatStage = (config) => ({
-  ...object(),
-  ...config,
-  [KEY_OBJECT_ON_UPDATE]: [update, checkTransition],
+nextStage();
+
+window.addEventListener('keydown', ({ key }) => {
+  if (key === 'Shift') setStage(($stageIndex.$ + 1) % stages.length);
+  if (key === 'Control') setWave(($stageWave.$ + 1) % $stage.$[KEY_STAGE_WAVES].length);
 });

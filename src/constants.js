@@ -46,7 +46,7 @@ export const G = 0.5;
 export const GROUND_FRICTION = 0.2;
 export const WALL_FRICTION = 0.15;
 
-export const MAX_RELEASE_VELOCITY = 16;
+export const MAX_RELEASE_VELOCITY = 14;
 export const DRAG_FORCE_FACTOR = 15;
 export const DEFAULT_DASH = 2;
 export const MINIMUM_DASH_VELOCITY = 2;
