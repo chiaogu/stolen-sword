@@ -237,3 +237,5 @@ export const $stage = ref();
 
 display(() => `stage: ${$stageIndex.$}`);
 display(() => `wave: ${$stageWave.$}`);
+
+export const $debug = ref(false);

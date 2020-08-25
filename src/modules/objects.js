@@ -36,7 +36,6 @@ function isSourceDead(projectile) {
 }
 
 export default (ctx) => {
-  objectLoop(player, ctx);
   for (let i = enemies.length - 1; i >= 0; i--) {
     // remove enemy when dead
     if (enemies[i][KEY_ENEMY_IS_DEAD]) enemies.splice(i, 1);
@@ -55,4 +54,5 @@ export default (ctx) => {
     else objectLoop(projectiles[i], ctx);
   }
   if ($stage.$) objectLoop($stage.$, ctx);
+  objectLoop(player, ctx);
 };

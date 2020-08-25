@@ -101,9 +101,7 @@ const isGoingThrough = (objectA, objectB, timeRatio) => {
 };
 
 export const collision = (objectA, objectB, timeRatio) => {
-  if (isOverlap(objectA, objectB, timeRatio))
-    return getClosetSide(objectA, objectB);
-  if (isGoingThrough(objectA, objectB, timeRatio))
+  if (isOverlap(objectA, objectB, timeRatio) || isGoingThrough(objectA, objectB, timeRatio))
     return getClosetSide(objectA, objectB);
 };
 

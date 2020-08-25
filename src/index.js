@@ -1,4 +1,5 @@
 import modules from './modules/index';
+import { $debug } from './state';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -25,8 +26,21 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-!function tick() { 
+function tick() { 
   if(devicePixelRatio != window.devicePixelRatio) resize();
   modules.map(render => render(ctx));
-  requestAnimationFrame(tick);
-}();
+  if(!$debug.$) requestAnimationFrame(tick);
+};
+tick();
+
+
+window.addEventListener('keydown', ({ key }) => {
+  if(key === '`') {
+    $debug.$ = true;
+    tick();
+  }
+  if(key === 'Backspace') {
+    $debug.$ = false;
+    tick();
+  }
+});
