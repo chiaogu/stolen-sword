@@ -4,6 +4,7 @@ import {
   $cameraZoom,
   pressingKeys,
   $cameraLoop,
+  player,
 } from '../state';
 import { PLAYER_POS_CHANGE, listen } from '../events';
 
@@ -15,10 +16,10 @@ export default (ctx) => {
   cameraFrameSize.x = Math.floor(ctx.canvas.width / window.devicePixelRatio);
   cameraFrameSize.y = Math.floor(ctx.canvas.height / window.devicePixelRatio);
 
-  if (pressingKeys.has('w')) cameraCenter.y += 10;
-  if (pressingKeys.has('a')) cameraCenter.x -= 10;
-  if (pressingKeys.has('s')) cameraCenter.y -= 10;
-  if (pressingKeys.has('d')) cameraCenter.x += 10;
+  if (pressingKeys.has('w')) player.v.y = 10;
+  if (pressingKeys.has('a')) player.v.x = -5;
+  if (pressingKeys.has('s')) player.v.y = -10;
+  if (pressingKeys.has('d')) player.v.x = 5;
   if (pressingKeys.has('q')) $cameraZoom.$ += 0.01;
   if (pressingKeys.has('e')) $cameraZoom.$ -= 0.01;
 };

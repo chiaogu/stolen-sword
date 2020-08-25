@@ -1,4 +1,4 @@
-import { $timeRatio, player, resetDash, transform, playerDamage } from '../state';
+import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash } from '../state';
 import { vector, object, approach, getObjectBoundary } from '../utils';
 import {
   SIDE_T,
@@ -98,6 +98,7 @@ export const platform = (x, y, w, h, options) => _platform(x, y, w, h, {
 export const penetrablePlatform = (x, y, w, h, options) => _platform(x, y, w, h, {
   ...options,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
+    if(!!collidedSide) setDash(Math.max($dash.$, 1));
     if(collidedSide === SIDE_T && player.v.y <= 0) handleStandardColiision(platform, platformBoundary, collidedSide);
   }
 });

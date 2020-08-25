@@ -45,7 +45,7 @@ export const FRAME_DURAITON = 16;
 
 export const G = 0.5;
 export const GROUND_FRICTION = 0.2;
-export const WALL_FRICTION = 0.15;
+export const WALL_FRICTION = 0.3;
 
 export const MAX_RELEASE_VELOCITY = 14;
 export const DRAG_FORCE_FACTOR = 10;
@@ -57,4 +57,5 @@ export const DEFAULT_HEALTH = 2;
 export const ENEMY_DEATH_ANIMATION_DURATION = 500;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
 export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
+// export const STAGE_TRANSITION_DURAION = 10;
 export const STAGE_TRANSITION_DURAION = 2000;

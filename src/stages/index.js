@@ -4,5 +4,5 @@ import playground from './playground';
 export default [
   stage1,
   stage2,
-  // playground
+  playground
 ];

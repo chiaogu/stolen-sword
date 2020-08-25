@@ -55,10 +55,12 @@ export function setStage(stageIndex) {
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
   projectiles.splice(0, projectiles.length);
-  $stageIndex.$ = stageIndex;
-  $stageWave.$ = -1;
-  $stage.$ = creatStage(stages[stageIndex]);
-  $stage.$[KEY_STAGE_INITIATE]();
+  if(stageIndex < stages.length) {
+    $stageIndex.$ = stageIndex;
+    $stageWave.$ = -1;
+    $stage.$ = creatStage(stages[stageIndex]);
+    $stage.$[KEY_STAGE_INITIATE]();
+  }
 }
 
 function update(stage) {
