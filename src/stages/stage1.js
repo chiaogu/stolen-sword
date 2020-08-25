@@ -64,7 +64,7 @@ export default {
           circularMovement(5000, 10, 5, 1000)
         ]
       }),
-      enemy(75, 400, 30, 30, {
+      enemy(75, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(1000, 200, 450),
           circularMovement(3000, 10, 5, 1000)

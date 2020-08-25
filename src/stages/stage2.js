@@ -48,7 +48,7 @@ export default {
       boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      penetrablePlatform(120, 150, 150, 0, {
+      penetrablePlatform(0, 150, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(9000, 0, 15)],
       }),
       penetrablePlatform(-120, 400, 150, 0, {

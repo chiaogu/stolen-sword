@@ -1,9 +1,10 @@
 import modules from './modules/index';
 import { $debug } from './state';
+import { ASPECT_RATIO } from './constants';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
-const ASPECT_RATIO = 16 / 9;
+
 let devicePixelRatio;
 
 canvas.style.border = '1px solid #fff';

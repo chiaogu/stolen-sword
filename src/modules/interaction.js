@@ -12,6 +12,8 @@ function onPressMove({ clientX, clientY }) {
 }
 
 function onPressDown({ clientX, clientY }) {
+  cursorPos.x = clientX;
+  cursorPos.y = clientY;
   pressDownPos.x = clientX;
   pressDownPos.y = clientY;
   $isPressing.$ = true;
@@ -26,6 +28,9 @@ function onPressUp() {
 window.addEventListener('mousemove', onPressMove);
 window.addEventListener('mousedown', onPressDown);
 window.addEventListener('mouseup', onPressUp);
+window.addEventListener('touchstart', ({ touches }) => onPressDown(touches[0]));
+window.addEventListener('touchmove', ({ touches }) => onPressMove(touches[0]));
+window.addEventListener('touchend', ({ touches }) => onPressUp(touches[0]));
 
 export default ctx => {
   const leftOffset = canvas.getBoundingClientRect().left;

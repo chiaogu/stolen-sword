@@ -35,8 +35,9 @@ export const SIDE_R = 'r';
 export const SIDE_B = 'b';
 export const SIDE_L = 'l';
 
+export const ASPECT_RATIO = 16 / 11;
 export const DEFAULT_FRAME_HEIGHT = 667;
-export const DEFAULT_FRAME_WIDTH = DEFAULT_FRAME_HEIGHT / 16 * 9;
+export const DEFAULT_FRAME_WIDTH = DEFAULT_FRAME_HEIGHT / ASPECT_RATIO;
 export const SLOW_DOWN_DURATION = 500;
 export const SLOW_MOTION_TIME_RATIO = 0.05;
 export const NORAML_TIME_RATIO = 1;
@@ -47,7 +48,7 @@ export const GROUND_FRICTION = 0.2;
 export const WALL_FRICTION = 0.15;
 
 export const MAX_RELEASE_VELOCITY = 14;
-export const DRAG_FORCE_FACTOR = 15;
+export const DRAG_FORCE_FACTOR = 10;
 export const DEFAULT_DASH = 2;
 export const MINIMUM_DASH_VELOCITY = 2;
 export const TRAJECTORY_LINE_LENGTH = 200;
