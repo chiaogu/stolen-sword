@@ -1,8 +1,8 @@
 let _id = 0;
 export const key = () => _id++;
 
-export const KEY_ENEMY_TYPE = key();
 export const KEY_ENEMY_IS_INVINCIBLE = key();
+export const KEY_ENEMY_IS_UNTOUCHABLE = key();
 export const KEY_ENEMY_DEAD_FRAME = key();
 export const KEY_ENEMY_IS_DEAD = key();
 export const KEY_ENEMY_COMPUND_CHILDREN = key();
@@ -26,6 +26,9 @@ export const KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME = key();
 
 export const KEY_PLAYER_DAMAGE_FRAME = key();
 export const KEY_PLAYER_DEATH_FRAME = key();
+
+export const KEY_PROJECTILE_IS_COMSUMED = key();
+export const KEY_PROJECTILE_SORUCE = key();
 
 export const SIDE_T = 't';
 export const SIDE_R = 'r';

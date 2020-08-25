@@ -7,15 +7,17 @@ import {
   platforms,
   cameraFrameSize,
 } from '../state';
-import { shooter } from '../helper/enemy';
+import { enemy, fire } from '../helper/enemy';
 import { platform, followPlayerX } from '../helper/platform';
+import { circularMovement } from '../animation';
 
 export default {
   [KEY_STAGE_INITIATE]() {
     enemies.push(
-      shooter(0, 250, {
+      enemy(0, 250, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          // circularMovement(10000, 80, 0)
+          fire(3000),
+          circularMovement(10000, 80, 0)
         ]
       })
     );

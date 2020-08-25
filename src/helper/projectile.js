@@ -1,16 +1,21 @@
 import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
+  KEY_PROJECTILE_IS_COMSUMED
 } from '../constants';
 import {
   transform,
   $timeRatio,
-  playerDamage
+  playerDamage,
+  projectiles
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp } from '../utils';
 
 function handleCollision(projectile, projectileBoundary, collidedSide) {
-  if (collidedSide) playerDamage();
+  if (collidedSide) {
+    playerDamage();
+    projectile[KEY_PROJECTILE_IS_COMSUMED] = true;
+  }
 }
 
 function draw(projectile, ctx) {

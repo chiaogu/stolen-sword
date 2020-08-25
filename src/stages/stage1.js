@@ -5,7 +5,8 @@ import {
   DEFAULT_FRAME_WIDTH,
   KEY_OBJECT_ON_UPDATE,
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
-  KEY_STAGE_TRANSITION
+  KEY_STAGE_TRANSITION,
+  KEY_ENEMY_IS_UNTOUCHABLE
 } from '../constants';
 import {
   enemies,
@@ -16,7 +17,7 @@ import {
   $cameraZoom
 } from '../state';
 import { alternateProgress, vector } from '../utils';
-import { enemy, compund, shooter } from '../helper/enemy';
+import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad } from '../easing';
 import { circularMovement, slideIn } from '../animation';
@@ -48,7 +49,7 @@ export default {
     () => enemies.push(
       enemy(50, 200, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 300, 300),
+          slideIn(1000, 200, 200),
           circularMovement(3000, 10, 5, 1000)
         ]
       })
@@ -56,13 +57,13 @@ export default {
     () => enemies.push(
       enemy(-100, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 300, 300),
+          slideIn(1000, 200, 350),
           circularMovement(5000, 10, 5, 1000)
         ]
       }),
       enemy(75, 450, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 300, 300),
+          slideIn(1000, 200, 450),
           circularMovement(3000, 10, 5, 1000)
         ]
       })
@@ -70,13 +71,13 @@ export default {
     () => enemies.push(
       compund(0, 530, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 300, 300),
-          circularMovement(5000, 10, 0, 1000)
+          slideIn(2000, 200, 330),
+          circularMovement(5000, 10, 0, 2000)
         ],
         [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
           () => enemy(0, 300, 30, 30, {
             [KEY_OBJECT_ON_UPDATE]:[
-              slideIn(1000, 300, 300),
+              slideIn(1000, 200, 300),
               circularMovement(6000, 100, 50, 1000)
             ]
           })
@@ -84,12 +85,32 @@ export default {
       })
     ),
     () => enemies.push(
-      shooter(0, 250, {
+      enemy(0, 250, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          circularMovement(10000, 80, 0)
+          fire(3000),
+          slideIn(1000, 200, 250),
+          circularMovement(10000, 80, 0, 1000)
         ]
       })
-    )
+    ),
+    () => enemies.push(
+      compund(0, 300, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          fire(2000),
+          slideIn(2000, 200, 300),
+          circularMovement(6000, 150, 10, 2000)
+        ],
+        [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
+          () => enemy(0, 220, 30, 30, {
+            [KEY_OBJECT_ON_UPDATE]:[
+              slideIn(1000, 200, 220),
+              circularMovement(5000, 100, 10, 1000)
+            ],
+            [KEY_ENEMY_IS_UNTOUCHABLE]: true
+          })
+        ]
+      })
+    ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0;

@@ -4,21 +4,31 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_ON_DEAD,
   KEY_OBJECT_IS_COLLIDED,
-  KEY_ENEMY_IS_INVINCIBLE, 
+  KEY_ENEMY_IS_INVINCIBLE,
   KEY_ENEMY_DEAD_FRAME,
   ENEMY_DEATH_ANIMATION_DURATION,
   KEY_ENEMY_IS_DEAD,
   KEY_OBJECT_EVENT_IS_REPEAT,
   KEY_OBJECT_EVENT_GET_OFFSET,
   KEY_ENEMY_COMPUND_CHILDREN,
+  KEY_PROJECTILE_SORUCE,
   SIDE_T,
   SIDE_B,
   SIDE_L,
   SIDE_R,
-  KEY_ENEMY_COMPUND_GENERATE_CHILDREN
+  KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
+  KEY_ENEMY_IS_UNTOUCHABLE,
 } from '../constants';
-import { transform, setDash, player, enemies, projectiles } from '../state';
-import { object, getObjectBoundary, vector, getActionProgress, objectEvent, vectorOp, vectorMagnitude, vectorStringify, vectorAngle, radiansToDegrees } from '../utils';
+import { transform, setDash, player, enemies, projectiles, playerDamage } from '../state';
+import {
+  object,
+  getObjectBoundary,
+  vector,
+  getActionProgress,
+  objectEvent,
+  vectorOp,
+  vectorMagnitude,
+} from '../utils';
 import { projectile } from '../helper/projectile';
 
 function handleCollision(enemy, enemyBoundary, collidedSide) {
@@ -26,6 +36,8 @@ function handleCollision(enemy, enemyBoundary, collidedSide) {
 
   if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
     bounceBack(enemy, enemyBoundary, collidedSide);
+  } else if(enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+    playerDamage();
   } else {
     underAttack(enemy, enemyBoundary, collidedSide);
   }
@@ -53,22 +65,21 @@ function underAttack(enemy, enemyBoundary, collidedSide) {
 }
 
 function draw(enemy, ctx) {
-  if(enemy[KEY_OBJECT_FRAME] === 0) return;
+  if (enemy[KEY_OBJECT_FRAME] === 0) return;
+  let deathProgress = 1 - getActionProgress(
+    enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
+    ENEMY_DEATH_ANIMATION_DURATION,
+    false
+  );
+  deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
   if (enemy[KEY_OBJECT_IS_COLLIDED]) {
     ctx.fillStyle = '#f00';
   } else if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
     ctx.fillStyle = '#0ff';
-  } else if (enemy[KEY_ENEMY_DEAD_FRAME]) {
-    ctx.fillStyle = `rgba(255,255,0, ${
-      1 -
-      getActionProgress(
-        enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
-        ENEMY_DEATH_ANIMATION_DURATION,
-        false
-      )
-    }`;
+  } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+    ctx.fillStyle = `rgba(255,0,255,${deathProgress})`;
   } else {
-    ctx.fillStyle = '#ff0';
+    ctx.fillStyle = `rgba(255,255,0,${deathProgress})`;
   }
 
   const { l, t } = getObjectBoundary(enemy);
@@ -79,18 +90,22 @@ function draw(enemy, ctx) {
   );
 }
 
-const switchMode = objectEvent(enemy => {
+const switchMode = objectEvent((enemy) => {
   enemy[KEY_OBJECT_IS_COLLIDED] = false;
   enemy[KEY_ENEMY_IS_INVINCIBLE] = !enemy[KEY_ENEMY_IS_INVINCIBLE];
 }, 3000);
 
-const dead = objectEvent(enemy => {
-  enemy[KEY_ENEMY_IS_DEAD] = true;
-  if(enemy[KEY_OBJECT_ON_DEAD]) enemy[KEY_OBJECT_ON_DEAD](enemy);
-}, ENEMY_DEATH_ANIMATION_DURATION, {
-  [KEY_OBJECT_EVENT_IS_REPEAT]: false,
-  [KEY_OBJECT_EVENT_GET_OFFSET]: enemy => enemy[KEY_ENEMY_DEAD_FRAME]
-});
+const dead = objectEvent(
+  (enemy) => {
+    enemy[KEY_ENEMY_IS_DEAD] = true;
+    if (enemy[KEY_OBJECT_ON_DEAD]) enemy[KEY_OBJECT_ON_DEAD](enemy);
+  },
+  ENEMY_DEATH_ANIMATION_DURATION,
+  {
+    [KEY_OBJECT_EVENT_IS_REPEAT]: false,
+    [KEY_OBJECT_EVENT_GET_OFFSET]: (enemy) => enemy[KEY_ENEMY_DEAD_FRAME],
+  }
+);
 
 export const enemy = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
@@ -100,18 +115,22 @@ export const enemy = (x, y, w, h, options = {}) => ({
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
     draw,
-  ]
+  ],
 });
 
 export const compund = (x, y, w, h, options = {}) => {
   function checkChildren(enemy) {
     const children = enemy[KEY_ENEMY_COMPUND_CHILDREN];
-    for (let i = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN].length - 1; i >= 0; i--) {
+    for (
+      let i = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN].length - 1;
+      i >= 0;
+      i--
+    ) {
       const child = children[i];
-      if(!enemy[KEY_ENEMY_DEAD_FRAME]) {
-        if(!child || child[KEY_ENEMY_IS_DEAD]) {
+      if (!enemy[KEY_ENEMY_DEAD_FRAME]) {
+        if (!child || child[KEY_ENEMY_IS_DEAD]) {
           const newChild = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN][i]();
-          if(child) {
+          if (child) {
             newChild[KEY_OBJECT_FRAME] = child[KEY_OBJECT_FRAME];
             newChild[KEY_OBJECT_ON_UPDATE] = child[KEY_OBJECT_ON_UPDATE];
           }
@@ -129,24 +148,21 @@ export const compund = (x, y, w, h, options = {}) => {
       checkChildren,
       ...(options[KEY_OBJECT_ON_UPDATE] || []),
     ],
-    [KEY_ENEMY_COMPUND_CHILDREN]: []
+    [KEY_ENEMY_COMPUND_CHILDREN]: [],
   });
 };
 
-export const shooter = (x, y, options) => {
-  const fire = objectEvent(enemy => {
-    if(!enemy[KEY_ENEMY_DEAD_FRAME]) {
-      const v = vectorOp((enemyP, playerP) => playerP - enemyP, [enemy.p, player.p]);
+export const fire = (interval) =>
+  objectEvent((enemy) => {
+    if (!enemy[KEY_ENEMY_DEAD_FRAME]) {
+      const v = vectorOp((enemyP, playerP) => playerP - enemyP, [
+        enemy.p,
+        player.p,
+      ]);
       const vm = vectorMagnitude(v);
-      vectorOp(v => v / vm * 2 , [v], v);
-      projectiles.push(projectile(enemy.p, vector(10, 10), v));
+      vectorOp((v) => (v / vm) * 2, [v], v);
+      projectiles.push(projectile(enemy.p, vector(10, 10), v, {
+        [KEY_PROJECTILE_SORUCE]: enemy
+      }));
     }
-  }, 2000);
-  
-  return enemy(x, y, 30, 30, {
-    [KEY_OBJECT_ON_UPDATE]: [
-      fire,
-      ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    ],
-  });
-};
+  }, interval);
