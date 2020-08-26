@@ -9,6 +9,7 @@ import {
   KEY_OBJECT_EVENT_GET_OFFSET,
   KEY_OBJECT_EVENT_IS_REPEAT,
   KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME,
+  KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
   key,
 } from './constants';
 
@@ -144,7 +145,7 @@ export const objectEvent = (callback, interval, options = {}) => {
         frame -= options[KEY_OBJECT_EVENT_GET_OFFSET](object) || frame;
       frame = Math.round(frame);
       if (
-        frame > 0 &&
+        (options[KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER] || frame > 0) &&
         frame !== object[lastTriggerFrameKey] &&
         frame % targetFrame === 0
       ) {

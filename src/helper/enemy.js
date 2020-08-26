@@ -18,6 +18,8 @@ import {
   SIDE_R,
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_ENEMY_IS_UNTOUCHABLE,
+  KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
+  FRAME_DURAITON,
 } from '../constants';
 import { transform, setDash, player, enemies, projectiles, playerDamage } from '../state';
 import {
@@ -152,7 +154,7 @@ export const compund = (x, y, w, h, options = {}) => {
   });
 };
 
-export const fire = (interval) =>
+export const fire = (interval, startTime = 0) =>
   objectEvent((enemy) => {
     if (!enemy[KEY_ENEMY_DEAD_FRAME]) {
       const v = vectorOp((enemyP, playerP) => playerP - enemyP, [
@@ -165,4 +167,7 @@ export const fire = (interval) =>
         [KEY_PROJECTILE_SORUCE]: enemy
       }));
     }
-  }, interval);
+  }, interval, {
+    [KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER]: true,
+    [KEY_OBJECT_EVENT_GET_OFFSET]: () => startTime / FRAME_DURAITON
+  });

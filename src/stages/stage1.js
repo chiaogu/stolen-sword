@@ -52,7 +52,7 @@ export default {
     () => enemies.push(
       enemy(50, 150, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 200, 200),
+          slideIn(1000, 250, 200),
           circularMovement(3000, 10, 5, 1000)
         ]
       })
@@ -60,13 +60,13 @@ export default {
     () => enemies.push(
       enemy(-100, 300, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 200, 350),
+          slideIn(1000, 250, 350),
           circularMovement(5000, 10, 5, 1000)
         ]
       }),
       enemy(75, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 200, 450),
+          slideIn(1000, 250, 450),
           circularMovement(3000, 10, 5, 1000)
         ]
       })
@@ -74,13 +74,13 @@ export default {
     () => enemies.push(
       compund(0, 450, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(2000, 200, 330),
+          slideIn(2000, 250, 330),
           circularMovement(5000, 10, 0, 2000)
         ],
         [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
           () => enemy(0, 300, 30, 30, {
             [KEY_OBJECT_ON_UPDATE]:[
-              slideIn(1000, 200, 300),
+              slideIn(1000, 250, 300),
               circularMovement(6000, 100, 50, 1000)
             ]
           })
@@ -90,23 +90,23 @@ export default {
     () => enemies.push(
       enemy(0, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          fire(2000),
-          slideIn(2000, 200, 400),
-          circularMovement(10000, 100, 10, 2000)
+          slideIn(1000, 250, 400),
+          fire(3000, 500),
+          circularMovement(10000, 100, 10, 1000)
         ]
       })
     ),
     () => enemies.push(
       compund(0, 300, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          fire(2000),
-          slideIn(2000, 200, 300),
+          fire(3000, 500),
+          slideIn(2000, 250, 300),
           circularMovement(6000, 150, 10, 2000)
         ],
         [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
           () => enemy(0, 220, 30, 30, {
             [KEY_OBJECT_ON_UPDATE]:[
-              slideIn(1000, 200, 220),
+              slideIn(1000, 250, 220),
               circularMovement(5000, 100, 10, 1000)
             ],
             [KEY_ENEMY_IS_UNTOUCHABLE]: true
