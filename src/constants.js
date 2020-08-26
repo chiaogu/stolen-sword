@@ -1,7 +1,7 @@
 let _id = 0;
 export const key = () => _id++;
 
-export const KEY_ENEMY_IS_INVINCIBLE = key();
+export const KEY_ENEMY_IS_DEFENCING = key();
 export const KEY_ENEMY_IS_UNTOUCHABLE = key();
 export const KEY_ENEMY_DEAD_FRAME = key();
 export const KEY_ENEMY_IS_DEAD = key();

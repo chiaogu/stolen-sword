@@ -4,7 +4,7 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_ON_DEAD,
   KEY_OBJECT_IS_COLLIDED,
-  KEY_ENEMY_IS_INVINCIBLE,
+  KEY_ENEMY_IS_DEFENCING,
   KEY_ENEMY_DEAD_FRAME,
   ENEMY_DEATH_ANIMATION_DURATION,
   KEY_ENEMY_IS_DEAD,
@@ -38,11 +38,12 @@ import { projectile } from '../helper/projectile';
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
 
-  if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
-    bounceBack(enemy, enemyBoundary, collidedSide);
-  } else if(enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+  if(enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
     playerDamage();
   } else {
+    if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+      bounceBack(enemy, enemyBoundary, collidedSide);
+    } 
     underAttack(enemy, enemyBoundary, collidedSide);
   }
 }
@@ -82,8 +83,6 @@ function draw(enemy, ctx) {
   deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
   if (enemy[KEY_OBJECT_IS_COLLIDED]) {
     ctx.fillStyle = '#f00';
-  } else if (enemy[KEY_ENEMY_IS_INVINCIBLE]) {
-    ctx.fillStyle = '#0ff';
   } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
     ctx.fillStyle = `rgba(255,0,255,${deathProgress})`;
   } else {
@@ -96,6 +95,17 @@ function draw(enemy, ctx) {
     transform(enemy.s.x),
     transform(enemy.s.y)
   );
+  
+  if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+    const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
+    const shellBoundary = getObjectBoundary(object(enemy.p.x, enemy.p.y, size.x, size.y));
+    ctx.fillStyle = '#0ff';
+    ctx.fillRect(
+      ...transform(vector(shellBoundary.l, shellBoundary.t)),
+      transform(size.x),
+      transform(size.y)
+    );
+  }
 }
 
 const dead = objectEvent(
@@ -113,7 +123,7 @@ const dead = objectEvent(
 export const enemy = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
-  [KEY_ENEMY_HEALTH]: 1,
+  [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
   [KEY_OBJECT_ON_UPDATE]: [
@@ -123,35 +133,35 @@ export const enemy = (x, y, w, h, options = {}) => ({
   ],
 });
 
-export const compund = (x, y, w, h, options = {}) => {
-  function checkChildren(enemy) {
-    enemy[KEY_ENEMY_COMPUND_CHILDREN].forEach(child => {
-      child[KEY_ENEMY_HEALTH] = 2;
-      if (enemy[KEY_ENEMY_DEAD_FRAME])
-        child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
-    })
-  }
-  return [
-    enemy(x, y, w, h, {
-      ...options,
-      [KEY_OBJECT_ON_UPDATE]: [
-        checkChildren,
-        ...(options[KEY_OBJECT_ON_UPDATE] || []),
-      ],
-    }),
-    ...(options[KEY_ENEMY_COMPUND_CHILDREN] || [])
-  ];
-};
+export const compund = (x, y, w, h, options = {}) => [
+  enemy(x, y, w, h, {
+    ...options,
+    [KEY_OBJECT_ON_UPDATE]: [
+      enemy => {
+        enemy[KEY_ENEMY_COMPUND_CHILDREN].forEach(child => {
+          child[KEY_ENEMY_HEALTH] = 2;
+          if (enemy[KEY_ENEMY_DEAD_FRAME])
+            child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
+        })
+      },
+      ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    ],
+  }),
+  ...(options[KEY_ENEMY_COMPUND_CHILDREN] || [])
+];
 
 export const shell = (x, y, w, h, options = {}) => enemy(x, y, w, h, {
   ...options,
   [KEY_ENEMY_HEALTH]: 3,
-  
+  [KEY_OBJECT_ON_UPDATE]: [
+    enemy => enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1,
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ]
 });
 
 export const switchMode = interval => objectEvent((enemy) => {
   enemy[KEY_OBJECT_IS_COLLIDED] = false;
-  enemy[KEY_ENEMY_IS_INVINCIBLE] = !enemy[KEY_ENEMY_IS_INVINCIBLE];
+  enemy[KEY_ENEMY_IS_DEFENCING] = !enemy[KEY_ENEMY_IS_DEFENCING];
 }, interval, {
   [KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER]: true,
 });
