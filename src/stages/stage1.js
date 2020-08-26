@@ -7,9 +7,7 @@ import {
   KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
-  KEY_OBJECT_INITIAL_POS,
-  KEY_OBJECT_EVENT_GET_OFFSET,
-  FRAME_DURAITON
+  KEY_ENEMY_COMPUND_CHILDREN
 } from '../constants';
 import {
   enemies,
@@ -72,13 +70,13 @@ export default {
       })
     ),
     () => enemies.push(
-      compund(0, 450, 30, 30, {
+      ...compund(0, 450, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(2000, 250, 330),
           circularMovement(5000, 10, 0, 2000)
         ],
-        [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
-          () => enemy(0, 300, 30, 30, {
+        [KEY_ENEMY_COMPUND_CHILDREN]: [
+          enemy(0, 300, 30, 30, {
             [KEY_OBJECT_ON_UPDATE]:[
               slideIn(1000, 250, 300),
               circularMovement(6000, 100, 50, 1000)
@@ -97,14 +95,14 @@ export default {
       })
     ),
     () => enemies.push(
-      compund(0, 300, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
+      ...compund(0, 300, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]: [
           fire(3000, 500),
           slideIn(2000, 250, 300),
           circularMovement(6000, 150, 10, 2000)
         ],
-        [KEY_ENEMY_COMPUND_GENERATE_CHILDREN]: [
-          () => enemy(0, 220, 30, 30, {
+        [KEY_ENEMY_COMPUND_CHILDREN]: [
+          enemy(0, 220, 30, 30, {
             [KEY_OBJECT_ON_UPDATE]:[
               slideIn(1000, 250, 220),
               circularMovement(5000, 100, 10, 1000)

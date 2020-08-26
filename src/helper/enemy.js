@@ -12,6 +12,8 @@ import {
   KEY_OBJECT_EVENT_GET_OFFSET,
   KEY_ENEMY_COMPUND_CHILDREN,
   KEY_PROJECTILE_SORUCE,
+  KEY_ENEMY_LAST_DAMAGE_FRAME,
+  KEY_ENEMY_HEALTH,
   SIDE_T,
   SIDE_B,
   SIDE_L,
@@ -63,7 +65,11 @@ function bounceBack(enemy, enemyBoundary, collidedSide) {
 
 function underAttack(enemy, enemyBoundary, collidedSide) {
   setDash(1);
-  enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+  if(enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] > 20) {
+    enemy[KEY_ENEMY_HEALTH] --;
+    enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] = enemy[KEY_OBJECT_FRAME];
+    if(enemy[KEY_ENEMY_HEALTH] === 0) enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+  }
 }
 
 function draw(enemy, ctx) {
@@ -92,11 +98,6 @@ function draw(enemy, ctx) {
   );
 }
 
-const switchMode = objectEvent((enemy) => {
-  enemy[KEY_OBJECT_IS_COLLIDED] = false;
-  enemy[KEY_ENEMY_IS_INVINCIBLE] = !enemy[KEY_ENEMY_IS_INVINCIBLE];
-}, 3000);
-
 const dead = objectEvent(
   (enemy) => {
     enemy[KEY_ENEMY_IS_DEAD] = true;
@@ -112,7 +113,9 @@ const dead = objectEvent(
 export const enemy = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
+  [KEY_ENEMY_HEALTH]: 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
+  [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
   [KEY_OBJECT_ON_UPDATE]: [
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
@@ -122,37 +125,37 @@ export const enemy = (x, y, w, h, options = {}) => ({
 
 export const compund = (x, y, w, h, options = {}) => {
   function checkChildren(enemy) {
-    const children = enemy[KEY_ENEMY_COMPUND_CHILDREN];
-    for (
-      let i = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN].length - 1;
-      i >= 0;
-      i--
-    ) {
-      const child = children[i];
-      if (!enemy[KEY_ENEMY_DEAD_FRAME]) {
-        if (!child || child[KEY_ENEMY_IS_DEAD]) {
-          const newChild = enemy[KEY_ENEMY_COMPUND_GENERATE_CHILDREN][i]();
-          if (child) {
-            newChild[KEY_OBJECT_FRAME] = child[KEY_OBJECT_FRAME];
-            newChild[KEY_OBJECT_ON_UPDATE] = child[KEY_OBJECT_ON_UPDATE];
-          }
-          children[i] = newChild;
-          enemies.push(newChild);
-        }
-      } else {
+    enemy[KEY_ENEMY_COMPUND_CHILDREN].forEach(child => {
+      child[KEY_ENEMY_HEALTH] = 2;
+      if (enemy[KEY_ENEMY_DEAD_FRAME])
         child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
-      }
-    }
+    })
   }
-  return enemy(x, y, w, h, {
-    ...options,
-    [KEY_OBJECT_ON_UPDATE]: [
-      checkChildren,
-      ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    ],
-    [KEY_ENEMY_COMPUND_CHILDREN]: [],
-  });
+  return [
+    enemy(x, y, w, h, {
+      ...options,
+      [KEY_OBJECT_ON_UPDATE]: [
+        checkChildren,
+        ...(options[KEY_OBJECT_ON_UPDATE] || []),
+      ],
+    }),
+    ...(options[KEY_ENEMY_COMPUND_CHILDREN] || [])
+  ];
 };
+
+export const shell = (x, y, w, h, options = {}) => enemy(x, y, w, h, {
+  ...options,
+  [KEY_ENEMY_HEALTH]: 3,
+  
+});
+
+export const switchMode = interval => objectEvent((enemy) => {
+  enemy[KEY_OBJECT_IS_COLLIDED] = false;
+  enemy[KEY_ENEMY_IS_INVINCIBLE] = !enemy[KEY_ENEMY_IS_INVINCIBLE];
+}, interval, {
+  [KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER]: true,
+});
+
 
 export const fire = (interval, startTime = 0) =>
   objectEvent((enemy) => {

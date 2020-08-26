@@ -23,7 +23,7 @@ import {
   $maxReleaseVelocity
 } from '../state';
 import { alternateProgress, vector, objectAction } from '../utils';
-import { enemy, compund, fire } from '../helper/enemy';
+import { enemy, compund, fire, switchMode } from '../helper/enemy';
 import { water, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad, easeInOutQuart, easeInQuad } from '../easing';
 import { circularMovement, slideIn } from '../animation';
@@ -56,17 +56,26 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
+    // () => enemies.push(
+    //   enemy(10, 350, 30, 30, {
+    //     [KEY_OBJECT_ON_UPDATE]:[
+    //       fire(6000, 3000),
+    //       slideIn(3500, 250, 500),
+    //       circularMovement(6000, 100, 5, 3500)
+    //     ]
+    //   }),
+    //   enemy(-10, 250, 30, 30, {
+    //     [KEY_OBJECT_ON_UPDATE]:[
+    //       fire(6000, 500),
+    //       slideIn(1000, 250, 400),
+    //       circularMovement(6000, 100, 5, 1000)
+    //     ]
+    //   })
+    // ),
     () => enemies.push(
       enemy(50, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 250, 500),
-          circularMovement(3000, 10, 5, 1000)
-        ]
-      })
-    ),
-    () => enemies.push(
-      enemy(50, 350, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
+          switchMode(5000),
           slideIn(1000, 250, 200),
           circularMovement(3000, 10, 5, 1000)
         ]

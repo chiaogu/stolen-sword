@@ -7,6 +7,8 @@ export const KEY_ENEMY_DEAD_FRAME = key();
 export const KEY_ENEMY_IS_DEAD = key();
 export const KEY_ENEMY_COMPUND_CHILDREN = key();
 export const KEY_ENEMY_COMPUND_GENERATE_CHILDREN = key();
+export const KEY_ENEMY_HEALTH = key();
+export const KEY_ENEMY_LAST_DAMAGE_FRAME = key();
 
 export const KEY_STAGE_INITIATE = key();
 export const KEY_STAGE_IS_WAVE_CLEAN = key();
