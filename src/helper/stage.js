@@ -10,6 +10,8 @@ import {
   $stageIndex,
   revive,
   $stageNextWave,
+  $g,
+  $maxReleaseVelocity
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -21,6 +23,8 @@ import {
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   STAGE_TRANSITION_DURAION,
+  G,
+  MAX_RELEASE_VELOCITY,
 } from '../constants';
 import stages from '../stages/index';
 
@@ -52,6 +56,8 @@ export function setStage(stageIndex) {
   vectorOp(() => 0, [], player.v);
   vectorOp(() => 0, [], cameraCenter);
   revive();
+  $g.$ = G;
+  $maxReleaseVelocity.$ = MAX_RELEASE_VELOCITY;
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
   projectiles.splice(0, projectiles.length);

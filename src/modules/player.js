@@ -11,6 +11,7 @@ import {
   isPlayerInvincibleAfterDamage,
   $health,
   $stageIndex,
+  $g
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -21,7 +22,6 @@ import {
   objectEvent
 } from '../utils';
 import {
-  G,
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_FRAME,
   KEY_PLAYER_DEATH_FRAME,
@@ -91,7 +91,7 @@ function update(player) {
   }
 
   // gravity pulling
-  player.v.y -= G * $timeRatio.$;
+  player.v.y -= $g.$ * $timeRatio.$;
 
   // update position
   vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);

@@ -116,7 +116,7 @@ export default {
     ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
-    return enemies.length === 0;
+    return enemies.length === 0 && player.p.y <= 0;
   },
   [KEY_STAGE_TRANSITION](progress) {
     $cameraZoom.$ = 1 + (1 - easeInOutQuad(alternateProgress(progress))) * 0.2;

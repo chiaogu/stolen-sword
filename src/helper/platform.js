@@ -108,7 +108,7 @@ export const water = (x, y, w, h, options) => _platform(x, y, w, h, {
   ...options,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
     if(collidedSide) {
-      resetDash();
+      if(player.v.y < 0) resetDash();
       player.v.x = approach(player.v.x, 0 ,player.v.x * 0.1 * $timeRatio.$);
       player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
     }

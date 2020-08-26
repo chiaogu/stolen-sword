@@ -18,18 +18,22 @@ import {
   player,
   cameraCenter,
   $cameraLoop,
-  $cameraZoom
+  $cameraZoom,
+  $g,
+  $maxReleaseVelocity
 } from '../state';
 import { alternateProgress, vector, objectAction } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
 import { water, boundary, followPlayerX, followPlayerY } from '../helper/platform';
-import { easeInOutQuad, easeOutCubic } from '../easing';
+import { easeInOutQuad, easeInOutQuart, easeInQuad } from '../easing';
 import { circularMovement, slideIn } from '../animation';
 
 let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
+    $g.$ = 0.3;
+    $maxReleaseVelocity.$ = 12;
     player.p.x = 0;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
@@ -52,22 +56,31 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    // () => enemies.push(
-    //   enemy(50, 150, 30, 30, {
-    //     [KEY_OBJECT_ON_UPDATE]:[
-    //       slideIn(1000, 250, 200),
-    //       circularMovement(3000, 10, 5, 1000)
-    //     ]
-    //   })
-    // ),
+    () => enemies.push(
+      enemy(50, 350, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          slideIn(1000, 250, 500),
+          circularMovement(3000, 10, 5, 1000)
+        ]
+      })
+    ),
+    () => enemies.push(
+      enemy(50, 350, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          slideIn(1000, 250, 200),
+          circularMovement(3000, 10, 5, 1000)
+        ]
+      })
+    ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
-    return false;
-    // return enemies.length === 0;
+    return enemies.length === 0 && player.p.y <= player.s.y / 2;
   },
-  // [KEY_STAGE_TRANSITION](progress) {
-  //   $cameraZoom.$ = 1 + (1 - easeInOutQuad(alternateProgress(progress))) * 0.2;
-  //   if(progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
-  //   else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
-  // }
+  [KEY_STAGE_TRANSITION](progress) {
+    $cameraZoom.$ = 1 - (1 - easeInOutQuart(alternateProgress(progress))) * 0.1;
+    player.v.y = 0;
+    player.p.y = (1 - easeInQuad(alternateProgress(progress))) * 200 + player.s.y / 2;
+    if(progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
+    else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
+  }
 };

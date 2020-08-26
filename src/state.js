@@ -3,7 +3,6 @@ import {
   SLOW_MOTION_TIME_RATIO,
   NORAML_TIME_RATIO,
   FRAME_DURAITON,
-  G,
   DEFAULT_DASH,
   MINIMUM_DASH_VELOCITY,
   DRAG_FORCE_FACTOR,
@@ -16,6 +15,7 @@ import {
   KEY_PLAYER_DEATH_FRAME,
   DEFAULT_HEALTH,
   KEY_STAGE_TRANSITION_FRAME,
+  G
 } from './constants';
 import {
   vector,
@@ -45,6 +45,8 @@ export const player = object(0, 0, 20, 20);
 export const $health = ref(DEFAULT_HEALTH);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
+export const $g = ref(G);
+export const $maxReleaseVelocity = ref(MAX_RELEASE_VELOCITY);
 
 display(() => `play.v: ${vectorStringify(player.v)}`);
 display(() => `health: ${$health.$}`);
@@ -56,8 +58,8 @@ export function getReleaseVelocity() {
     (cursorPos.y - pressDownPos.y) / DRAG_FORCE_FACTOR
   );
   const vm = vectorMagnitude(v);
-  if (vm > MAX_RELEASE_VELOCITY)
-    vectorOp((v) => (v * MAX_RELEASE_VELOCITY) / vm, [v], v);
+  if (vm > $maxReleaseVelocity.$)
+    vectorOp((v) => (v * $maxReleaseVelocity.$) / vm, [v], v);
   return v;
 }
 export function playerTrajectory() {
@@ -68,7 +70,7 @@ export function playerTrajectory() {
     const lastP = path[path.length - 1];
     const nextP = vectorOp((pos, v) => pos + v, [lastP, estimateV]);
     distance += vectorDistance(lastP, nextP);
-    estimateV.y -= G;
+    estimateV.y -= $g.$;
     path.push(nextP);
   }
   return path;
