@@ -23,6 +23,7 @@ import {
   vectorOp,
   vectorDistance,
   vectorMagnitude,
+  vectorStringify,
 } from './utils';
 import { display } from './modules/display';
 import { easeOutQuint } from './easing';
@@ -45,6 +46,7 @@ export const $health = ref(DEFAULT_HEALTH);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
 
+display(() => `play.v: ${vectorStringify(player.v)}`);
 display(() => `health: ${$health.$}`);
 display(() => `dash: ${$dash.$}`);
 

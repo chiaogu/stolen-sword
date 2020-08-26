@@ -1,5 +1,5 @@
 import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash } from '../state';
-import { vector, object, approach, getObjectBoundary } from '../utils';
+import { vector, object, approach, getObjectBoundary, vectorOp } from '../utils';
 import {
   SIDE_T,
   SIDE_B,
@@ -98,7 +98,19 @@ export const platform = (x, y, w, h, options) => _platform(x, y, w, h, {
 export const penetrablePlatform = (x, y, w, h, options) => _platform(x, y, w, h, {
   ...options,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
-    if(!!collidedSide) setDash(Math.max($dash.$, 1));
-    if(collidedSide === SIDE_T && player.v.y <= 0) handleStandardColiision(platform, platformBoundary, collidedSide);
+    if(collidedSide) setDash(Math.max($dash.$, 1));
+    if(collidedSide === SIDE_T && player.v.y <= 0)
+      handleStandardColiision(platform, platformBoundary, collidedSide);
+  }
+});
+
+export const water = (x, y, w, h, options) => _platform(x, y, w, h, {
+  ...options,
+  [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
+    if(collidedSide) {
+      resetDash();
+      player.v.x = approach(player.v.x, 0 ,player.v.x * 0.1 * $timeRatio.$);
+      player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
+    }
   }
 });
