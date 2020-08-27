@@ -22,11 +22,11 @@ import {
   $g,
   $maxReleaseVelocity
 } from '../state';
-import { alternateProgress, vector, objectAction } from '../utils';
+import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell } from '../helper/enemy';
 import { water, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad, easeInOutQuart, easeInQuad } from '../easing';
-import { circularMovement, slideIn } from '../animation';
+import { circularMovement, slideIn, parabolas, follow } from '../animation';
 
 let tempPlayerPos;
 
@@ -85,6 +85,43 @@ export default {
         ]
       }),
     ),
+    () => {
+      const core = enemy(0, 200, 30, 30, {
+        [KEY_ENEMY_IS_UNTOUCHABLE]: true,
+        [KEY_OBJECT_ON_UPDATE]: [
+          slideIn(1800, 0, 550),
+          parabolas(10000, 300, 1800)
+        ]
+      });
+      const left = shell(-40, 200, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]:[
+          slideIn(1800, -250, 200),
+          follow(core, vector(-40, 0), 1800)
+        ]
+      });
+      enemies.push(
+        core,
+        left,
+        shell(40, 200, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]:[
+            slideIn(1800, 250, 200),
+            follow(core, vector(40, 0), 1800)
+          ]
+        }),
+        shell(0, 240, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]:[
+            slideIn(1800, 250, 550),
+            follow(core, vector(0, 40), 1800)
+          ]
+        }),
+        shell(0, 160, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]:[
+            slideIn(1800, -250, 550),
+            follow(core, vector(0, -40), 1800)
+          ]
+        }),
+      )
+    },
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0 && player.p.y <= player.s.y / 2;
