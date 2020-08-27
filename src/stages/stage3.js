@@ -10,7 +10,10 @@ import {
   KEY_OBJECT_INITIAL_POS,
   KEY_OBJECT_EVENT_GET_OFFSET,
   FRAME_DURAITON,
-  SIDE_L
+  SIDE_L,
+  KEY_ENEMY_IS_DEAD,
+  KEY_ENEMY_DEAD_FRAME,
+  KEY_OBJECT_FRAME,
 } from '../constants';
 import {
   enemies,
@@ -20,13 +23,25 @@ import {
   $cameraLoop,
   $cameraZoom,
   $g,
-  $maxReleaseVelocity
+  $maxReleaseVelocity,
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell } from '../helper/enemy';
-import { water, boundary, followPlayerX, followPlayerY } from '../helper/platform';
+import {
+  water,
+  boundary,
+  followPlayerX,
+  followPlayerY,
+} from '../helper/platform';
 import { easeInOutQuad, easeInOutQuart, easeInQuad } from '../easing';
-import { circularMovement, slideIn, parabolas, follow } from '../animation';
+import {
+  circularMovement,
+  lemniscateMovement,
+  slideIn,
+  parabolas,
+  follow,
+  chase,
+} from '../animation';
 
 let tempPlayerPos;
 
@@ -37,9 +52,12 @@ export default {
     player.p.x = 0;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
-      cameraCenter.y = Math.min(player.p.y - player.s.y / 2 + 200, cameraCenter.y);
+      cameraCenter.y = Math.min(
+        player.p.y - player.s.y / 2 + 200,
+        cameraCenter.y
+      );
       cameraCenter.y = Math.max(200, cameraCenter.y);
-    }
+    };
     platforms.push(
       water(0, -50, player.s.x * 10, 100, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
@@ -90,37 +108,67 @@ export default {
         [KEY_ENEMY_IS_UNTOUCHABLE]: true,
         [KEY_OBJECT_ON_UPDATE]: [
           slideIn(1800, 0, 550),
-          parabolas(10000, 300, 1800)
-        ]
+          parabolas(10000, 300, 1800),
+          checkChildren,
+        ],
       });
-      const left = shell(-40, 200, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1800, -250, 200),
-          follow(core, vector(-40, 0), 1800)
-        ]
-      });
-      enemies.push(
-        core,
-        left,
+
+      const children = [
+        shell(-40, 200, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]: [
+            slideIn(1800, -250, 400),
+            follow(core, vector(-40, 0), 1800),
+          ],
+        }),
         shell(40, 200, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]:[
-            slideIn(1800, 250, 200),
-            follow(core, vector(40, 0), 1800)
-          ]
+          [KEY_OBJECT_ON_UPDATE]: [
+            slideIn(1800, 250, 400),
+            follow(core, vector(40, 0), 1800),
+          ],
         }),
         shell(0, 240, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]:[
+          [KEY_OBJECT_ON_UPDATE]: [
             slideIn(1800, 250, 550),
-            follow(core, vector(0, 40), 1800)
-          ]
+            follow(core, vector(0, 40), 1800),
+          ],
         }),
         shell(0, 160, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]:[
+          [KEY_OBJECT_ON_UPDATE]: [
             slideIn(1800, -250, 550),
-            follow(core, vector(0, -40), 1800)
-          ]
+            follow(core, vector(0, -40), 1800),
+          ],
         }),
-      )
+      ];
+
+      function checkChildren(enemy) {
+        if (
+          !enemy[KEY_ENEMY_DEAD_FRAME] &&
+          children.filter((child) => child[KEY_ENEMY_IS_DEAD]).length ===
+            children.length
+        ) {
+          enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+        }
+      }
+
+      enemies.push(core, ...children);
+    },
+    () => {
+      const head = shell(0, 300, 30, 30, {
+        [KEY_OBJECT_ON_UPDATE]: [
+          slideIn(2000, -250, 400),
+          // circularMovement(4000, 100, 50, 1000),
+          lemniscateMovement(8000, 500, 2000)
+          // follow(core, vector(-40, 0), 1800),
+        ],
+      });
+      enemies.push(
+        head,
+        ...chase(head, [300, 600, 900, 1200]).map((doChase) =>
+          enemy(-250, 200, 30, 30, {
+            [KEY_OBJECT_ON_UPDATE]: [doChase],
+          })
+        )
+      );
     },
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
@@ -129,8 +177,9 @@ export default {
   [KEY_STAGE_TRANSITION](progress) {
     $cameraZoom.$ = 1 - (1 - easeInOutQuart(alternateProgress(progress))) * 0.1;
     player.v.y = 0;
-    player.p.y = (1 - easeInQuad(alternateProgress(progress))) * 200 + player.s.y / 2;
-    if(progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
+    player.p.y =
+      (1 - easeInQuad(alternateProgress(progress))) * 200 + player.s.y / 2;
+    if (progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
     else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
-  }
+  },
 };

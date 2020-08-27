@@ -1,13 +1,14 @@
-import { vectorOp, objectAction, vector, alternateProgress } from './utils';
+import { vectorOp, objectAction, vector, alternateProgress, approach } from './utils';
 import { easeOutCubic, easeInOutCubic } from './easing';
 import {
   KEY_OBJECT_FRAME,
   FRAME_DURAITON,
   KEY_OBJECT_INITIAL_POS,
   KEY_OBJECT_EVENT_GET_OFFSET,
-  KEY_OBJECT_EVENT_IS_REPEAT,
+  KEY_OBJECT_ON_UPDATE,
 } from './constants';
 import { enemy } from './helper/enemy';
+import { $timeRatio } from './state';
 
 const getOffset = (startTime) =>
   startTime ? () => startTime / FRAME_DURAITON : undefined;
@@ -25,6 +26,23 @@ export const circularMovement = (duration, xRadius, yRadius, startTime = 0) => {
       object.p.y =
         object[KEY_OBJECT_INITIAL_POS].y +
         yRadius * radiusProgress * Math.sin(theta);
+    },
+    {
+      [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),
+    }
+  );
+};
+
+export const lemniscateMovement = (duration, radius, startTime = 0) => {
+  let radiusProgress = 0;
+  return objectAction(
+    duration,
+    (object, progress) => {
+      radiusProgress = Math.max(progress, radiusProgress);
+      const theta = progress * 2 * Math.PI;
+      const scale = radius * radiusProgress / (3 - Math.cos(2 * theta));
+      object.p.x = object[KEY_OBJECT_INITIAL_POS].x + scale * Math.cos(theta);
+      object.p.y = object[KEY_OBJECT_INITIAL_POS].y + scale * Math.sin(2*theta) / 2;
     },
     {
       [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),
@@ -69,3 +87,26 @@ export const follow = (object, offset, startTime) =>
       enemy.p.x = object.p.x + offset.x;
     }
   }
+  
+export const chase = (head, durations) => {
+  const maxDuration = Math.max(...durations);
+  const path = [];
+  let lastFrame = 0;
+  head[KEY_OBJECT_ON_UPDATE].push(enemy => {
+    if(enemy[KEY_OBJECT_FRAME] > 0 && lastFrame !== Math.floor(enemy[KEY_OBJECT_FRAME])) {
+      path.unshift(vector(enemy.p.x, enemy.p.y));
+      if(path.length > maxDuration / FRAME_DURAITON) path.pop();
+      lastFrame = Math.floor(enemy[KEY_OBJECT_FRAME]);
+    }
+  });
+  return durations.map(duration => {
+    return enemy => {
+      const pos = path[Math.floor(duration / FRAME_DURAITON) - 1];
+      const prevPos = path[Math.floor(duration / FRAME_DURAITON) - 2];
+      if(pos && prevPos) {
+        enemy.p.x = approach(enemy.p.x, pos.x, (pos.x - prevPos.x) * $timeRatio.$)
+        enemy.p.y = approach(enemy.p.y, pos.y, (pos.y - prevPos.y) * $timeRatio.$)
+      }
+    }
+  })
+}
