@@ -5,8 +5,6 @@ export const KEY_ENEMY_IS_DEFENCING = key();
 export const KEY_ENEMY_IS_UNTOUCHABLE = key();
 export const KEY_ENEMY_DEAD_FRAME = key();
 export const KEY_ENEMY_IS_DEAD = key();
-export const KEY_ENEMY_COMPUND_CHILDREN = key();
-export const KEY_ENEMY_COMPUND_GENERATE_CHILDREN = key();
 export const KEY_ENEMY_HEALTH = key();
 export const KEY_ENEMY_LAST_DAMAGE_FRAME = key();
 
@@ -60,5 +58,5 @@ export const DEFAULT_HEALTH = 2;
 export const ENEMY_DEATH_ANIMATION_DURATION = 500;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
 export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
-export const STAGE_TRANSITION_DURAION = 10;
-// export const STAGE_TRANSITION_DURAION = 2000;
+// export const STAGE_TRANSITION_DURAION = 10;
+export const STAGE_TRANSITION_DURAION = 2000;

@@ -10,7 +10,6 @@ import {
   KEY_ENEMY_IS_DEAD,
   KEY_OBJECT_EVENT_IS_REPEAT,
   KEY_OBJECT_EVENT_GET_OFFSET,
-  KEY_ENEMY_COMPUND_CHILDREN,
   KEY_PROJECTILE_SORUCE,
   KEY_ENEMY_LAST_DAMAGE_FRAME,
   KEY_ENEMY_HEALTH,
@@ -18,7 +17,6 @@ import {
   SIDE_B,
   SIDE_L,
   SIDE_R,
-  KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
   FRAME_DURAITON,
@@ -133,22 +131,19 @@ export const enemy = (x, y, w, h, options = {}) => ({
   ],
 });
 
-export const compund = (x, y, w, h, options = {}) => [
-  enemy(x, y, w, h, {
-    ...options,
-    [KEY_OBJECT_ON_UPDATE]: [
-      enemy => {
-        enemy[KEY_ENEMY_COMPUND_CHILDREN].forEach(child => {
-          child[KEY_ENEMY_HEALTH] = 2;
-          if (enemy[KEY_ENEMY_DEAD_FRAME])
-            child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
-        })
-      },
-      ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    ],
-  }),
-  ...(options[KEY_ENEMY_COMPUND_CHILDREN] || [])
-];
+export const compund = (core, ...children) => {
+  core[KEY_OBJECT_ON_UPDATE].push(enemy => {
+    children.forEach(child => {
+      child[KEY_ENEMY_HEALTH] = 2;
+      if (enemy[KEY_ENEMY_DEAD_FRAME] && !child[KEY_ENEMY_DEAD_FRAME])
+        child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
+    })
+  })
+  return [
+    core,
+    ...children
+  ]
+};
 
 export const shell = (x, y, w, h, options = {}) => enemy(x, y, w, h, {
   ...options,

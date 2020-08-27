@@ -4,10 +4,8 @@ import {
   KEY_STAGE_WAVES,
   DEFAULT_FRAME_WIDTH,
   KEY_OBJECT_ON_UPDATE,
-  KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
-  KEY_ENEMY_COMPUND_CHILDREN
 } from '../constants';
 import {
   enemies,
@@ -70,20 +68,20 @@ export default {
       })
     ),
     () => enemies.push(
-      ...compund(0, 450, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(2000, 250, 330),
-          circularMovement(5000, 10, 0, 2000)
-        ],
-        [KEY_ENEMY_COMPUND_CHILDREN]: [
-          enemy(0, 300, 30, 30, {
-            [KEY_OBJECT_ON_UPDATE]:[
-              slideIn(1000, 250, 300),
-              circularMovement(6000, 100, 50, 1000)
-            ]
-          })
-        ]
-      })
+      ...compund(
+        enemy(0, 450, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]:[
+            slideIn(2000, 250, 330),
+            circularMovement(5000, 10, 0, 2000)
+          ]
+        }),
+        enemy(0, 300, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]:[
+            slideIn(1000, 250, 300),
+            circularMovement(6000, 100, 50, 1000)
+          ]
+        })
+      )
     ),
     () => enemies.push(
       enemy(0, 350, 30, 30, {
@@ -95,22 +93,22 @@ export default {
       })
     ),
     () => enemies.push(
-      ...compund(0, 300, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]: [
-          fire(3000, 500),
-          slideIn(2000, 250, 300),
-          circularMovement(6000, 150, 10, 2000)
-        ],
-        [KEY_ENEMY_COMPUND_CHILDREN]: [
-          enemy(0, 220, 30, 30, {
-            [KEY_OBJECT_ON_UPDATE]:[
-              slideIn(1000, 250, 220),
-              circularMovement(5000, 100, 10, 1000)
-            ],
-            [KEY_ENEMY_IS_UNTOUCHABLE]: true
-          })
-        ]
-      })
+      ...compund(
+        enemy(0, 300, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]: [
+            fire(3000, 500),
+            slideIn(2000, 250, 300),
+            circularMovement(6000, 150, 10, 2000)
+          ]
+        }),
+        enemy(0, 220, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]:[
+            slideIn(1000, 250, 220),
+            circularMovement(5000, 100, 10, 1000)
+          ],
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        })
+      )
     ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {

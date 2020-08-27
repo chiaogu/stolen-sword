@@ -4,7 +4,6 @@ import {
   KEY_STAGE_WAVES,
   DEFAULT_FRAME_WIDTH,
   KEY_OBJECT_ON_UPDATE,
-  KEY_ENEMY_COMPUND_GENERATE_CHILDREN,
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_OBJECT_INITIAL_POS,
@@ -107,38 +106,25 @@ export default {
       const core = enemy(0, 200, 30, 30, {
         [KEY_ENEMY_IS_UNTOUCHABLE]: true,
         [KEY_OBJECT_ON_UPDATE]: [
-          slideIn(1800, 0, 550),
-          parabolas(10000, 300, 1800),
+          slideIn(1700, 0, 550),
+          parabolas(10000, 300, 2300),
           checkChildren,
         ],
       });
 
       const children = [
-        shell(-40, 200, 30, 30, {
+        vector(-40, 0),
+        vector(0, -40),
+        vector(40, 0),
+        vector(0, 40),
+      ].map((offset, index) => 
+        shell(offset.x, 200 + offset.y, 30, 30, {
           [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1800, -250, 400),
-            follow(core, vector(-40, 0), 1800),
+            slideIn(2000 + index * 100, 250 * (index > 1 ? 1 : -1), index % 2 === 1 ? 400 : 550),
+            follow(core, offset, 2300),
           ],
-        }),
-        shell(40, 200, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1800, 250, 400),
-            follow(core, vector(40, 0), 1800),
-          ],
-        }),
-        shell(0, 240, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1800, 250, 550),
-            follow(core, vector(0, 40), 1800),
-          ],
-        }),
-        shell(0, 160, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1800, -250, 550),
-            follow(core, vector(0, -40), 1800),
-          ],
-        }),
-      ];
+        })
+      )
 
       function checkChildren(enemy) {
         if (
@@ -155,18 +141,19 @@ export default {
     () => {
       const head = shell(0, 300, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]: [
-          slideIn(2000, -250, 400),
-          // circularMovement(4000, 100, 50, 1000),
+          slideIn(2000, 250, 450),
           lemniscateMovement(8000, 500, 2000)
-          // follow(core, vector(-40, 0), 1800),
         ],
       });
       enemies.push(
-        head,
-        ...chase(head, [300, 600, 900, 1200]).map((doChase) =>
-          enemy(-250, 200, 30, 30, {
-            [KEY_OBJECT_ON_UPDATE]: [doChase],
-          })
+        ...compund(
+          head,
+          ...chase(head, Array(6).fill().map((_, i) => (i + 1) * 300)).map((doChase, i) =>
+            enemy(250, 450, 30, 30, {
+              [KEY_ENEMY_IS_UNTOUCHABLE]: i === 0,
+              [KEY_OBJECT_ON_UPDATE]: [doChase],
+            })
+          )
         )
       );
     },
