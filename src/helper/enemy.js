@@ -179,3 +179,26 @@ export const fire = (interval, startTime = 0) =>
     [KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER]: true,
     [KEY_OBJECT_EVENT_GET_OFFSET]: () => startTime / FRAME_DURAITON
   });
+  
+  export const firework = (amount, interval, startTime = 0) =>
+    objectEvent((enemy) => {
+      if (!enemy[KEY_ENEMY_DEAD_FRAME]) {
+        const v = 2;
+        for(let i = 0; i < amount; i ++) {
+          const theta = i / amount * 2 * Math.PI;
+          projectiles.push(
+            projectile(enemy.p, vector(10, 10), vector(v * Math.cos(theta), v * Math.sin(theta)), {
+              [KEY_PROJECTILE_SORUCE]: enemy
+            })
+          );
+        }
+      }
+    }, interval, {
+      [KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER]: true,
+      [KEY_OBJECT_EVENT_GET_OFFSET]: () => startTime / FRAME_DURAITON
+    });
+  
+export const recover = (interval, max) => 
+  objectEvent(enemy => {
+    enemy[KEY_ENEMY_HEALTH] = Math.min(max, enemy[KEY_ENEMY_HEALTH] + 1);
+  }, interval);
