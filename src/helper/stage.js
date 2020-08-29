@@ -38,6 +38,9 @@ const creatStage = (config) => ({
   ...object(),
   ...config,
   [KEY_OBJECT_ON_UPDATE]: [update, checkTransition],
+  [KEY_STAGE_ENDING_CUT_SCENE_INDEX]: 0,
+  [KEY_STAGE_ENDING_CUT_SCENE_FRAME]: 0,
+  [KEY_STAGE_ENDING_CUT_SCENE]: [[() => {}, 0], ...(config[KEY_STAGE_ENDING_CUT_SCENE] || [])]
 });
 
 function setWave(wave) {
@@ -76,34 +79,29 @@ function update(stage) {
   // if($stageWave.$ ===  -1) {
   // } else 
   if($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
-    if(stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] === undefined) {
-      stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] = 0;
+    const [callback, duration = FRAME_DURAITON * 2, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
+    const frameDiff = stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
+    if(frameDiff >= Math.round(duration / FRAME_DURAITON)) {
       stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
-    } else {
-      const [animation, duration, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
-      const frameDiff = stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
-      if(frameDiff * FRAME_DURAITON >= duration) {
-        stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
-        const nextAnimation = () => {
-          if(stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] < stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1) {
-            stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
-            stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
-          } else {
-            setStage($stageIndex.$ + 1);
-          }
-        };
-        if(wait) {
-          waitForClick(
-            `${KEY_STAGE_ENDING_CUT_SCENE_KEY}${$stageIndex.$}${stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]}`,
-            nextAnimation
-          );
+      const nextAnimation = () => {
+        if(stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] < stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1) {
+          stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
+          stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
+          stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]][0](0);
         } else {
-          nextAnimation();
+          setStage($stageIndex.$ + 1);
         }
+      };
+      if(wait) {
+        waitForClick(
+          `${KEY_STAGE_ENDING_CUT_SCENE_KEY}${$stageIndex.$}${stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]}`,
+          nextAnimation
+        );
       } else {
-        const progress = getActionProgress(frameDiff, duration);
-        animation(progress);
+        nextAnimation();
       }
+    } else {
+      callback(getActionProgress(frameDiff, duration));
     }
   } else if (stage[KEY_STAGE_TRANSITION_FRAME] !== undefined) {
     const progress = getActionProgress(

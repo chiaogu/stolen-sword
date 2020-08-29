@@ -16,10 +16,10 @@ import {
   $cameraLoop,
   $cameraZoom
 } from '../state';
-import { alternateProgress, vector, objectAction } from '../utils';
+import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
-import { easeInOutQuad, easeOutCubic } from '../easing';
+import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint } from '../easing';
 import { circularMovement, slideIn } from '../animation';
 
 let tempPlayerPos;
@@ -121,11 +121,32 @@ export default {
     else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
-    [(progress) => {
-      player.p.x = alternateProgress(progress) * 100 - 50;
-    }, 3000],
-    [(progress) => {
-      player.p.y = alternateProgress(progress) * 100 - 50;
-    }, 1000, true],
+    [() => tempPlayerPos = vector(player.p.x, player.p.y)],
+    [progress => {
+      player.p.x = tempPlayerPos.x + (-140 - tempPlayerPos.x) * easeInOutQuad(progress);
+    }, 2000],
+    [() => enemies.push(
+      enemy(-250, 0, 30, 30)
+    ), 500],
+    [progress => {
+      enemies[0].p.x = -250 + 200 * progress;
+      enemies[0].p.y = 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+    }, 1000],
+    [progress => {
+      enemies[0].p.x = -50 + 100 * progress;
+      enemies[0].p.y = 80 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+    }, 500],
+    [progress => {
+      enemies[0].p.x = 50 + 140 * progress;
+      enemies[0].p.y = 160 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+    }, 500],
+    [progress => {
+      enemies[0].p.x = 190 + 120 * progress;
+      enemies[0].p.y = 240 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+    }, 1000],
+    [() => {}, 0, true],
+    [progress => {
+      player.p.x = -140 + 390 * easeInQuad(progress);
+    }, 1000],
   ]
 };
