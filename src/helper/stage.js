@@ -30,7 +30,8 @@ import {
   KEY_STAGE_ENDING_CUT_SCENE_FRAME,
   KEY_STAGE_ENDING_CUT_SCENE_INDEX,
   FRAME_DURAITON,
-  KEY_STAGE_ENDING_CUT_SCENE_KEY
+  KEY_STAGE_ENDING_CUT_SCENE_KEY,
+  KEY_STAGE_START_KEY
 } from '../constants';
 import stages from '../stages/index';
 
@@ -68,6 +69,7 @@ export function setStage(stageIndex, wave) {
   projectiles.splice(0, projectiles.length);
   if (stageIndex < stages.length) {
     $stageIndex.$ = stageIndex;
+    $stageNextWave.$ = -1;
     $stage.$ = creatStage(stages[stageIndex]);
     if (wave) setWave(wave);
     else $stageWave.$ = -1;
@@ -76,9 +78,12 @@ export function setStage(stageIndex, wave) {
 }
 
 function update(stage) {
-  // if($stageWave.$ ===  -1) {
-  // } else 
-  if($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
+  if($stageWave.$ === -1 && $stageNextWave.$ !== 0) {
+    waitForClick(
+      `${KEY_STAGE_START_KEY}${$stageIndex.$}`,
+      () => setWave(0)
+    );
+  } else if($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
     const [callback, duration = FRAME_DURAITON * 2, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
     const frameDiff = stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
     if(frameDiff >= Math.round(duration / FRAME_DURAITON)) {

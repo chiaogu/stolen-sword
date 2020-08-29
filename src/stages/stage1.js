@@ -19,14 +19,14 @@ import {
 import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
-import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint } from '../easing';
+import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint, easeInQuint } from '../easing';
 import { circularMovement, slideIn } from '../animation';
 
 let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    player.p.x = 0;
+    player.p.x = -240;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(player.p.y - player.s.y / 2 + 200,
@@ -144,9 +144,8 @@ export default {
       enemies[0].p.x = 190 + 120 * progress;
       enemies[0].p.y = 240 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8));
     }, 1000],
-    [() => {}, 0, true],
     [progress => {
-      player.p.x = -140 + 390 * easeInQuad(progress);
-    }, 1000],
+      player.p.x = -140 + 390 * easeInQuint(progress);
+    }, 1500],
   ]
 };

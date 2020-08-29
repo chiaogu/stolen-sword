@@ -32,7 +32,7 @@ import { collision, object, vectorMagnitude, alternateProgress } from '../utils'
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    player.p.x = 0;
+    player.p.x = -240;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(
