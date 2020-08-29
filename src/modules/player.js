@@ -11,7 +11,8 @@ import {
   isPlayerInvincibleAfterDamage,
   $health,
   $stageIndex,
-  $g
+  $g,
+  $stageWave
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -99,7 +100,9 @@ function update(player) {
 }
 
 const death = objectEvent(
-  () => setStage($stageIndex.$),
+  () => {
+    setStage($stageIndex.$, $stageWave.$)
+  },
   PLAYER_DEATH_ANIMATION_DURATION,
   {
     [KEY_OBJECT_EVENT_GET_OFFSET]: (stage) => stage[KEY_PLAYER_DEATH_FRAME],
