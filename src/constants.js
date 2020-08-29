@@ -16,6 +16,7 @@ export const KEY_STAGE_TRANSITION_FRAME = key();
 export const KEY_STAGE_ENDING_CUT_SCENE = key();
 export const KEY_STAGE_ENDING_CUT_SCENE_FRAME = key();
 export const KEY_STAGE_ENDING_CUT_SCENE_INDEX = key();
+export const KEY_STAGE_ENDING_CUT_SCENE_KEY = key();
 
 export const KEY_OBJECT_ON_UPDATE = key();
 export const KEY_OBJECT_ON_DEAD = key();

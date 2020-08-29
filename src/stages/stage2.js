@@ -6,6 +6,7 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
+  KEY_STAGE_ENDING_CUT_SCENE
 } from '../constants';
 import {
   platforms,
@@ -27,7 +28,7 @@ import {
 import { enemy, compund } from '../helper/enemy';
 import { easeInQuint } from '../easing';
 import { circularMovement } from '../animation';
-import { collision, object, vectorMagnitude } from '../utils';
+import { collision, object, vectorMagnitude, alternateProgress } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -132,4 +133,12 @@ export default {
   [KEY_STAGE_TRANSITION](progress) {
     player.p.x = -500 * easeInQuint(1 - progress);
   },
+  [KEY_STAGE_ENDING_CUT_SCENE]: [
+    [(progress) => {
+      player.p.x = alternateProgress(progress) * 100 - 50;
+    }, 3000],
+    [(progress) => {
+      player.p.y = alternateProgress(progress) * 100 - 50;
+    }, 1000, true],
+  ]
 };

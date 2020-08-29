@@ -15,6 +15,7 @@ import {
   KEY_PLAYER_DEATH_FRAME,
   DEFAULT_HEALTH,
   KEY_STAGE_TRANSITION_FRAME,
+  KEY_STAGE_WAVES,
   G
 } from './constants';
 import {
@@ -112,7 +113,8 @@ export function isAbleToDash() {
     $dash.$ > 0 &&
     !player[KEY_PLAYER_DEATH_FRAME] &&
     $stage.$ &&
-    !$stage.$[KEY_STAGE_TRANSITION_FRAME]
+    !$stage.$[KEY_STAGE_TRANSITION_FRAME] &&
+    !isInTranisition()
   );
 }
 export function isReleaseVelocityEnough() {
@@ -238,8 +240,19 @@ export const $stageWave = ref(-1);
 export const $stageNextWave = ref(-1);
 export const $stageIndex = ref(-1);
 export const $stage = ref();
+export const isInTranisition = () => 
+  $stage.$ && (
+    $stageWave.$ === $stage.$[KEY_STAGE_WAVES].length ||
+    $stage.$[KEY_STAGE_TRANSITION_FRAME] !== undefined
+  );
 
 display(() => `stage: ${$stageIndex.$}`);
 display(() => `wave: ${$stageWave.$}`);
 
 export const $debug = ref(false);
+let clickPromises = {};
+export const resolveClick = () => {
+  Object.keys(clickPromises).forEach(key => clickPromises[key]());
+  clickPromises = {};
+};
+export const waitForClick = (key, callback) => clickPromises[key] = callback;

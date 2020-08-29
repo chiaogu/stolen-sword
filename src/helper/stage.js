@@ -12,6 +12,7 @@ import {
   $stageNextWave,
   $g,
   $maxReleaseVelocity,
+  waitForClick,
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -28,7 +29,8 @@ import {
   KEY_STAGE_ENDING_CUT_SCENE,
   KEY_STAGE_ENDING_CUT_SCENE_FRAME,
   KEY_STAGE_ENDING_CUT_SCENE_INDEX,
-  FRAME_DURAITON
+  FRAME_DURAITON,
+  KEY_STAGE_ENDING_CUT_SCENE_KEY
 } from '../constants';
 import stages from '../stages/index';
 
@@ -78,14 +80,25 @@ function update(stage) {
       stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] = 0;
       stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
     } else {
-      const [duration, animation] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
+      const [animation, duration, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
       const frameDiff = stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
       if(frameDiff * FRAME_DURAITON >= duration) {
-        stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME]
-        if(stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] < stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1) {
-          stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
+        stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
+        const nextAnimation = () => {
+          if(stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] < stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1) {
+            stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
+            stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
+          } else {
+            setStage($stageIndex.$ + 1);
+          }
+        };
+        if(wait) {
+          waitForClick(
+            `${KEY_STAGE_ENDING_CUT_SCENE_KEY}${$stageIndex.$}${stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]}`,
+            nextAnimation
+          );
         } else {
-          setStage($stageIndex.$ + 1);
+          nextAnimation();
         }
       } else {
         const progress = getActionProgress(frameDiff, duration);

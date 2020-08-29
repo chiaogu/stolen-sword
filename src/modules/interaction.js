@@ -1,5 +1,5 @@
 import { PRESS_DOWN, PRESS_UP, emit } from '../events';
-import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform, cameraFrameSize } from '../state';
+import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform, cameraFrameSize, resolveClick } from '../state';
 import { vector } from '../utils';
 
 const canvas = document.querySelector("canvas");
@@ -18,6 +18,7 @@ function onPressDown({ clientX, clientY }) {
   pressDownPos.y = clientY;
   $isPressing.$ = true;
   emit(PRESS_DOWN);
+  resolveClick();
 }
 
 function onPressUp() {
