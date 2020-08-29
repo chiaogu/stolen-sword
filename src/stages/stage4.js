@@ -34,9 +34,7 @@ import { collision, object, vectorMagnitude, vector } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    // player.p.x = 0;
-    player.p.x = 138;
-    player.p.y = 1561;
+    player.p.x = 0;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
@@ -79,7 +77,24 @@ export default {
       platform(220, 1850, 20, 600),
       platform(155, 2170, 150, 40),
       platform(105, 2200, 250, 20),
-      flow(-40, 1600, 40, 1250, vector(0, -0.4))
+      flow(-40, 1602.5, 40, 1255, vector(0, -0.5)),
+      flow(105, 2220, 250, 20, vector(-0.2, 0)),
+      platform(-215, 2595, 31, 382),
+      platform(-110, 2638, 179, 199),
+      platform(-21, 2538, 0, 0),
+      platform(7, 2705, 55, 208),
+      platform(61, 2766, 51, 225),
+      platform(224, 2773, 8, 1124),
+      platform(57, 3032, 12, 309),
+      platform(84, 3388, 287, 110),
+      platform(-62, 3245, 11, 293),
+      platform(-75, 3107, 13, 361),
+      platform(81, 3158, 37, 126),
+      platform(-90, 2953, 17, 170),
+      platform(-94, 3513, 67, 244),
+      platform(-69, 3740, 64, 212),
+      platform(-47, 3919, 58, 149),
+      platform(6, 4008, 124, 28),
     );
   },
   [KEY_STAGE_WAVES]: [
@@ -115,7 +130,7 @@ export default {
       ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
-    const goalArea = object(-136, 2900, 200, 30);
+    const goalArea = object(6, 4222, 124, 400);
     const collidedSide = collision(goalArea, player, $timeRatio.$);
     return (
       $stageWave.$ === -1 ||
