@@ -27,7 +27,7 @@ import {
   penetrablePlatform,
   flow,
 } from '../helper/platform';
-import { enemy, compund, recover } from '../helper/enemy';
+import { enemy, compund, recover, shell } from '../helper/enemy';
 import { easeInQuint } from '../easing';
 import { circularMovement } from '../animation';
 import { collision, object, vectorMagnitude, vector } from '../utils';
@@ -126,6 +126,45 @@ export default {
         }),
         enemy(-136, 2099, 30, 30, {
           [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)]
+        }),
+        
+        enemy(136, 2900, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(80, 3205, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(-40, 3203, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(30, 3076, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(-50, 2980, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(33, 2890, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(-8, 2829, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(-8, 2829, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        ...Array(4).fill().map((_, i) =>
+          enemy(-183 + i * 50 * (Math.random() * 0.2 + 0.8), 2750, 30, 30, {
+            [KEY_ENEMY_IS_UNTOUCHABLE]: true
+          })
+        ),
+        enemy(-208, 2814, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true
+        }),
+        enemy(-183, 2905, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)]
+        }),
+        shell(-173, 3397, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]: [recover(2000, 3)]
         }),
       ),
   ],
