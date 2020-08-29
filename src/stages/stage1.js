@@ -6,6 +6,7 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
+  KEY_STAGE_ENDING_CUT_SCENE,
 } from '../constants';
 import {
   enemies,
@@ -118,5 +119,15 @@ export default {
     $cameraZoom.$ = 1 + (1 - easeInOutQuad(alternateProgress(progress))) * 0.2;
     if(progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
     else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
-  }
+  },
+  [KEY_STAGE_ENDING_CUT_SCENE]: [
+    [3000, (progress) => {
+      // console.log('KEY_STAGE_CUT_SCENE', progress)
+      player.p.x = alternateProgress(progress) * 100 - 50;
+    }],
+    [1000, (progress) => {
+      // console.log('KEY_STAGE_CUT_SCENE', progress)
+      player.p.y = alternateProgress(progress) * 100 - 50;
+    }],
+  ]
 };
