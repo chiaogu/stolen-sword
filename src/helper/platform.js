@@ -114,3 +114,25 @@ export const water = (x, y, w, h, options) => _platform(x, y, w, h, {
     }
   }
 });
+
+export const flow = (x, y, w, h, v, options) => _platform(x, y, w, h, {
+  ...options,
+  [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
+    if(collidedSide) {
+      vectorOp((player, target) => player + target * $timeRatio.$, [player.v, v], player.v);
+    }
+  },
+  [KEY_OBJECT_ON_UPDATE]: [
+    function draw(platform, ctx) {
+      if(platform[KEY_OBJECT_FRAME] === 0) return;
+      const platformBoundary = getObjectBoundary(platform);
+      ctx.fillStyle = 'rgba(0,0,255,0.5)';
+      ctx.fillRect(
+        ...transform(vector(platformBoundary.l, platformBoundary.t)),
+        transform(platform.s.x),
+        transform(platform.s.y)
+      );
+    }
+    
+  ]
+});

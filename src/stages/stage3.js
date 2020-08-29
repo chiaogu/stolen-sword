@@ -29,6 +29,7 @@ import { enemy, compund, fire, switchMode, shell, recover, firework } from '../h
 import {
   water,
   boundary,
+  platform,
   followPlayerX,
   followPlayerY,
 } from '../helper/platform';
@@ -51,17 +52,14 @@ export default {
     player.p.x = 0;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
-      cameraCenter.y = Math.min(
-        player.p.y - player.s.y / 2 + 200,
-        cameraCenter.y
-      );
-      cameraCenter.y = Math.max(200, cameraCenter.y);
+      cameraCenter.y = 
+        Math.max(player.p.y - player.s.y / 2 - 200, Math.min(200, cameraCenter.y))
     };
     platforms.push(
       water(0, -50, player.s.x * 10, 100, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
-      boundary(0, -100, player.s.x * 10, 0, {
+      platform(0, -100, player.s.x * 10, 0, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
       boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
@@ -92,11 +90,13 @@ export default {
       shell(100, 250, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(2000, -250, 500),
+          recover(3000, 3),
           circularMovement(3000, 10, 5, 2000)
         ]
       }),
       shell(-100, 300, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
+          recover(3000, 3),
           slideIn(2500, 250, 500),
           circularMovement(4000, 10, 5, 2500)
         ]
