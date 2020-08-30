@@ -16,14 +16,15 @@ import {
   $cameraLoop,
   $cameraZoom,
   graphics,
-  effects
+  effects,
+  $backgroundV
 } from '../state';
 import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint, easeInQuint } from '../easing';
 import { circularMovement, slideIn } from '../animation';
-import { wipe, bamboo } from '../helper/graphic';
+import { wipe, movingBamboo } from '../helper/graphic';
 
 let tempPlayerPos;
 
@@ -48,9 +49,9 @@ export default {
       })
     );
     graphics.push(
-      ...bamboo(0, 30, 5, 0.9),
-      ...bamboo(50, 30, 5, 0.75),
-      ...bamboo(20, 30, 10, 0.6)
+      ...movingBamboo(0, 30, 1250, 5, 0.9),
+      ...movingBamboo(50, 30, 1250, 5, 0.75),
+      ...movingBamboo(20, 30, 1250, 10, 0.6)
     );
   },
   [KEY_STAGE_WAVES]: [
@@ -124,13 +125,16 @@ export default {
     return enemies.length === 0 && player.p.y <= 0;
   },
   [KEY_STAGE_TRANSITION](progress) {
-    $cameraZoom.$ = 1 + (1 - easeInOutQuad(alternateProgress(progress))) * 0.2;
+    const movementProgress = (1 - easeInOutQuad(alternateProgress(progress)));
+    $backgroundV.$ = 1 + movementProgress * 3;
+    $cameraZoom.$ = 1 + movementProgress * 0.1;
     if(progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
     else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
     [() => tempPlayerPos = vector(player.p.x, player.p.y)],
     [progress => {
+      $backgroundV.$ = 1 + easeOutQuad(progress) * 3;
       player.p.x = tempPlayerPos.x + (-140 - tempPlayerPos.x) * easeInOutQuad(progress);
     }, 2000],
     [() => enemies.push(
@@ -154,6 +158,7 @@ export default {
     }, 1000],
     [progress => {
       player.p.x = -140 + 390 * easeInQuad(progress);
+      $backgroundV.$ = 4 + easeOutQuad(progress) * 2;
     }, 1000],
     [() => effects.push(wipe())],
     [() => {}, 1000]

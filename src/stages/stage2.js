@@ -18,7 +18,8 @@ import {
   $stageWave,
   enemies,
   $timeRatio,
-  graphics
+  graphics,
+  $backgroundV
 } from '../state';
 import {
   platform,
@@ -31,7 +32,7 @@ import { enemy, compund } from '../helper/enemy';
 import { easeInQuint } from '../easing';
 import { circularMovement } from '../animation';
 import { collision, object, vectorMagnitude, alternateProgress } from '../utils';
-import { wipe } from '../helper/graphic';
+import { wipe, staticBamboo } from '../helper/graphic';
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -43,6 +44,15 @@ export default {
         Math.max(player.p.y + player.s.y / 2, cameraCenter.y)
       );
     };
+    graphics.push(
+      staticBamboo(330, -20, 3100, 1, 1.5, 51, 0.02),
+      staticBamboo(20, -20, 3100,  2, 1.2, 51, 0.02),
+      staticBamboo(0, -10, 3100,  5, 0.9, 10, 0.02),
+      staticBamboo(100, -10, 3100,  7, 0.8, 10, 0.02),
+      staticBamboo(-100, -10, 3100,  5, 0.7, 10, 0.02),
+      staticBamboo(33, -10, 3100,  5, 0.6, 10, 0.02),
+      staticBamboo(-33, -10, 3100,  5, 0.5, 10, 0.02),
+    );
     platforms.push(
       platform(0, -player.s.y / 2, player.s.x * 10, 0, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],

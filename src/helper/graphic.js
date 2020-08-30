@@ -17,9 +17,10 @@ import {
   cameraFrameSize,
   detransform,
   graphics,
-  draw
+  draw,
+  $backgroundV
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp, getActionProgress } from '../utils';
+import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress } from '../utils';
 import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad } from '../easing';
 import { display } from '../modules/display';
 
@@ -54,30 +55,42 @@ const background = (draw, v) =>
   Array(3).fill().map((_, i) => 
     graphic(i * DEFAULT_FRAME_WIDTH - DEFAULT_FRAME_WIDTH, 0, (graphic) => {
       if(graphic.p.x < DEFAULT_FRAME_WIDTH * -1.5 ) graphic.p.x = DEFAULT_FRAME_WIDTH * 1.5;
-      else graphic.p.x-= v * $timeRatio.$; 
+      else graphic.p.x-= v * $timeRatio.$ * $backgroundV.$; 
       draw(graphic.p.x - DEFAULT_FRAME_WIDTH / 2, i);
     }))
-
-export const bamboo = (x, y, amount, distance) => {
+    
+const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
   const sectionHeight = 50;
-  const sections = 25;
-  const minSections = 12;
-  const amountSeed = Array(3).fill().map(() => Array(amount).fill().map(() => Math.random()));
-  return background((offset, index) => {
-    draw(10, ctx => {
-      const bright = 10 + 80 * easeInQuad(distance);
-      ctx.strokeStyle = `rgb(${bright}, ${bright}, ${bright})`;
-      ctx.lineWidth = transform(8 + 2 * distance, distance);
-      for(let i = 0; i < amount; i++) {
-        const seed = amountSeed[index][i];
-        ctx.beginPath();
-        for(let j = 0; j < minSections + (sections - minSections) * seed; j++) {
-          ctx.setLineDash([transform(30 * seed + 70, distance), transform(1, distance)]);
-          ctx.lineTo(...transform(vector(x + offset + DEFAULT_FRAME_WIDTH / amount * i + 50 * seed + (seed < 0.5 ? easeInQuad : easeOutQuad)(j) * (0.1 * seed + 0.1), y + sectionHeight * j - 10 * seed), distance));
-        }
-        ctx.stroke();
+  const sections = h / sectionHeight;
+  const minSections = h / sectionHeight * 0.8;
+  const amountSeed = Array(amount).fill().map(() => Math.random());
+  const progress = Array(amount).fill(0);
+  return offset => draw(zIndex, ctx => {
+    const bright = 10 + 50 * easeInQuad(distance > 1 ? 0.7 : distance);
+    ctx.strokeStyle = `rgb(${bright}, ${bright}, ${bright})`;
+    ctx.lineWidth = transform(8 + 2 * distance, distance);
+    for(let i = 0; i < amount; i++) {
+      const seed = amountSeed[i];
+      progress[i] = progress[i] >= 1 ? 0 : progress[i] + 0.001 + 0.002 * seed;
+      ctx.beginPath();
+      for(let j = 0; j < minSections + (sections - minSections) * seed; j++) {
+        ctx.setLineDash([transform(30 * seed + 70, distance), transform(1, distance)]);
+        ctx.lineTo(...transform(vector(x + offset + DEFAULT_FRAME_WIDTH / amount * i + 50 * seed + (seed < 0.5 ? easeInQuad : easeOutQuad)(j) * (easeInOutQuad(alternateProgress(progress[i])) * amplitude / 2 * seed + amplitude / 2), y + sectionHeight * j - 10 * seed), distance));
       }
-      ctx.lineWidth = 1;
-    });
+      ctx.stroke();
+    }
+    ctx.lineWidth = 1;
+  });
+}
+
+export const staticBamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
+  const drawBamboo = bamboo(x - DEFAULT_FRAME_WIDTH / 2, y, h, amount, distance, zIndex, amplitude);
+  return graphic(0, 0, () => drawBamboo(0));
+}
+
+export const movingBamboo = (x, y, h, amount, distance, zIndex=10, amplitude=0.2) => {
+  const drawBamboo = Array(3).fill().map(() => bamboo(x, y, h, amount, distance, zIndex, amplitude));
+  return background((offset, index) => {
+    drawBamboo[index](offset);
   }, 2 * distance);
 };
