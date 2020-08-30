@@ -7,7 +7,8 @@ import {
   transform,
   $timeRatio,
   playerDamage,
-  projectiles
+  projectiles,
+  draw
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp } from '../utils';
 
@@ -18,15 +19,16 @@ function handleCollision(projectile, projectileBoundary, collidedSide) {
   }
 }
 
-function draw(projectile, ctx) {
-  ctx.fillStyle = '#f00';
-
-  const { l, t } = getObjectBoundary(projectile);
-  ctx.fillRect(
-    ...transform(vector(l, t)),
-    transform(projectile.s.x),
-    transform(projectile.s.y)
-  );
+function drawProjectile(projectile) {
+  draw(35, ctx => {
+    ctx.fillStyle = '#f00';
+    const { l, t } = getObjectBoundary(projectile);
+    ctx.fillRect(
+      ...transform(vector(l, t)),
+      transform(projectile.s.x),
+      transform(projectile.s.y)
+    );
+  });
 }
 
 function move(projectile) {
@@ -44,6 +46,6 @@ export const projectile = (pos, size, v, options = {}) => ({
   [KEY_OBJECT_ON_UPDATE]: [
     move,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    draw,
+    drawProjectile,
   ],
 });

@@ -7,7 +7,8 @@ import {
   projectiles,
   isOutOfScreen,
   $stage,
-  graphics
+  graphics,
+  effects
 } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
@@ -60,5 +61,9 @@ export default (ctx) => {
   for (let i = graphics.length - 1; i >= 0; i--) {
     if (graphics[i][KEY_GRAPHIC_IS_ANIMATION_FINISH]) graphics.splice(i, 1);
     else objectLoop(graphics[i], ctx);
+  }
+  for (let i = effects.length - 1; i >= 0; i--) {
+    if (effects[i][KEY_GRAPHIC_IS_ANIMATION_FINISH]) effects.splice(i, 1);
+    else objectLoop(effects[i], ctx);
   }
 };

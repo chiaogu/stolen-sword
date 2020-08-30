@@ -67,3 +67,14 @@ export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
 export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
 // export const STAGE_TRANSITION_DURAION = 10;
 export const STAGE_TRANSITION_DURAION = 2000;
+
+/**
+ *  zIndex
+ *  0-10: background
+ * 11-20: enemy
+ * 21-30: player
+ * 31-40: platform
+ * 41-50: effect
+ * 51-60: foreground
+ * 61-70: menu/hud
+ */

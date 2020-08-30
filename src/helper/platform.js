@@ -1,4 +1,4 @@
-import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash } from '../state';
+import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw } from '../state';
 import { vector, object, approach, getObjectBoundary, vectorOp } from '../utils';
 import {
   SIDE_T,
@@ -65,22 +65,24 @@ function handleBoundaryCollision(platform, platformBoundary, collidedSide) {
   }
 }
 
-function draw(platform, ctx) {
+function drawPlatform(platform) {
   if(platform[KEY_OBJECT_FRAME] === 0) return;
-  const platformBoundary = getObjectBoundary(platform);
-  ctx.strokeStyle = '#fff';
-  ctx.strokeRect(
-    ...transform(vector(platformBoundary.l, platformBoundary.t)),
-    transform(platform.s.x),
-    transform(platform.s.y)
-  );
+  draw(31, ctx => {
+    const platformBoundary = getObjectBoundary(platform);
+    ctx.strokeStyle = '#fff';
+    ctx.strokeRect(
+      ...transform(vector(platformBoundary.l, platformBoundary.t)),
+      transform(platform.s.x),
+      transform(platform.s.y)
+    );
+  })
 }
 
 const _platform = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
   [KEY_OBJECT_ON_UPDATE]: [
-    draw,
+    drawPlatform,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
   ],
 });
@@ -123,15 +125,17 @@ export const flow = (x, y, w, h, v, options) => _platform(x, y, w, h, {
     }
   },
   [KEY_OBJECT_ON_UPDATE]: [
-    function draw(platform, ctx) {
+    function draw(platform) {
       if(platform[KEY_OBJECT_FRAME] === 0) return;
-      const platformBoundary = getObjectBoundary(platform);
-      ctx.fillStyle = 'rgba(0,0,255,0.5)';
-      ctx.fillRect(
-        ...transform(vector(platformBoundary.l, platformBoundary.t)),
-        transform(platform.s.x),
-        transform(platform.s.y)
-      );
+      draw(31, ctx => {
+        const platformBoundary = getObjectBoundary(platform);
+        ctx.fillStyle = 'rgba(0,0,255,0.5)';
+        ctx.fillRect(
+          ...transform(vector(platformBoundary.l, platformBoundary.t)),
+          transform(platform.s.x),
+          transform(platform.s.y)
+        );
+      })
     }
     
   ]

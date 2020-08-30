@@ -16,7 +16,7 @@ import {
   DEFAULT_HEALTH,
   KEY_STAGE_TRANSITION_FRAME,
   KEY_STAGE_WAVES,
-  G
+  G,
 } from './constants';
 import {
   vector,
@@ -237,15 +237,15 @@ export const enemies = [];
 export const projectiles = [];
 export const platforms = [];
 export const graphics = [];
+export const effects = [];
 export const $stageWave = ref(-1);
 export const $stageNextWave = ref(-1);
 export const $stageIndex = ref(-1);
 export const $stage = ref();
-export const isInTranisition = () => 
-  $stage.$ && (
-    $stageWave.$ === $stage.$[KEY_STAGE_WAVES].length ||
-    $stage.$[KEY_STAGE_TRANSITION_FRAME] !== undefined
-  );
+export const isInTranisition = () =>
+  $stage.$ &&
+  ($stageWave.$ === $stage.$[KEY_STAGE_WAVES].length ||
+    $stage.$[KEY_STAGE_TRANSITION_FRAME] !== undefined);
 
 display(() => `stage: ${$stageIndex.$}`);
 display(() => `wave: ${$stageWave.$}`);
@@ -253,7 +253,13 @@ display(() => `wave: ${$stageWave.$}`);
 export const $debug = ref(false);
 let clickPromises = {};
 export const resolveClick = () => {
-  Object.keys(clickPromises).forEach(key => clickPromises[key]());
+  Object.keys(clickPromises).forEach((key) => clickPromises[key]());
   clickPromises = {};
 };
-export const waitForClick = (key, callback) => clickPromises[key] = callback;
+export const waitForClick = (key, callback) => (clickPromises[key] = callback);
+
+export const drawStack = [];
+export const draw = (zIndex, callback) =>
+  drawStack[zIndex]
+    ? drawStack[zIndex].push(callback)
+    : (drawStack[zIndex] = [callback]);

@@ -15,7 +15,8 @@ import {
   cameraCenter,
   $cameraLoop,
   $cameraZoom,
-  graphics
+  graphics,
+  effects
 } from '../state';
 import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
@@ -47,9 +48,9 @@ export default {
       })
     );
     graphics.push(
-      ...bamboo(0, 50, 5, 1),
-      ...bamboo(50, 30, 5, 0.7),
-      ...bamboo(20, 10, 7, 0.5)
+      ...bamboo(0, 30, 5, 0.9),
+      ...bamboo(50, 30, 5, 0.75),
+      ...bamboo(20, 30, 10, 0.6)
     );
   },
   [KEY_STAGE_WAVES]: [
@@ -154,7 +155,7 @@ export default {
     [progress => {
       player.p.x = -140 + 390 * easeInQuad(progress);
     }, 1000],
-    [() => graphics.push(wipe())],
+    [() => effects.push(wipe())],
     [() => {}, 1000]
   ]
 };

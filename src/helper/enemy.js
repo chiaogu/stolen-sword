@@ -21,7 +21,7 @@ import {
   KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
   FRAME_DURAITON,
 } from '../constants';
-import { transform, setDash, player, enemies, projectiles, playerDamage } from '../state';
+import { transform, setDash, player, enemies, projectiles, playerDamage, draw } from '../state';
 import {
   object,
   getObjectBoundary,
@@ -71,39 +71,40 @@ function underAttack(enemy, enemyBoundary, collidedSide) {
   }
 }
 
-function draw(enemy, ctx) {
+function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
-  let deathProgress = 1 - getActionProgress(
-    enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
-    ENEMY_DEATH_ANIMATION_DURATION,
-    false
-  );
-  deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
-  if (enemy[KEY_OBJECT_IS_COLLIDED]) {
-    ctx.fillStyle = '#f00';
-  } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
-    ctx.fillStyle = `rgba(255,0,255,${deathProgress})`;
-  } else {
-    ctx.fillStyle = `rgba(255,255,0,${deathProgress})`;
-  }
-
-  const { l, t } = getObjectBoundary(enemy);
-  ctx.fillRect(
-    ...transform(vector(l, t)),
-    transform(enemy.s.x),
-    transform(enemy.s.y)
-  );
-  
-  if (enemy[KEY_ENEMY_IS_DEFENCING]) {
-    const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
-    const shellBoundary = getObjectBoundary(object(enemy.p.x, enemy.p.y, size.x, size.y));
-    ctx.fillStyle = '#0ff';
-    ctx.fillRect(
-      ...transform(vector(shellBoundary.l, shellBoundary.t)),
-      transform(size.x),
-      transform(size.y)
+  draw(11, ctx => {
+    let deathProgress = 1 - getActionProgress(
+      enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
+      ENEMY_DEATH_ANIMATION_DURATION,
+      false
     );
-  }
+    deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
+    if (enemy[KEY_OBJECT_IS_COLLIDED]) {
+      ctx.fillStyle = '#f00';
+    } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+      ctx.fillStyle = `rgba(255,0,255,${deathProgress})`;
+    } else {
+      ctx.fillStyle = `rgba(255,255,0,${deathProgress})`;
+    }
+    const { l, t } = getObjectBoundary(enemy);
+    ctx.fillRect(
+      ...transform(vector(l, t)),
+      transform(enemy.s.x),
+      transform(enemy.s.y)
+    );
+    
+    if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+      const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
+      const shellBoundary = getObjectBoundary(object(enemy.p.x, enemy.p.y, size.x, size.y));
+      ctx.fillStyle = '#0ff';
+      ctx.fillRect(
+        ...transform(vector(shellBoundary.l, shellBoundary.t)),
+        transform(size.x),
+        transform(size.y)
+      );
+    }
+  })
 }
 
 const dead = objectEvent(
@@ -127,7 +128,7 @@ export const enemy = (x, y, w, h, options = {}) => ({
   [KEY_OBJECT_ON_UPDATE]: [
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    draw,
+    drawEnemy,
   ],
 });
 
