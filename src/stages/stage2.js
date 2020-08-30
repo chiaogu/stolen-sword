@@ -26,7 +26,7 @@ import {
   boundary,
   followPlayerX,
   followPlayerY,
-  penetrablePlatform,
+  horizontalBamboo,
 } from '../helper/platform';
 import { enemy, compund } from '../helper/enemy';
 import { easeInQuint } from '../easing';
@@ -45,13 +45,13 @@ export default {
       );
     };
     graphics.push(
-      staticBamboo(330, -20, 3100, 1, 1.5, 51, 0.02),
-      staticBamboo(20, -20, 3100,  2, 1.2, 51, 0.02),
-      staticBamboo(0, -10, 3100,  5, 0.9, 10, 0.02),
-      staticBamboo(100, -10, 3100,  7, 0.8, 10, 0.02),
-      staticBamboo(-100, -10, 3100,  5, 0.7, 10, 0.02),
-      staticBamboo(33, -10, 3100,  5, 0.6, 10, 0.02),
-      staticBamboo(-33, -10, 3100,  5, 0.5, 10, 0.02),
+      staticBamboo(330, -10, 2900, 1, 1.5, 51, 0.02),
+      staticBamboo(30, -10, 2900,  2, 1.2, 51, 0.02),
+      staticBamboo(0, 0, 2900,  3, 0.9, 10, 0.02),
+      staticBamboo(-67, 0, 3000,  5, 0.7, 10, 0.02),
+      staticBamboo(67, -10, 3100,  5, 0.7, 10, 0.02),
+      staticBamboo(-200, -10, 3200,  10, 0.5, 10, 0.02),
+      staticBamboo(200, -10, 3200,  10, 0.5, 10, 0.02),
     );
     platforms.push(
       platform(0, -player.s.y / 2, player.s.x * 10, 0, {
@@ -63,22 +63,22 @@ export default {
       boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      penetrablePlatform(-50, 150, 150, 0, {
+      horizontalBamboo(-50, 150, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(9000, 0, 15)],
       }),
-      penetrablePlatform(120, 300, 200, 0, {
+      horizontalBamboo(120, 300, 200, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(10000, 0, 15)],
       }),
-      penetrablePlatform(-120, 450, 200, 0, {
+      horizontalBamboo(-120, 450, 200, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(8000, 0, 15)],
       }),
-      penetrablePlatform(-50, 610, 180, 0, {
+      horizontalBamboo(-50, 610, 180, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(10000, 0, 15)],
       }),
       platform(-180, 800, 0, 200, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(8000, 15, 0)],
       }),
-      penetrablePlatform(50, 870, 150, 0, {
+      horizontalBamboo(50, 870, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(9000, 0, 15)],
       }),
       platform(150, 1100, 0, 200, {
@@ -87,22 +87,22 @@ export default {
       platform(-100, 1400, 0, 500, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(10000, 15, 0)],
       }),
-      penetrablePlatform(200, 1350, 50, 0, {
+      horizontalBamboo(250, 1350, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(9000, 0, 15)],
       }),
-      penetrablePlatform(150, 1620, 150, 0, {
+      horizontalBamboo(150, 1620, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(8000, 0, 15)],
       }),
-      penetrablePlatform(-50, 1920, 150, 0, {
+      horizontalBamboo(-50, 1920, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(10000, 0, 15)],
       }),
-      penetrablePlatform(-200, 2220, 50, 0, {
+      horizontalBamboo(-250, 2220, 150, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(9000, 0, 15)],
       }),
       platform(190, 2500, 0, 500, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(8000, 15, 0)],
       }),
-      penetrablePlatform(-136, 2900, 200, 0, {
+      horizontalBamboo(-136, 2900, 200, 0, {
         [KEY_OBJECT_ON_UPDATE]: [circularMovement(10000, 0, 15)],
       })
     );

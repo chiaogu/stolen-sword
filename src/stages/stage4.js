@@ -24,7 +24,6 @@ import {
   boundary,
   followPlayerX,
   followPlayerY,
-  penetrablePlatform,
   flow,
 } from '../helper/platform';
 import { enemy, compund, recover, shell } from '../helper/enemy';

@@ -1,5 +1,5 @@
 import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw } from '../state';
-import { vector, object, approach, getObjectBoundary, vectorOp } from '../utils';
+import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress } from '../utils';
 import {
   SIDE_T,
   SIDE_B,
@@ -78,26 +78,24 @@ function drawPlatform(platform) {
   })
 }
 
-const _platform = (x, y, w, h, options = {}) => ({
+export const boundary = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
-  ...options,
-  [KEY_OBJECT_ON_UPDATE]: [
-    drawPlatform,
-    ...(options[KEY_OBJECT_ON_UPDATE] || []),
-  ],
-});
-
-export const boundary = (x, y, w, h, options) => _platform(x, y, w, h, {
   ...options,
   [KEY_OBJECT_ON_COLLIDED]: handleBoundaryCollision
 });
 
-export const platform = (x, y, w, h, options) => _platform(x, y, w, h, {
+export const platform = (x, y, w, h, options = {}) => ({
+  ...object(x, y, w, h),
   ...options,
-  [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision
+  [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision,
+  [KEY_OBJECT_ON_UPDATE]: [
+    drawPlatform,
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ]
 });
 
-export const penetrablePlatform = (x, y, w, h, options) => _platform(x, y, w, h, {
+export const penetrablePlatform = (x, y, w, h, options) => ({
+  ...object(x, y, w, h),
   ...options,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
     if(collidedSide) setDash(Math.max($dash.$, 1));
@@ -106,7 +104,38 @@ export const penetrablePlatform = (x, y, w, h, options) => _platform(x, y, w, h,
   }
 });
 
-export const water = (x, y, w, h, options) => _platform(x, y, w, h, {
+export const horizontalBamboo = (x, y, w, h, options) => penetrablePlatform(x, y, w, h, {
+  ...options,
+  [KEY_OBJECT_ON_UPDATE]: [
+    platform => {
+      if(platform[KEY_OBJECT_FRAME] === 0) return;
+      draw(31, ctx => {
+        const { l, t, r } = getObjectBoundary(platform);
+        const direction = x < 0 ? -1 : 1;
+        const grad = ctx.createLinearGradient(...transform(vector(l - 20, 0)), ...transform(vector(r + 20, 0)));
+        grad.addColorStop(0, '#444');
+        grad.addColorStop(0.2, '#aaa');   
+        grad.addColorStop(0.8, '#aaa');     
+        grad.addColorStop(1, '#444');  
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 5;
+        ctx.setLineDash([transform(80), transform(1)]);
+        
+        const side = x < 0 ? l : r;
+        const anotherSide = x < 0 ? r : l;
+        ctx.beginPath();
+        ctx.moveTo(...transform(vector(x + direction * w * 4, y - w * 2)));
+        ctx.quadraticCurveTo(...transform(vector(side + direction * w * 2, t)), ...transform(vector(side, t)));
+        ctx.quadraticCurveTo(...transform(vector(anotherSide - direction * w / 4, t + 2)), ...transform(vector(anotherSide - direction * w / 2, t - w * 0.1)));
+        ctx.stroke();
+      })
+    },
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ]
+}) 
+
+export const water = (x, y, w, h, options = {}) => ({
+  ...object(x, y, w, h),
   ...options,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
     if(collidedSide) {
@@ -114,18 +143,9 @@ export const water = (x, y, w, h, options) => _platform(x, y, w, h, {
       player.v.x = approach(player.v.x, 0 ,player.v.x * 0.1 * $timeRatio.$);
       player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
     }
-  }
-});
-
-export const flow = (x, y, w, h, v, options) => _platform(x, y, w, h, {
-  ...options,
-  [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
-    if(collidedSide) {
-      vectorOp((player, target) => player + target * $timeRatio.$, [player.v, v], player.v);
-    }
   },
   [KEY_OBJECT_ON_UPDATE]: [
-    function draw(platform) {
+    platform => {
       if(platform[KEY_OBJECT_FRAME] === 0) return;
       draw(31, ctx => {
         const platformBoundary = getObjectBoundary(platform);
@@ -136,7 +156,32 @@ export const flow = (x, y, w, h, v, options) => _platform(x, y, w, h, {
           transform(platform.s.y)
         );
       })
+    },
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ]
+});
+
+export const flow = (x, y, w, h, v, options = {}) => ({
+  ...object(x, y, w, h),
+  ...options,
+  [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
+    if(collidedSide) {
+      vectorOp((player, target) => player + target * $timeRatio.$, [player.v, v], player.v);
     }
-    
+  },
+  [KEY_OBJECT_ON_UPDATE]: [
+    platform => {
+      if(platform[KEY_OBJECT_FRAME] === 0) return;
+      draw(31, ctx => {
+        const platformBoundary = getObjectBoundary(platform);
+        ctx.fillStyle = 'rgba(0,0,255,0.5)';
+        ctx.fillRect(
+          ...transform(vector(platformBoundary.l, platformBoundary.t)),
+          transform(platform.s.x),
+          transform(platform.s.y)
+        );
+      })
+    },
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
   ]
 });

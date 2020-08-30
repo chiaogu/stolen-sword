@@ -49,6 +49,8 @@ export default {
       })
     );
     graphics.push(
+      ...movingBamboo(0, -10, 1250, 1, 1.5, 51),
+      ...movingBamboo(50, -10, 1250, 2, 1.1, 51),
       ...movingBamboo(0, 30, 1250, 5, 0.9),
       ...movingBamboo(50, 30, 1250, 5, 0.75),
       ...movingBamboo(20, 30, 1250, 10, 0.6)
