@@ -1,8 +1,18 @@
 import { PRESS_DOWN, PRESS_UP, emit } from '../events';
-import { cursorPos, pressDownPos, pressingKeys, $isPressing, detransform, cameraFrameSize, resolveClick } from '../state';
+import {
+  cursorPos,
+  pressDownPos,
+  pressingKeys,
+  $isPressing,
+  detransform,
+  cameraFrameSize,
+  resolveClick,
+  graphics,
+} from '../state';
 import { vector } from '../utils';
+import { wipe } from '../helper/graphic';
 
-const canvas = document.querySelector("canvas");
+const canvas = document.querySelector('canvas');
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
 
@@ -33,20 +43,24 @@ window.addEventListener('touchstart', ({ touches }) => onPressDown(touches[0]));
 window.addEventListener('touchmove', ({ touches }) => onPressMove(touches[0]));
 window.addEventListener('touchend', ({ touches }) => onPressUp(touches[0]));
 
-export default ctx => {
+export default (ctx) => {
   const leftOffset = canvas.getBoundingClientRect().left;
   let x = cursorPos.x - leftOffset;
   let y = cursorPos.y - 10;
-  if(x > cameraFrameSize.x - 40) x -= 40;
-  if(y < 40) y += 60;
-    
+  if (x > cameraFrameSize.x - 40) x -= 40;
+  if (y < 40) y += 60;
+
   ctx.font = `20px`;
   ctx.fillStyle = '#fff';
-  ctx.fillText(`${(cursorPos.x  - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`, x, y);
-  const worldPos = detransform(vector(cursorPos.x  - leftOffset, cursorPos.y));
+  ctx.fillText(
+    `${(cursorPos.x - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`,
+    x,
+    y
+  );
+  const worldPos = detransform(vector(cursorPos.x - leftOffset, cursorPos.y));
   ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, x, y - 15);
-  
-  if($isPressing.$) {
+
+  if ($isPressing.$) {
     // visualize drag track
     ctx.strokeStyle = '#0ff';
     ctx.lineWidth = 1;
@@ -55,4 +69,4 @@ export default ctx => {
     ctx.lineTo(cursorPos.x - leftOffset, cursorPos.y);
     ctx.stroke();
   }
-}
+};

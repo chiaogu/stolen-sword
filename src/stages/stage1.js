@@ -14,13 +14,15 @@ import {
   player,
   cameraCenter,
   $cameraLoop,
-  $cameraZoom
+  $cameraZoom,
+  graphics
 } from '../state';
 import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint, easeInQuint } from '../easing';
 import { circularMovement, slideIn } from '../animation';
+import { wipe } from '../helper/graphic';
 
 let tempPlayerPos;
 
@@ -145,7 +147,9 @@ export default {
       enemies[0].p.y = 240 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8));
     }, 1000],
     [progress => {
-      player.p.x = -140 + 390 * easeInQuint(progress);
-    }, 1500],
+      player.p.x = -140 + 390 * easeInQuad(progress);
+    }, 1000],
+    [() => graphics.push(wipe())],
+    [() => {}, 1000]
   ]
 };

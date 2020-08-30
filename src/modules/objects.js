@@ -7,6 +7,7 @@ import {
   projectiles,
   isOutOfScreen,
   $stage,
+  graphics
 } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
@@ -15,7 +16,8 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_ENEMY_IS_DEAD,
   KEY_PROJECTILE_IS_COMSUMED,
-  KEY_PROJECTILE_SORUCE
+  KEY_PROJECTILE_SORUCE,
+  KEY_GRAPHIC_IS_ANIMATION_FINISH
 } from '../constants';
 
 function objectLoop(object, ctx) {
@@ -55,4 +57,8 @@ export default (ctx) => {
   }
   if ($stage.$) objectLoop($stage.$, ctx);
   objectLoop(player, ctx);
+  for (let i = graphics.length - 1; i >= 0; i--) {
+    if (graphics[i][KEY_GRAPHIC_IS_ANIMATION_FINISH]) graphics.splice(i, 1);
+    else objectLoop(graphics[i], ctx);
+  }
 };

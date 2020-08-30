@@ -236,6 +236,7 @@ export function backToNormal() {
 export const enemies = [];
 export const projectiles = [];
 export const platforms = [];
+export const graphics = [];
 export const $stageWave = ref(-1);
 export const $stageNextWave = ref(-1);
 export const $stageIndex = ref(-1);

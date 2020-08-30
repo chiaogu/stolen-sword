@@ -36,6 +36,8 @@ export const KEY_PLAYER_DEATH_FRAME = key();
 export const KEY_PROJECTILE_IS_COMSUMED = key();
 export const KEY_PROJECTILE_SORUCE = key();
 
+export const KEY_GRAPHIC_IS_ANIMATION_FINISH = key();
+
 export const SIDE_T = 't';
 export const SIDE_R = 'r';
 export const SIDE_B = 'b';
