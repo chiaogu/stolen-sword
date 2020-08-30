@@ -46,7 +46,11 @@ export default {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       })
     );
-    graphics.push(...bamboo());
+    graphics.push(
+      ...bamboo(0, 50, 5, 1),
+      ...bamboo(50, 30, 5, 0.7),
+      ...bamboo(20, 10, 7, 0.5)
+    );
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(

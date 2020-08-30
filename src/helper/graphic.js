@@ -47,33 +47,32 @@ export const wipe = side => effect(0, 0, 2000, (ctx, progress) => {
   }
 })
 
-const background = draw => 
+const background = (draw, v) => 
   Array(3).fill().map((_, i) => 
     graphic(i * DEFAULT_FRAME_WIDTH - DEFAULT_FRAME_WIDTH, 0, (graphic, ctx) => {
       if(graphic.p.x < DEFAULT_FRAME_WIDTH * -1.5 ) graphic.p.x = DEFAULT_FRAME_WIDTH * 1.5;
-      else graphic.p.x-= 3 * $timeRatio.$; 
+      else graphic.p.x-= v * $timeRatio.$; 
       draw(ctx, graphic.p.x - DEFAULT_FRAME_WIDTH / 2, i);
     }))
 
-export const bamboo = () => {
-  const height = 50;
-  const amount = 5;
-  const nodes = 20;
-  const minNodes = 12;
+export const bamboo = (x, y, amount, distance) => {
+  const sectionHeight = 50;
+  const sections = 25;
+  const minSections = 12;
   const amountSeed = Array(3).fill().map(() => Array(amount).fill().map(() => Math.random()));
   return background((ctx, offset, index) => {
-    ctx.strokeStyle = `#555`;
-    ctx.lineWidth = transform(5);
+    const bright = 20 + 80 * easeInQuad(distance);
+    ctx.strokeStyle = `rgb(${bright}, ${bright}, ${bright})`;
+    ctx.lineWidth = transform(5 + 5 * distance, distance);
     for(let i = 0; i < amount; i++) {
       const seed = amountSeed[index][i];
-      let x = offset + DEFAULT_FRAME_WIDTH / amount * i;
       ctx.beginPath();
-      for(let j = 0; j < minNodes + (nodes - minNodes) * seed; j++) {
-        ctx.setLineDash([transform(30 * seed + 70), transform(1)]);
-        ctx.lineTo(...transform(vector(x + (seed < 0.5 ? easeInQuad : easeOutQuad)(j) * (0.1 * seed + 0.1), 50 + height * j)));
+      for(let j = 0; j < minSections + (sections - minSections) * seed; j++) {
+        ctx.setLineDash([transform(30 * seed + 70, distance), transform(1, distance)]);
+        ctx.lineTo(...transform(vector(x + offset + DEFAULT_FRAME_WIDTH / amount * i + 30 * seed + (seed < 0.5 ? easeInQuad : easeOutQuad)(j) * (0.1 * seed + 0.1), y + sectionHeight * j), distance));
       }
       ctx.stroke();
     }
     ctx.lineWidth = 1;
-  }, 100);
+  }, 2 * distance);
 };
