@@ -13,6 +13,7 @@ import {
   $g,
   $maxReleaseVelocity,
   waitForClick,
+  graphics,
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -67,6 +68,7 @@ export function setStage(stageIndex, wave) {
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
   projectiles.splice(0, projectiles.length);
+  graphics.splice(0, graphics.length);
   if (stageIndex < stages.length) {
     $stageIndex.$ = stageIndex;
     $stageNextWave.$ = -1;

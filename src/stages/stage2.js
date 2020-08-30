@@ -6,7 +6,8 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
-  KEY_STAGE_ENDING_CUT_SCENE
+  KEY_STAGE_ENDING_CUT_SCENE,
+  SIDE_T
 } from '../constants';
 import {
   platforms,
@@ -17,6 +18,7 @@ import {
   $stageWave,
   enemies,
   $timeRatio,
+  graphics
 } from '../state';
 import {
   platform,
@@ -29,6 +31,7 @@ import { enemy, compund } from '../helper/enemy';
 import { easeInQuint } from '../easing';
 import { circularMovement } from '../animation';
 import { collision, object, vectorMagnitude, alternateProgress } from '../utils';
+import { wipe } from '../helper/graphic';
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -134,11 +137,7 @@ export default {
     player.p.x = -500 * easeInQuint(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
-    [(progress) => {
-      player.p.x = alternateProgress(progress) * 100 - 50;
-    }, 3000],
-    [(progress) => {
-      player.p.y = alternateProgress(progress) * 100 - 50;
-    }, 1000, true],
+    [() => graphics.push(wipe())],
+    [() => {}, 1000]
   ]
 };

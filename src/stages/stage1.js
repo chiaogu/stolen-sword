@@ -22,7 +22,7 @@ import { enemy, compund, fire } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint, easeInQuint } from '../easing';
 import { circularMovement, slideIn } from '../animation';
-import { wipe } from '../helper/graphic';
+import { wipe, bamboo } from '../helper/graphic';
 
 let tempPlayerPos;
 
@@ -46,6 +46,7 @@ export default {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       })
     );
+    graphics.push(...bamboo());
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
