@@ -56,7 +56,7 @@ export default {
         Math.max(player.p.y - player.s.y / 2 - 200, Math.min(200, cameraCenter.y))
     };
     platforms.push(
-      water(0, -50, player.s.x * 10, 100, {
+      water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
       platform(0, -100, player.s.x * 10, 0, {

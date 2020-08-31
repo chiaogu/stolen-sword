@@ -67,6 +67,7 @@ function drawPlayer(player) {
     // visualize velocity
     ctx.strokeStyle = '#f0f';
     ctx.lineWidth = 1;
+    ctx.setLineDash([]);
     ctx.beginPath();
     ctx.moveTo(...transform(player.p));
     ctx.lineTo(

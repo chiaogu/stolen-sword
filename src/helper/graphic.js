@@ -64,7 +64,7 @@ const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
   const progress = Array(amount).fill().map(() => Math.random());
   const seeds = progress.map(() => Math.random());
   const lineDashes = seeds.map(seed => 30 * seed + 70, distance);
-  const bright = 10 + 30 * easeInQuad(distance > 1 ? 0.5 : distance);
+  const bright = 10 + 40 * easeInQuad(distance > 1 ? 0.5 : distance);
   const strokeStyle = `rgb(${bright}, ${bright}, ${bright})`;
   return offset => draw(zIndex, ctx => {
     ctx.strokeStyle = strokeStyle;
@@ -95,8 +95,6 @@ const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
       );
       ctx.stroke();
     }
-    ctx.lineWidth = 1;
-    ctx.setLineDash([]);
   });
 }
 

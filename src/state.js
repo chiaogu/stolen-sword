@@ -27,7 +27,7 @@ import {
   vectorStringify,
 } from './utils';
 import { display } from './modules/display';
-import { easeOutQuint } from './easing';
+import { easeOutQuint, easeInCirc, easeOutCirc, easeInQuint } from './easing';
 
 const ref = (defaultValue) =>
   new Proxy(
@@ -139,7 +139,7 @@ export const $cameraLoop = ref();
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
-display(() => `cameraZoom: ${$cameraZoom.$}`);
+display(() => `cameraZoom: ${$cameraZoom.$.toFixed(3)}`);
 
 export function transform(value, ratio = 1) {
   const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
@@ -216,7 +216,7 @@ export function slowDown(duration = SLOW_DOWN_DURATION) {
       (ratio) => {
         $timeRatio.$ =
           NORAML_TIME_RATIO -
-          (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * ratio;
+          (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * easeOutQuint(ratio);
       },
       duration,
       easeOutQuint
