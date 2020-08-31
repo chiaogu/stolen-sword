@@ -20,6 +20,7 @@ import {
   KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
   FRAME_DURAITON,
+  KEY_OBJECT_Z_INDEX
 } from '../constants';
 import { transform, setDash, player, enemies, projectiles, playerDamage, draw } from '../state';
 import {
@@ -73,7 +74,7 @@ function underAttack(enemy, enemyBoundary, collidedSide) {
 
 function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
-  draw(11, ctx => {
+  draw(enemy[KEY_OBJECT_Z_INDEX], ctx => {
     let deathProgress = 1 - getActionProgress(
       enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
       ENEMY_DEATH_ANIMATION_DURATION,
@@ -121,10 +122,11 @@ const dead = objectEvent(
 
 export const enemy = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
-  ...options,
   [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
+  [KEY_OBJECT_Z_INDEX]: 11,
+  ...options,
   [KEY_OBJECT_ON_UPDATE]: [
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),

@@ -7,25 +7,32 @@ import {
   KEY_OBJECT_EVENT_GET_OFFSET,
   KEY_OBJECT_ON_UPDATE,
 } from './constants';
-import { enemy } from './helper/enemy';
 import { $timeRatio } from './state';
 
 const getOffset = (startTime) =>
   startTime ? () => startTime / FRAME_DURAITON : undefined;
 
+export const circular = (x, y, rx, ry, progress, ratio = 1) => vector(
+  x + rx * Math.cos(progress * 2 * Math.PI) * ratio,
+  y + ry * Math.sin(progress * 2 * Math.PI) * ratio
+);
+  
 export const circularMovement = (duration, xRadius, yRadius, startTime = 0) => {
   let radiusProgress = 0;
   return objectAction(
     duration,
     (object, progress) => {
       radiusProgress = Math.max(progress, radiusProgress);
-      const theta = progress * 2 * Math.PI;
-      object.p.x =
-        object[KEY_OBJECT_INITIAL_POS].x +
-        xRadius * radiusProgress * Math.cos(theta);
-      object.p.y =
-        object[KEY_OBJECT_INITIAL_POS].y +
-        yRadius * radiusProgress * Math.sin(theta);
+      vectorOp(pos => pos, [
+        circular(
+          object[KEY_OBJECT_INITIAL_POS].x,
+          object[KEY_OBJECT_INITIAL_POS].y,
+          xRadius,
+          yRadius,
+          progress,
+          radiusProgress
+        )
+      ], object.p);
     },
     {
       [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),

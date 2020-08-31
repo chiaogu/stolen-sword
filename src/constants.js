@@ -29,6 +29,7 @@ export const KEY_OBJECT_EVENT_GET_OFFSET = key();
 export const KEY_OBJECT_EVENT_IS_REPEAT = key();
 export const KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME = key();
 export const KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER = key();
+export const KEY_OBJECT_Z_INDEX = key();
 
 export const KEY_PLAYER_DAMAGE_FRAME = key();
 export const KEY_PLAYER_DEATH_FRAME = key();

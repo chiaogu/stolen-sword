@@ -7,6 +7,7 @@ import {
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_STAGE_ENDING_CUT_SCENE,
+  KEY_OBJECT_Z_INDEX,
 } from '../constants';
 import {
   enemies,
@@ -17,7 +18,8 @@ import {
   $cameraZoom,
   graphics,
   effects,
-  $backgroundV
+  $backgroundV,
+  slowDown
 } from '../state';
 import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
 import { enemy, compund, fire } from '../helper/enemy';
@@ -49,11 +51,11 @@ export default {
       })
     );
     graphics.push(
-      ...movingBamboo(0, -10, 1250, 1, 1.5, 51),
-      ...movingBamboo(50, -10, 1250, 2, 1.1, 51),
+      ...movingBamboo(0, -20, 1250, 1, 1.5, 51),
+      ...movingBamboo(50, -40, 1250, 2, 1.1, 51),
       ...movingBamboo(0, 30, 1250, 5, 0.9),
-      ...movingBamboo(50, 30, 1250, 5, 0.75),
-      ...movingBamboo(20, 30, 1250, 10, 0.6)
+      ...movingBamboo(50, 30, 1250, 5, 0.75, 8),
+      ...movingBamboo(20, 30, 1250, 5, 0.6, 8)
     );
   },
   [KEY_STAGE_WAVES]: [
@@ -140,23 +142,25 @@ export default {
       player.p.x = tempPlayerPos.x + (-140 - tempPlayerPos.x) * easeInOutQuad(progress);
     }, 2000],
     [() => enemies.push(
-      enemy(-250, 0, 30, 30)
-    ), 500],
+      enemy(-250, 100, 20, 20, {
+        [KEY_OBJECT_Z_INDEX]: 9
+      })
+    )],
     [progress => {
       enemies[0].p.x = -250 + 200 * progress;
-      enemies[0].p.y = 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+      enemies[0].p.y = 200 * easeOutQuad(1 - alternateProgress(progress * 0.8));
     }, 1000],
     [progress => {
       enemies[0].p.x = -50 + 100 * progress;
-      enemies[0].p.y = 80 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
-    }, 500],
-    [progress => {
-      enemies[0].p.x = 50 + 140 * progress;
       enemies[0].p.y = 160 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
     }, 500],
     [progress => {
+      enemies[0].p.x = 50 + 140 * progress;
+      enemies[0].p.y = 240 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+    }, 500],
+    [progress => {
       enemies[0].p.x = 190 + 120 * progress;
-      enemies[0].p.y = 240 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8));
+      enemies[0].p.y = 320 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8));
     }, 1000],
     [progress => {
       player.p.x = -140 + 390 * easeInQuad(progress);

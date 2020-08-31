@@ -1,5 +1,5 @@
 import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw } from '../state';
-import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress } from '../utils';
+import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction } from '../utils';
 import {
   SIDE_T,
   SIDE_B,
@@ -11,6 +11,8 @@ import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_FRAME,
 } from '../constants';
+import { circularMovement } from '../animation';
+import { easeInQuad } from '../easing';
 
 export function followPlayerX(platform) {
   platform.p.x = player.p.x;
@@ -69,6 +71,7 @@ function drawPlatform(platform) {
   if(platform[KEY_OBJECT_FRAME] === 0) return;
   draw(31, ctx => {
     const platformBoundary = getObjectBoundary(platform);
+    ctx.lineWidth = 1;
     ctx.strokeStyle = '#fff';
     ctx.strokeRect(
       ...transform(vector(platformBoundary.l, platformBoundary.t)),
@@ -87,11 +90,7 @@ export const boundary = (x, y, w, h, options = {}) => ({
 export const platform = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
-  [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision,
-  [KEY_OBJECT_ON_UPDATE]: [
-    drawPlatform,
-    ...(options[KEY_OBJECT_ON_UPDATE] || []),
-  ]
+  [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision
 });
 
 export const penetrablePlatform = (x, y, w, h, options) => ({
@@ -104,21 +103,23 @@ export const penetrablePlatform = (x, y, w, h, options) => ({
   }
 });
 
-export const horizontalBamboo = (x, y, w, h, options) => penetrablePlatform(x, y, w, h, {
-  ...options,
+let bambooCycle = 0;
+const getBambooCycleDuration = () => 8000 + 1000 * ((bambooCycle++) % 3);
+
+export const horizontalBamboo = (x, y, w) => penetrablePlatform(x, y, w, 0, {
   [KEY_OBJECT_ON_UPDATE]: [
+    circularMovement(getBambooCycleDuration(), 0, 15),
     platform => {
-      if(platform[KEY_OBJECT_FRAME] === 0) return;
-      draw(31, ctx => {
+      draw(20, ctx => {
         const { l, t, r } = getObjectBoundary(platform);
         const direction = x < 0 ? -1 : 1;
         const grad = ctx.createLinearGradient(...transform(vector(l - 20, 0)), ...transform(vector(r + 20, 0)));
-        grad.addColorStop(0, '#444');
+        grad.addColorStop(0, '#333');
         grad.addColorStop(0.2, '#aaa');   
         grad.addColorStop(0.8, '#aaa');     
-        grad.addColorStop(1, '#444');  
+        grad.addColorStop(1, '#333');  
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = transform(5);
         ctx.setLineDash([transform(80), transform(1)]);
         
         const side = x < 0 ? l : r;
@@ -129,10 +130,35 @@ export const horizontalBamboo = (x, y, w, h, options) => penetrablePlatform(x, y
         ctx.quadraticCurveTo(...transform(vector(anotherSide - direction * w / 4, t + 2)), ...transform(vector(anotherSide - direction * w / 2, t - w * 0.1)));
         ctx.stroke();
       })
-    },
-    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    }
   ]
 }) 
+
+export const verticalBamboo = (x, y, h) => platform(x, y, 7, h, {
+  [KEY_OBJECT_ON_UPDATE]: [
+    circularMovement(getBambooCycleDuration(), 15, 0),
+    platform => {
+      draw(20, ctx => {
+        const { t, b } = getObjectBoundary(platform);
+        const startY = b - h;
+        const endY = t + h / 2;
+        const grad = ctx.createLinearGradient(...transform(vector(0, startY)), ...transform(vector(0, endY)));
+        grad.addColorStop(0, '#000');
+        grad.addColorStop(0.4, '#333');
+        grad.addColorStop(0.6, '#aaa');     
+        grad.addColorStop(0.8, '#333');  
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = transform(7);
+        ctx.setLineDash([transform(80), transform(1)]);
+        
+        ctx.beginPath();
+        ctx.moveTo(...transform(vector(x, startY)));
+        ctx.lineTo(...transform(vector(platform.p.x + (platform.p.x - x) / 2, endY)));
+        ctx.stroke();
+      })
+    }
+  ]
+})
 
 export const water = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),

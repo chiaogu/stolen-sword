@@ -23,6 +23,7 @@ import {
 import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress } from '../utils';
 import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad } from '../easing';
 import { display } from '../modules/display';
+import { circular } from '../animation';
 
 const graphic = (x, y, draw) => ({
   ...object(x, y, 0, 0),
@@ -60,36 +61,52 @@ const background = (draw, v) =>
     }))
     
 const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
-  const sectionHeight = 50;
-  const sections = h / sectionHeight;
-  const minSections = h / sectionHeight * 0.8;
-  const amountSeed = Array(amount).fill().map(() => Math.random());
-  const progress = Array(amount).fill(0);
+  const progress = Array(amount).fill().map(() => Math.random());
+  const seeds = progress.map(() => Math.random());
+  const lineDashes = seeds.map(seed => 30 * seed + 70, distance);
+  const bright = 10 + 30 * easeInQuad(distance > 1 ? 0.5 : distance);
+  const strokeStyle = `rgb(${bright}, ${bright}, ${bright})`;
   return offset => draw(zIndex, ctx => {
-    const bright = 10 + 50 * easeInQuad(distance > 1 ? 0.7 : distance);
-    ctx.strokeStyle = `rgb(${bright}, ${bright}, ${bright})`;
-    ctx.lineWidth = transform(8 + 2 * distance, distance);
+    ctx.strokeStyle = strokeStyle;
     for(let i = 0; i < amount; i++) {
-      const seed = amountSeed[i];
-      progress[i] = progress[i] >= 1 ? 0 : progress[i] + 0.001 + 0.002 * seed;
+      const seed = seeds[i];
+      progress[i] = progress[i] >= 1 ? 0 : progress[i] + (0.0005 + 0.001 * seed) * $timeRatio.$;
+      ctx.lineWidth = transform(2 + 10 * distance * (0.4 + 0.6 * seed), distance);
+      ctx.setLineDash([transform(lineDashes[i]), 1]);
       ctx.beginPath();
-      for(let j = 0; j < minSections + (sections - minSections) * seed; j++) {
-        ctx.setLineDash([transform(30 * seed + 70, distance), transform(1, distance)]);
-        ctx.lineTo(...transform(vector(x + offset + DEFAULT_FRAME_WIDTH / amount * i + 50 * seed + (seed < 0.5 ? easeInQuad : easeOutQuad)(j) * (easeInOutQuad(alternateProgress(progress[i])) * amplitude / 2 * seed + amplitude / 2), y + sectionHeight * j - 10 * seed), distance));
-      }
+      const rootX = x + offset + DEFAULT_FRAME_WIDTH / amount * i + 70 * seed;
+      const rootY = y - 20 * seed;
+      ctx.moveTo(...transform(vector(rootX, rootY), distance));
+      ctx.quadraticCurveTo(
+        ...transform(circular(
+          rootX,
+          rootY + h / 2,
+          0,
+          h / 8,
+          progress[i]
+        ), distance),
+        ...transform(circular(
+          rootX,
+          rootY + h * 0.8 + h * seed * 0.2,
+          amplitude / 2 + amplitude / 2 * seed,
+          0,
+          progress[i]
+        ), distance)
+      );
       ctx.stroke();
     }
     ctx.lineWidth = 1;
+    ctx.setLineDash([]);
   });
 }
 
-export const staticBamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
-  const drawBamboo = bamboo(x - DEFAULT_FRAME_WIDTH / 2, y, h, amount, distance, zIndex, amplitude);
+export const staticBamboo = (x, y, h, amount, distance, zIndex) => {
+  const drawBamboo = bamboo(x - DEFAULT_FRAME_WIDTH / 2, y, h, amount, distance, zIndex, 50);
   return graphic(0, 0, () => drawBamboo(0));
 }
 
-export const movingBamboo = (x, y, h, amount, distance, zIndex=10, amplitude=0.2) => {
-  const drawBamboo = Array(3).fill().map(() => bamboo(x, y, h, amount, distance, zIndex, amplitude));
+export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
+  const drawBamboo = Array(3).fill().map(() => bamboo(x, y, h, amount, distance, zIndex, 100));
   return background((offset, index) => {
     drawBamboo[index](offset);
   }, 2 * distance);
