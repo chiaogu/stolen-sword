@@ -18,9 +18,11 @@ import {
   detransform,
   graphics,
   draw,
-  $backgroundV
+  $backgroundV,
+  $reflectionY,
+  effects
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress } from '../utils';
+import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude } from '../utils';
 import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad, easeInOutQuart, easeInCirc, easeOutCirc } from '../easing';
 import { display } from '../modules/display';
 import { circular } from '../animation';
@@ -75,7 +77,7 @@ export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => 
     ctx.restore();  
   }
   
-  draw(21, ctx => drawRipple(ctx, [
+  draw(10, ctx => drawRipple(ctx, [
     [0.1, color()],
     [0.6, color(easeInQuint(1 - progress))],
     [0.61, color()],
@@ -86,6 +88,16 @@ export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => 
     [1, color()],
   ], 2 * Math.PI, Math.PI));
 })
+
+export const checkRipple = isUnderWater => object => {
+  if(object[KEY_OBJECT_FRAME] > 0 && $reflectionY.$) {
+    const isNowUnderWater = object.p.y - object.s.y / 2 <= 0;
+    if(isUnderWater !== isNowUnderWater) {
+      if(isUnderWater !== undefined) effects.push(ripple(object.p.x, 0, vectorMagnitude(object.v) * 5 + 100));
+      isUnderWater = isNowUnderWater;
+    }
+  }
+}
 
 const background = (draw, v) => 
   Array(3).fill().map((_, i) => 

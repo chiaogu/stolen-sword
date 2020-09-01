@@ -163,15 +163,10 @@ export const verticalBamboo = (x, y, h) => platform(x, y, 7, h, {
 })
 
 export const water = (x, y, w, h, options = {}) => {
-  let isPlayerUnderWater = false;
   return {
     ...object(x, y, w, h),
     ...options,
     [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
-      if(!!collidedSide !== isPlayerUnderWater) {
-        effects.push(ripple(player.p.x, platformBoundary.t, vectorMagnitude(player.v) * 5 + 100));
-        isPlayerUnderWater = !!collidedSide;
-      }
       if(collidedSide) {
         if(player.v.y < 0) resetDash();
         player.p.x -= $backgroundV.$ * $timeRatio.$;

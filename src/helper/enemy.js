@@ -22,7 +22,7 @@ import {
   FRAME_DURAITON,
   KEY_OBJECT_Z_INDEX
 } from '../constants';
-import { transform, setDash, player, enemies, projectiles, playerDamage, draw } from '../state';
+import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect } from '../state';
 import {
   object,
   getObjectBoundary,
@@ -33,6 +33,7 @@ import {
   vectorMagnitude,
 } from '../utils';
 import { projectile } from '../helper/projectile';
+import { checkRipple } from './graphic';
 
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
@@ -88,7 +89,7 @@ function drawEnemy(enemy) {
     } else {
       ctx.fillStyle = `rgba(255,255,0,${deathProgress})`;
     }
-    const { l, t } = getObjectBoundary(enemy);
+    const { l, t, b } = getObjectBoundary(enemy);
     ctx.fillRect(
       ...transform(vector(l, t)),
       transform(enemy.s.x),
@@ -104,6 +105,24 @@ function drawEnemy(enemy) {
         transform(size.x),
         transform(size.y)
       );
+    }
+    
+    if($reflectionY.$ && enemy.p.y > 0) {
+      ctx.fillRect(
+        ...reflect(vector(l, b)),
+        transform(enemy.s.x),
+        transform(enemy.s.y)
+      );
+      if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+        const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
+        const shellBoundary = getObjectBoundary(object(enemy.p.x, enemy.p.y, size.x, size.y));
+        ctx.fillStyle = '#0ff';
+        ctx.fillRect(
+          ...transform(vector(shellBoundary.l, shellBoundary.t)),
+          transform(size.x),
+          transform(size.y)
+        );
+      }
     }
   })
 }
@@ -131,6 +150,7 @@ export const enemy = (x, y, w, h, options = {}) => ({
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
     drawEnemy,
+    checkRipple()
   ],
 });
 

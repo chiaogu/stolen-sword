@@ -16,7 +16,8 @@ import {
   draw,
   cameraFrameSize,
   $reflectionY,
-  reflect
+  reflect,
+  effects
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -24,7 +25,8 @@ import {
   vector,
   getObjectBoundary,
   getActionProgress,
-  objectEvent
+  objectEvent,
+  vectorMagnitude
 } from '../utils';
 import {
   KEY_OBJECT_ON_UPDATE,
@@ -34,10 +36,13 @@ import {
   KEY_OBJECT_EVENT_GET_OFFSET
 } from '../constants';
 import { setStage } from '../helper/stage';
+import { ripple, checkRipple } from '../helper/graphic';
 
 listen(PRESS_UP, () => {
   dash();
 });
+
+let isPlayerUnderWater = false;
 
 function drawPlayer(player) {
   draw(25, ctx => {
@@ -67,7 +72,7 @@ function drawPlayer(player) {
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
     
-    if($reflectionY.$ && player.p.y > 0) {
+    if($reflectionY.$ && b > 0) {
       ctx.fillRect(...reflect(vector(l, b)), transform(player.s.x), height);
     }
   
@@ -120,4 +125,4 @@ const death = objectEvent(
   }
 );
 
-player[KEY_OBJECT_ON_UPDATE] = [death, update, drawPlayer];
+player[KEY_OBJECT_ON_UPDATE] = [death, update, drawPlayer, checkRipple()];

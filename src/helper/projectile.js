@@ -9,9 +9,12 @@ import {
   playerDamage,
   draw,
   $reflectionY,
-  reflect
+  reflect,
+  projectiles,
+  effects
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp } from '../utils';
+import { object, getObjectBoundary, vector, vectorOp, vectorMagnitude } from '../utils';
+import { ripple, checkRipple } from './graphic';
 
 function handleCollision(projectile, projectileBoundary, collidedSide) {
   if (collidedSide) {
@@ -48,13 +51,16 @@ function move(projectile) {
   );
 }
 
-export const projectile = (pos, size, v, options = {}) => ({
-  ...object(pos.x, pos.y, size.x, size.y, v.x, v.y),
-  ...options,
-  [KEY_OBJECT_ON_COLLIDED]: handleCollision,
-  [KEY_OBJECT_ON_UPDATE]: [
-    move,
-    ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    drawProjectile,
-  ],
-});
+export const projectile = (pos, size, v, options = {}) => {
+  return {
+    ...object(pos.x, pos.y, size.x, size.y, v.x, v.y),
+    ...options,
+    [KEY_OBJECT_ON_COLLIDED]: handleCollision,
+    [KEY_OBJECT_ON_UPDATE]: [
+      move,
+      ...(options[KEY_OBJECT_ON_UPDATE] || []),
+      drawProjectile,
+      checkRipple()
+    ],
+  };
+};

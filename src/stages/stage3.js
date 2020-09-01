@@ -98,25 +98,25 @@ export default {
       })
     ),
     () => enemies.push(
-      enemy(10, 400, 30, 30, {
+      enemy(10, 350, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           fire(6000, 3000),
           slideIn(3500, 0, 550),
-          circularMovement(6000, 100, 5, 3500)
+          circularMovement(8000, 100, 30, 3500)
         ]
       }),
-      shell(100, 250, 30, 30, {
+      shell(-100, 100, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(2000, -250, 500),
+          slideIn(2000, -100, -150),
           recover(3000, 3),
-          circularMovement(3000, 10, 5, 2000)
+          circularMovement(5000, 10, 15, 2000)
         ]
       }),
-      shell(-100, 300, 30, 30, {
+      shell(100, 200, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           recover(3000, 3),
-          slideIn(2500, 250, 500),
-          circularMovement(4000, 10, 5, 2500)
+          slideIn(2500, 100, -150),
+          circularMovement(6000, 10, 15, 2500)
         ]
       }),
     ),
