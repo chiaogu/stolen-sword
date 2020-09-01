@@ -1,4 +1,4 @@
-import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw, effects } from '../state';
+import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw, effects, $backgroundV } from '../state';
 import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction, collision, vectorMagnitude } from '../utils';
 import {
   SIDE_T,
@@ -10,6 +10,7 @@ import {
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_FRAME,
+  DEFAULT_FRAME_WIDTH,
 } from '../constants';
 import { circularMovement } from '../animation';
 import { easeInQuad } from '../easing';
@@ -168,14 +169,14 @@ export const water = (x, y, w, h, options = {}) => {
     ...options,
     [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
       if(!!collidedSide !== isPlayerUnderWater) {
-        effects.push(ripple(player.p.x, platformBoundary.t, vectorMagnitude(player.v) * 15));
+        effects.push(ripple(player.p.x, platformBoundary.t, vectorMagnitude(player.v) * 5 + 100));
         isPlayerUnderWater = !!collidedSide;
       }
       if(collidedSide) {
         if(player.v.y < 0) resetDash();
-        player.v.x = approach(player.v.x, 0 ,player.v.x * 0.1 * $timeRatio.$);
+        player.p.x -= $backgroundV.$ * $timeRatio.$;
+        player.v.x = approach(player.v.x, 0, player.v.x * 0.1 * $timeRatio.$);
         player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
-        
       }
     },
   }

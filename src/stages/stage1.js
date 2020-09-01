@@ -39,6 +39,7 @@ export default {
         Math.max(player.p.y + player.s.y / 2 - 200, cameraCenter.y)
       )
     }
+    $backgroundV.$ = 1;
     platforms.push(
       platform(0, -player.s.y / 2, player.s.x * 10, 0, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],

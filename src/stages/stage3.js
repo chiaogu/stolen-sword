@@ -25,7 +25,7 @@ import {
   $maxReleaseVelocity,
   $reflectionY,
   graphics,
-  effects
+  $backgroundV
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell, recover, firework } from '../helper/enemy';
@@ -57,6 +57,7 @@ export default {
     player.p.x = -DEFAULT_FRAME_WIDTH;
     cameraCenter.y = player.p.y + 200;
     $reflectionY.$ = 133;
+    $backgroundV.$ = 1;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
         Math.max(player.p.y - player.s.y / 2 - 200, Math.min(200, cameraCenter.y))
@@ -211,7 +212,9 @@ export default {
     return enemies.length === 0 && player.p.y <= player.s.y / 2;
   },
   [KEY_STAGE_TRANSITION](progress) {
-    $cameraZoom.$ = 1 - (1 - easeInOutQuart(alternateProgress(progress))) * 0.1;
+    const movementProgress = (1 - easeInOutQuad(alternateProgress(progress)));
+    $cameraZoom.$ = 1 - movementProgress * 0.1;
+    $backgroundV.$ = 1 + movementProgress * 3;
     player.v.y = 0;
     player.p.y =
       (1 - easeInQuad(alternateProgress(progress))) * 200 + player.s.y / 2;

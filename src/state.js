@@ -252,7 +252,7 @@ export const $stageWave = ref(-1);
 export const $stageNextWave = ref(-1);
 export const $stageIndex = ref(-1);
 export const $stage = ref();
-export const $backgroundV = ref(1);
+export const $backgroundV = ref(0);
 export const isInTranisition = () =>
   $stage.$ &&
   ($stageWave.$ === $stage.$[KEY_STAGE_WAVES].length ||

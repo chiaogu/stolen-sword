@@ -52,24 +52,25 @@ export const wipe = side => effect(0, 0, 2000, (progress) => {
   });
 })
 
-export const ripple = (x, y, maxR) => effect(0, 0, 3000, progress => {
+export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => {
+  graphic.p.x -= $backgroundV.$ * $timeRatio.$;
   const r = transform(maxR) * (progress + 0.1);
   const color = (a = 0) => `rgba(70,70,70,${a})`;
   const drawRipple = (ctx, colors, ...args) => {
     const grad = ctx.createRadialGradient(
-      ...transform(vector(x, y)),
+      ...transform(graphic.p),
       r * progress,
-      ...transform(vector(x, y)),
+      ...transform(graphic.p),
       r
     );
     colors.forEach(color => grad.addColorStop(...color));
     ctx.fillStyle = grad;
     ctx.lineWidth = transform(10) * easeInQuint(1 - progress);
     ctx.save();
-    ctx.translate(0, transform(vector(x, y))[1] * 0.7);
+    ctx.translate(0, transform(graphic.p)[1] * 0.7);
     ctx.scale(1, 0.3);
     ctx.beginPath();
-    ctx.ellipse(...transform(vector(x, y)), r, r, 0, ...args);
+    ctx.ellipse(...transform(graphic.p), r, r, 0, ...args);
     ctx.fill();
     ctx.restore();  
   }
