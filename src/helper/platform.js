@@ -170,21 +170,22 @@ export const water = (x, y, w, h, options = {}) => ({
       player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
     }
   },
-  [KEY_OBJECT_ON_UPDATE]: [
-    platform => {
-      if(platform[KEY_OBJECT_FRAME] === 0) return;
-      draw(31, ctx => {
-        const platformBoundary = getObjectBoundary(platform);
-        ctx.fillStyle = 'rgba(0,0,255,0.5)';
-        ctx.fillRect(
-          ...transform(vector(platformBoundary.l, platformBoundary.t)),
-          transform(platform.s.x),
-          transform(platform.s.y)
-        );
-      })
-    },
-    ...(options[KEY_OBJECT_ON_UPDATE] || []),
-  ]
+  // [KEY_OBJECT_ON_UPDATE]: [
+  //   platform => {
+  //     if(platform[KEY_OBJECT_FRAME] === 0) return;
+  //     draw(31, ctx => {
+  //       const platformBoundary = getObjectBoundary(platform);
+  //       ctx.strokeStyle = '#0ff';
+  //       ctx.lineWidth = 1;
+  //       ctx.strokeRect(
+  //         ...transform(vector(platformBoundary.l, platformBoundary.t)),
+  //         transform(platform.s.x),
+  //         transform(platform.s.y)
+  //       );
+  //     })
+  //   },
+  //   ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  // ]
 });
 
 export const flow = (x, y, w, h, v, options = {}) => ({

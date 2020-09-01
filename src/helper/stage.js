@@ -14,6 +14,7 @@ import {
   $maxReleaseVelocity,
   waitForClick,
   graphics,
+  $reflectionY
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -65,6 +66,7 @@ export function setStage(stageIndex, wave) {
   revive();
   $g.$ = G;
   $maxReleaseVelocity.$ = MAX_RELEASE_VELOCITY;
+  $reflectionY.$ = undefined;
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
   projectiles.splice(0, projectiles.length);

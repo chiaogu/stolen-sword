@@ -109,3 +109,16 @@ export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
     drawBamboo[index](offset);
   }, 2 * distance);
 };
+
+export const gradient = (y, h, z, colors) => graphic(0, 0, () => draw(z, ctx => {
+  const grad = ctx.createLinearGradient(...transform(vector(0, y)), ...transform(vector(0, y - h)));
+  colors.forEach(color => grad.addColorStop(...color));
+  ctx.fillStyle = grad;
+  // ctx.globalAlpha = 0.9;
+  ctx.fillRect(
+    ...transform(vector(-DEFAULT_FRAME_WIDTH, y)),
+    transform(DEFAULT_FRAME_WIDTH * 2),
+    transform(h)
+  );
+  ctx.globalAlpha = 1;
+}));

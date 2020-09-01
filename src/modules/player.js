@@ -13,7 +13,10 @@ import {
   $stageIndex,
   $g,
   $stageWave,
-  draw
+  draw,
+  cameraFrameSize,
+  $reflectionY,
+  reflect
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -49,7 +52,7 @@ function drawPlayer(player) {
     } else {
       ctx.fillStyle = '#fff';
     }
-    const { l, t } = getObjectBoundary(player);
+    const { l, t, b } = getObjectBoundary(player);
     let height = transform(player.s.y);
     if (player[KEY_PLAYER_DEATH_FRAME]) {
       const deathProgress = Math.min(
@@ -63,6 +66,10 @@ function drawPlayer(player) {
       height *= 1 - 0.7 * deathProgress;
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
+    
+    if($reflectionY.$ && player.p.y > 0) {
+      ctx.fillRect(...reflect(vector(l, b)), transform(player.s.x), height);
+    }
   
     // visualize velocity
     ctx.strokeStyle = '#f0f';

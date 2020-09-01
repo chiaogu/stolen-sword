@@ -23,6 +23,8 @@ import {
   $cameraZoom,
   $g,
   $maxReleaseVelocity,
+  $reflectionY,
+  graphics
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell, recover, firework } from '../helper/enemy';
@@ -42,6 +44,7 @@ import {
   follow,
   chase,
 } from '../animation';
+import { gradient } from '../helper/graphic';
 
 let tempPlayerPos;
 
@@ -51,10 +54,22 @@ export default {
     $maxReleaseVelocity.$ = 12;
     player.p.x = 0;
     cameraCenter.y = player.p.y + 200;
+    $reflectionY.$ = 133;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
         Math.max(player.p.y - player.s.y / 2 - 200, Math.min(200, cameraCenter.y))
     };
+    graphics.push(
+      gradient(100, 101, 0, [
+        [0, 'rgb(161,161,161, 1)'],
+        [1, 'rgb(110,110,110, 1)']
+      ]),
+      gradient(0, 400, 51, [
+        [0, 'rgb(110,110,110, 1)'],
+        [0.1, 'rgb(92,92,92, 0.9)'],
+        [0.4, 'rgb(34, 34, 34, 0.9)'],
+      ])
+    )
     platforms.push(
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],

@@ -141,6 +141,16 @@ export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `cameraZoom: ${$cameraZoom.$.toFixed(3)}`);
 
+export function reflect(value, ratio = 1) {
+  const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
+  return [
+    cameraFrameSize.x / 2 -
+      (cameraCenter.x - value.x) * $cameraZoom.$ * scale * ratio,
+    cameraFrameSize.y / 2 + transform(DEFAULT_FRAME_HEIGHT - $reflectionY.$ * 2) -
+      (cameraCenter.y - value.y) * $cameraZoom.$ * scale * ratio 
+  ];
+}
+
 export function transform(value, ratio = 1) {
   const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
   if (typeof value === 'number') {
@@ -264,3 +274,5 @@ export const draw = (zIndex, callback) =>
   drawStack[zIndex]
     ? drawStack[zIndex].push(callback)
     : (drawStack[zIndex] = [callback]);
+
+export const $reflectionY = ref();
