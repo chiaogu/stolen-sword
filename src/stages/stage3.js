@@ -24,7 +24,8 @@ import {
   $g,
   $maxReleaseVelocity,
   $reflectionY,
-  graphics
+  graphics,
+  effects
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell, recover, firework } from '../helper/enemy';
@@ -44,7 +45,12 @@ import {
   follow,
   chase,
 } from '../animation';
-import { gradient } from '../helper/graphic';
+import { gradient, ripple } from '../helper/graphic';
+import { listen, PRESS_DOWN } from '../events';
+
+// listen(PRESS_DOWN, () => {
+//   effects.push(ripple(0, 0));
+// });
 
 let tempPlayerPos;
 
@@ -52,7 +58,7 @@ export default {
   [KEY_STAGE_INITIATE]() {
     $g.$ = 0.3;
     $maxReleaseVelocity.$ = 12;
-    player.p.x = 0;
+    player.p.x = -DEFAULT_FRAME_WIDTH;
     cameraCenter.y = player.p.y + 200;
     $reflectionY.$ = 133;
     $cameraLoop.$ = () => {

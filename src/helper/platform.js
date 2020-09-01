@@ -1,5 +1,5 @@
-import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw } from '../state';
-import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction } from '../utils';
+import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw, effects } from '../state';
+import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction, collision } from '../utils';
 import {
   SIDE_T,
   SIDE_B,
@@ -13,6 +13,7 @@ import {
 } from '../constants';
 import { circularMovement } from '../animation';
 import { easeInQuad } from '../easing';
+import { ripple } from './graphic';
 
 export function followPlayerX(platform) {
   platform.p.x = player.p.x;
@@ -160,33 +161,41 @@ export const verticalBamboo = (x, y, h) => platform(x, y, 7, h, {
   ]
 })
 
-export const water = (x, y, w, h, options = {}) => ({
-  ...object(x, y, w, h),
-  ...options,
-  [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
-    if(collidedSide) {
-      if(player.v.y < 0) resetDash();
-      player.v.x = approach(player.v.x, 0 ,player.v.x * 0.1 * $timeRatio.$);
-      player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
-    }
-  },
-  // [KEY_OBJECT_ON_UPDATE]: [
-  //   platform => {
-  //     if(platform[KEY_OBJECT_FRAME] === 0) return;
-  //     draw(31, ctx => {
-  //       const platformBoundary = getObjectBoundary(platform);
-  //       ctx.strokeStyle = '#0ff';
-  //       ctx.lineWidth = 1;
-  //       ctx.strokeRect(
-  //         ...transform(vector(platformBoundary.l, platformBoundary.t)),
-  //         transform(platform.s.x),
-  //         transform(platform.s.y)
-  //       );
-  //     })
-  //   },
-  //   ...(options[KEY_OBJECT_ON_UPDATE] || []),
-  // ]
-});
+export const water = (x, y, w, h, options = {}) => {
+  let isPlayerUnderWater = false;
+  return {
+    ...object(x, y, w, h),
+    ...options,
+    [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
+      if(!!collidedSide !== isPlayerUnderWater) {
+        effects.push(ripple(player.p.x, player.p.y - player.s.y / 2));
+        isPlayerUnderWater = !!collidedSide;
+      }
+      if(collidedSide) {
+        if(player.v.y < 0) resetDash();
+        player.v.x = approach(player.v.x, 0 ,player.v.x * 0.1 * $timeRatio.$);
+        player.v.y = approach(player.v.y, 0 ,player.v.y * (player.v.y > 0 ? 0.1 : 0.6) * $timeRatio.$);
+        
+      }
+    },
+    // [KEY_OBJECT_ON_UPDATE]: [
+    //   platform => {
+    //     if(platform[KEY_OBJECT_FRAME] === 0) return;
+    //     draw(31, ctx => {
+    //       const platformBoundary = getObjectBoundary(platform);
+    //       ctx.strokeStyle = '#0ff';
+    //       ctx.lineWidth = 1;
+    //       ctx.strokeRect(
+    //         ...transform(vector(platformBoundary.l, platformBoundary.t)),
+    //         transform(platform.s.x),
+    //         transform(platform.s.y)
+    //       );
+    //     })
+    //   },
+    //   ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    // ]
+  }
+};
 
 export const flow = (x, y, w, h, v, options = {}) => ({
   ...object(x, y, w, h),

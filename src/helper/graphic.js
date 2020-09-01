@@ -21,7 +21,7 @@ import {
   $backgroundV
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress } from '../utils';
-import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad } from '../easing';
+import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad, easeInOutQuart } from '../easing';
 import { display } from '../modules/display';
 import { circular } from '../animation';
 
@@ -49,6 +49,31 @@ export const wipe = side => effect(0, 0, 2000, (progress) => {
     } else {
       ctx.fillRect(pos, 0, size, cameraFrameSize.y)
     }
+  });
+})
+
+export const ripple = (x, y) => effect(0, 0, 2000, progress => {
+  const seeds = Array(3).fill().map(() => 50 * Math.random());
+  const setColor = ctx => {
+    const grad = ctx.createLinearGradient(0, -10, 0, 10);
+    grad.addColorStop(0, '#aaa');  
+    grad.addColorStop(1, '#aaa');  
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = transform(1);
+  }
+  draw(21, ctx => {
+    setColor(ctx);
+    ctx.setLineDash([transform(seeds[0]) * easeOutQuad(1 - progress), transform(seeds[1]) * easeInQuint(progress)], transform(seeds[2]) * easeInOutQuart(progress));
+    ctx.beginPath();
+    ctx.ellipse(...transform(vector(x, y)), transform(75) * (progress + 0.1), transform(25) * (progress + 0.1), 0, Math.PI, 2 * Math.PI);
+    ctx.stroke();
+  });
+  draw(52, ctx => {
+    setColor(ctx);
+    ctx.setLineDash([transform(seeds[0]) * easeOutQuad(1 - progress), transform(seeds[1]) * easeInQuint(progress)], transform(seeds[2]) * easeInOutQuart(progress));
+    ctx.beginPath();
+    ctx.ellipse(...transform(vector(x, y)), transform(75) * (progress + 0.1), transform(25) * (progress + 0.1), 0, 2 * Math.PI, Math.PI);
+    ctx.stroke();
   });
 })
 

@@ -40,7 +40,7 @@ listen(PRESS_UP, () => {
 });
 
 function drawPlayer(player) {
-  draw(21, ctx => {
+  draw(25, ctx => {
     // draw character
     if (isPlayerInvincibleAfterDamage()) {
       ctx.fillStyle =
