@@ -1,5 +1,5 @@
 import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw, effects } from '../state';
-import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction, collision } from '../utils';
+import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction, collision, vectorMagnitude } from '../utils';
 import {
   SIDE_T,
   SIDE_B,
@@ -168,7 +168,7 @@ export const water = (x, y, w, h, options = {}) => {
     ...options,
     [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
       if(!!collidedSide !== isPlayerUnderWater) {
-        effects.push(ripple(player.p.x, player.p.y - player.s.y / 2));
+        effects.push(ripple(player.p.x, platformBoundary.t, vectorMagnitude(player.v) * 15));
         isPlayerUnderWater = !!collidedSide;
       }
       if(collidedSide) {
@@ -178,22 +178,6 @@ export const water = (x, y, w, h, options = {}) => {
         
       }
     },
-    // [KEY_OBJECT_ON_UPDATE]: [
-    //   platform => {
-    //     if(platform[KEY_OBJECT_FRAME] === 0) return;
-    //     draw(31, ctx => {
-    //       const platformBoundary = getObjectBoundary(platform);
-    //       ctx.strokeStyle = '#0ff';
-    //       ctx.lineWidth = 1;
-    //       ctx.strokeRect(
-    //         ...transform(vector(platformBoundary.l, platformBoundary.t)),
-    //         transform(platform.s.x),
-    //         transform(platform.s.y)
-    //       );
-    //     })
-    //   },
-    //   ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    // ]
   }
 };
 

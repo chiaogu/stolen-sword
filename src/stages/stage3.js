@@ -48,10 +48,6 @@ import {
 import { gradient, ripple } from '../helper/graphic';
 import { listen, PRESS_DOWN } from '../events';
 
-// listen(PRESS_DOWN, () => {
-//   effects.push(ripple(0, 0));
-// });
-
 let tempPlayerPos;
 
 export default {
