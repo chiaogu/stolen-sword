@@ -58,7 +58,7 @@ export const wipe = side => effect(0, 0, 2000, (progress) => {
 export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => {
   graphic.p.x -= $backgroundV.$ * $timeRatio.$;
   const r = transform(maxR) * (progress + 0.1);
-  const color = (a = 0) => `rgba(70,70,70,${a})`;
+  const color = (a = 0) => `rgba(110,110,110,${a})`;
   const drawRipple = (ctx, colors, ...args) => {
     const grad = ctx.createRadialGradient(
       ...transform(graphic.p),
@@ -91,10 +91,10 @@ export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => 
 })
 
 export const checkRipple = isUnderWater => object => {
-  if(object[KEY_OBJECT_FRAME] > 0 && $reflectionY.$) {
+  if(object[KEY_OBJECT_FRAME] > 0 && $reflectionY.$ !== undefined) {
     const isNowUnderWater = object.p.y - object.s.y / 2 <= 0;
     if(isUnderWater !== isNowUnderWater) {
-      if(isUnderWater !== undefined) effects.push(ripple(object.p.x, 0, vectorMagnitude(object.v) * 5 + 100));
+      if(isUnderWater !== undefined) effects.push(ripple(object.p.x, $reflectionY.$, vectorMagnitude(object.v) * 5 + 100));
       isUnderWater = isNowUnderWater;
     }
   }
@@ -158,13 +158,13 @@ export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
   }, 2 * distance);
 };
 
-export const gradient = (y, h, z, colors) => graphic(0, 0, () => draw(z, ctx => {
-  const grad = ctx.createLinearGradient(...transform(vector(0, y)), ...transform(vector(0, y - h)));
+export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(z, ctx => {
+  const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h)));
   colors.forEach(color => grad.addColorStop(...color));
   ctx.fillStyle = grad;
   ctx.fillRect(
-    ...transform(vector(-DEFAULT_FRAME_WIDTH, y)),
-    transform(DEFAULT_FRAME_WIDTH * 2),
+    0, transform(vector(0, y), distance)[1],
+    cameraFrameSize.x * 2,
     transform(h)
   );
 }));
@@ -191,10 +191,11 @@ const drawMountain = (x, y, z, scale = 1, color) => {
   })  
 }
 
-export const movingMountain = (x, y, z, distance = 1) => {
+export const movingMountain = (x, y, z, distance = 1, scale = 1) => {
   return background((offset, index) => {
-    drawMountain(x + offset + 100 * index, y, z, distance * 4, `rgba(136, 136, 136, ${distance * 2})`);
-  }, $backgroundV.$ * distance * distance);
+    const bright = 300 * (1 - distance);
+    drawMountain(x + offset + 100 * index, y, z, scale, `rgb(${bright}, ${bright}, ${bright})`);
+  }, $backgroundV.$ * distance);
 };
 
 function decompressPath(str) {

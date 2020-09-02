@@ -17,7 +17,8 @@ import {
   cameraFrameSize,
   $reflectionY,
   reflect,
-  effects
+  effects,
+  isReflected
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -45,6 +46,31 @@ listen(PRESS_UP, () => {
 let isPlayerUnderWater = false;
 
 function drawPlayer(player) {
+  draw(26, ctx => {
+    // visualize velocity
+    ctx.strokeStyle = '#f0f';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(...transform(player.p));
+    ctx.lineTo(
+      ...transform(vectorOp((pos, v) => pos + v * 5, [player.p, player.v]))
+    );
+    ctx.stroke();
+  
+    if ($isPressing.$ && isAbleToDash()) {
+      ctx.strokeStyle = `rgba(0,255,0,${isReleaseVelocityEnough() ? 1 : 0})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(...transform(player.p));
+      playerTrajectory().forEach((pos) => {
+        ctx.lineTo(...transform(vector(pos.x, pos.y)));
+        // ctx.strokeRect(...transform(vector(pos.x - player.s.x / 2, pos.y + player.s.y / 2)), transform(player.s.x), transform(player.s.y));
+      });
+      ctx.stroke();
+    }
+  })
+  
   draw(25, ctx => {
     // draw character
     if (isPlayerInvincibleAfterDamage()) {
@@ -72,32 +98,10 @@ function drawPlayer(player) {
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
     
-    if($reflectionY.$ && b > 0) {
-      ctx.fillRect(...reflect(vector(l, b)), transform(player.s.x), height);
-    }
-  
-    // visualize velocity
-    ctx.strokeStyle = '#f0f';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    ctx.moveTo(...transform(player.p));
-    ctx.lineTo(
-      ...transform(vectorOp((pos, v) => pos + v * 5, [player.p, player.v]))
-    );
-    ctx.stroke();
-  
-    if ($isPressing.$ && isAbleToDash()) {
-      // draw character positioin on next frame
-      ctx.strokeStyle = `rgba(0,255,0,${isReleaseVelocityEnough() ? 1 : 0})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(...transform(player.p));
-      playerTrajectory().forEach((pos) => {
-        ctx.lineTo(...transform(vector(pos.x, pos.y)));
-        // ctx.strokeRect(...transform(vector(pos.x - player.s.x / 2, pos.y + player.s.y / 2)), transform(player.s.x), transform(player.s.y));
-      });
-      ctx.stroke();
+    if(isReflected(player)) {
+      ctx.globalAlpha = 0.3;
+      ctx.fillRect(...reflect(vector(l, t)), transform(player.s.x), -height);
+      ctx.globalAlpha = 1;
     }
   })
 }

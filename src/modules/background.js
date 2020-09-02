@@ -1,7 +1,7 @@
-import { cameraFrameSize, drawStack } from '../state';
+import { cameraFrameSize, drawStack, $backgroundColor } from '../state';
 
 export default ctx => {
-  ctx.fillStyle = '#000';
+  ctx.fillStyle = $backgroundColor.$ || '#000';
   ctx.fillRect(0, 0, cameraFrameSize.x + 1, cameraFrameSize.y);
   drawStack.forEach(layer => {
     while(layer.length > 0) {

@@ -141,13 +141,15 @@ export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `cameraZoom: ${$cameraZoom.$.toFixed(3)}`);
 
+export const isReflected = object => $reflectionY.$ !== undefined && object.p.y > $reflectionY.$;
+
 export function reflect(value, ratio = 1) {
   const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
   return [
     cameraFrameSize.x / 2 -
       (cameraCenter.x - value.x) * $cameraZoom.$ * scale * ratio,
-    cameraFrameSize.y / 2 + transform(DEFAULT_FRAME_HEIGHT - $reflectionY.$ * 2) -
-      (cameraCenter.y - value.y) * $cameraZoom.$ * scale * ratio 
+    cameraFrameSize.y / 2 + 
+      (cameraCenter.y + value.y - $reflectionY.$) * $cameraZoom.$ * scale * ratio
   ];
 }
 
@@ -253,6 +255,7 @@ export const $stageNextWave = ref(-1);
 export const $stageIndex = ref(-1);
 export const $stage = ref();
 export const $backgroundV = ref(0);
+export const $backgroundColor = ref();
 export const isInTranisition = () =>
   $stage.$ &&
   ($stageWave.$ === $stage.$[KEY_STAGE_WAVES].length ||

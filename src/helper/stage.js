@@ -15,7 +15,8 @@ import {
   waitForClick,
   graphics,
   $reflectionY,
-  $backgroundV
+  $backgroundV,
+  $backgroundColor
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -69,6 +70,7 @@ export function setStage(stageIndex, wave) {
   $maxReleaseVelocity.$ = MAX_RELEASE_VELOCITY;
   $reflectionY.$ = undefined;
   $backgroundV.$ = 0;
+  $backgroundColor.$ = undefined;
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
   projectiles.splice(0, projectiles.length);

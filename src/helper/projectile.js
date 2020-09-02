@@ -11,7 +11,8 @@ import {
   $reflectionY,
   reflect,
   projectiles,
-  effects
+  effects,
+  isReflected
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp, vectorMagnitude } from '../utils';
 import { ripple, checkRipple } from './graphic';
@@ -33,12 +34,14 @@ function drawProjectile(projectile) {
       transform(projectile.s.y)
     );
     
-    if($reflectionY.$ && projectile.p.y > 0) {
+    if(isReflected(projectile)) {
+      ctx.globalAlpha = 0.3;
       ctx.fillRect(
-        ...reflect(vector(l, b)),
+        ...reflect(vector(l, t)),
         transform(projectile.s.x),
-        transform(projectile.s.y)
+        -transform(projectile.s.y)
       );
+      ctx.globalAlpha = 1;
     }
   });
 }

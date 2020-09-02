@@ -22,7 +22,7 @@ import {
   FRAME_DURAITON,
   KEY_OBJECT_Z_INDEX
 } from '../constants';
-import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect } from '../state';
+import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, isReflected } from '../state';
 import {
   object,
   getObjectBoundary,
@@ -96,6 +96,16 @@ function drawEnemy(enemy) {
       transform(enemy.s.y)
     );
     
+    if(isReflected(enemy)) {
+      ctx.globalAlpha = 0.3;
+      ctx.fillRect(
+        ...reflect(vector(l, t)),
+        transform(enemy.s.x),
+        -transform(enemy.s.y)
+      );
+      ctx.globalAlpha = 1;
+    }
+    
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
       const shellBoundary = getObjectBoundary(object(enemy.p.x, enemy.p.y, size.x, size.y));
@@ -105,23 +115,15 @@ function drawEnemy(enemy) {
         transform(size.x),
         transform(size.y)
       );
-    }
-    
-    if($reflectionY.$ && enemy.p.y > 0) {
-      ctx.fillRect(
-        ...reflect(vector(l, b)),
-        transform(enemy.s.x),
-        transform(enemy.s.y)
-      );
-      if (enemy[KEY_ENEMY_IS_DEFENCING]) {
-        const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
-        const shellBoundary = getObjectBoundary(object(enemy.p.x, enemy.p.y, size.x, size.y));
-        ctx.fillStyle = '#0ff';
+      
+      if(isReflected(enemy)) {
+        ctx.globalAlpha = 0.3;
         ctx.fillRect(
-          ...transform(vector(shellBoundary.l, shellBoundary.t)),
+          ...reflect(vector(shellBoundary.l, shellBoundary.t)),
           transform(size.x),
-          transform(size.y)
+          -transform(size.y)
         );
+        ctx.globalAlpha = 1;
       }
     }
   })

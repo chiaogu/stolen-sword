@@ -25,7 +25,8 @@ import {
   $maxReleaseVelocity,
   $reflectionY,
   graphics,
-  $backgroundV
+  $backgroundV,
+  $backgroundColor
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell, recover, firework } from '../helper/enemy';
@@ -54,30 +55,24 @@ export default {
   [KEY_STAGE_INITIATE]() {
     $g.$ = 0.3;
     $maxReleaseVelocity.$ = 12;
-    player.p.x = -DEFAULT_FRAME_WIDTH;
-    cameraCenter.y = player.p.y + 200;
-    $reflectionY.$ = 133;
+    cameraCenter.y = player.p.y + 100;
+    $reflectionY.$ = 0;
     $backgroundV.$ = 1;
+    $backgroundColor.$ = 'rgb(200,200,200)';
+    player.p.x = -DEFAULT_FRAME_WIDTH;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
-        Math.max(player.p.y - player.s.y / 2 - 200, Math.min(200, cameraCenter.y))
+        Math.max(player.p.y - player.s.y / 2 - 200, Math.min(100, cameraCenter.y))
     };
     graphics.push(
-      gradient(100, 101, 0, [
-        [0, 'rgb(161,161,161, 1)'],
-        [1, 'rgb(110,110,110, 1)']
+      gradient(100, 400, 0, 0.4, [
+        [0, 'rgb(200,200,200)'],
+        [0.5, 'rgb(110,110,110, 1)'],
+        [0.6, 'rgb(92,92,92, 0.9)'],
+        [1, 'rgb(34, 34, 34, 0.9)'],
       ]),
-      gradient(0, 400, 51, [
-        [0, 'rgb(110,110,110, 1)'],
-        [0.1, 'rgb(92,92,92, 0.9)'],
-        [0.4, 'rgb(34, 34, 34, 0.9)'],
-      ]),
-      gradient(699, 600, 0, [
-        [0, 'rgb(200,200,200, 1)'],
-        [1, 'rgb(161,161,161, 1)']
-      ]),
-      ...movingMountain(0, -50, 10, 0.5),
-      ...movingMountain(0, -30, 10, 0.4),
+      ...movingMountain(0, -30, 10, 0.5, 2, 2),
+      ...movingMountain(0, -10, 10, 0.4, 1.2, 1.2),
     )
     platforms.push(
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
