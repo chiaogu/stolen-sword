@@ -20,9 +20,10 @@ import {
   draw,
   $backgroundV,
   $reflectionY,
-  effects
+  effects,
+  reflect
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude } from '../utils';
+import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude, vectorStringify } from '../utils';
 import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad, easeInOutQuart, easeInCirc, easeOutCirc } from '../easing';
 import { display } from '../modules/display';
 import { circular } from '../animation';
@@ -161,11 +162,69 @@ export const gradient = (y, h, z, colors) => graphic(0, 0, () => draw(z, ctx => 
   const grad = ctx.createLinearGradient(...transform(vector(0, y)), ...transform(vector(0, y - h)));
   colors.forEach(color => grad.addColorStop(...color));
   ctx.fillStyle = grad;
-  // ctx.globalAlpha = 0.9;
   ctx.fillRect(
     ...transform(vector(-DEFAULT_FRAME_WIDTH, y)),
     transform(DEFAULT_FRAME_WIDTH * 2),
     transform(h)
   );
-  ctx.globalAlpha = 1;
 }));
+
+const mountainSprite = decompressPath(`	qaK^LWZMGGOWGOGGO`);
+mountainSprite.p[0].y = mountainSprite.p[mountainSprite.p.length - 1].y;
+const drawMountain = (x, y, z, scale = 1, color) => {
+  draw(z, ctx => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    mountainSprite.p.forEach(p => {
+      ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainSprite.h / 2) * scale), 0.5));
+    })
+    ctx.fill();
+    
+    // if($reflectionY.$) {
+    //   ctx.fillStyle = color;
+    //   ctx.beginPath();
+    //   mountainSprite.p.forEach(p => {
+    //     ctx.lineTo(...reflect(vector((x + p.x) * scale, (y + p.y) * scale), 0.5));
+    //   })
+    //   ctx.fill();
+    // }
+  })  
+}
+
+export const movingMountain = (x, y, z, distance = 1) => {
+  return background((offset, index) => {
+    drawMountain(x + offset + 100 * index, y, z, distance * 4, `rgba(136, 136, 136, ${distance * 2})`);
+  }, $backgroundV.$ * distance * distance);
+};
+
+function decompressPath(str) {
+  let z = 'charCodeAt';
+  let x = 0;
+  let y = 0;
+  let xMin = 0;
+  let yMin = 0
+  let xMax = 0;
+  let yMax = 0
+  const result = [];
+  str.split('').map(i => {
+    let j = i[z]();
+    let a = -(j >> 3) * 0.39 + 4.72;
+    let d = (j & 7) * 4 + 4;
+    x += d * Math.cos(a);
+    y -= d * Math.sin(a);
+    xMin = Math.min(x, xMin);
+    yMin = Math.min(y, yMin);
+    xMax = Math.max(x, xMax);
+    yMax = Math.max(y, yMax);
+    result.push(vector(x, y));
+  });
+  result.forEach(p => {
+    p.x -= (xMax - xMin) / 2;
+    p.y -= (yMax - yMin) / 2;
+  })
+  return {
+    p: result.splice(1, result.length),
+    w: xMax - xMin,
+    h: yMax - yMin
+  }
+}

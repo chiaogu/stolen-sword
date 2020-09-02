@@ -260,6 +260,7 @@ export const isInTranisition = () =>
 
 display(() => `stage: ${$stageIndex.$}`);
 display(() => `wave: ${$stageWave.$}`);
+display(() => `bgV: ${$backgroundV.$}`);
 
 export const $debug = ref(false);
 let clickPromises = {};

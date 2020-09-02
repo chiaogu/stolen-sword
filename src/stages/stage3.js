@@ -45,7 +45,7 @@ import {
   follow,
   chase,
 } from '../animation';
-import { gradient, ripple } from '../helper/graphic';
+import { gradient, ripple, movingMountain } from '../helper/graphic';
 import { listen, PRESS_DOWN } from '../events';
 
 let tempPlayerPos;
@@ -71,7 +71,13 @@ export default {
         [0, 'rgb(110,110,110, 1)'],
         [0.1, 'rgb(92,92,92, 0.9)'],
         [0.4, 'rgb(34, 34, 34, 0.9)'],
-      ])
+      ]),
+      gradient(699, 600, 0, [
+        [0, 'rgb(200,200,200, 1)'],
+        [1, 'rgb(161,161,161, 1)']
+      ]),
+      ...movingMountain(0, -50, 10, 0.5),
+      ...movingMountain(0, -30, 10, 0.4),
     )
     platforms.push(
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
