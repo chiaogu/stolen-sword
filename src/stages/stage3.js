@@ -13,6 +13,7 @@ import {
   KEY_ENEMY_IS_DEAD,
   KEY_ENEMY_DEAD_FRAME,
   KEY_OBJECT_FRAME,
+  DEFAULT_FRAME_HEIGHT,
 } from '../constants';
 import {
   enemies,
@@ -26,7 +27,8 @@ import {
   $reflectionY,
   graphics,
   $backgroundV,
-  $backgroundColor
+  $backgroundColor,
+  $reflectionGradient
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
 import { enemy, compund, fire, switchMode, shell, recover, firework } from '../helper/enemy';
@@ -57,6 +59,11 @@ export default {
     $maxReleaseVelocity.$ = 12;
     cameraCenter.y = player.p.y + 100;
     $reflectionY.$ = 0;
+    $reflectionGradient.$ = [0, 230, [
+      [0.1, 'rgba(154, 154, 154, 1)'],
+      [0.4, 'rgba(125, 125, 125, 0.8)'],
+      [1, 'rgba(72, 72, 72, 1)'],
+    ]];
     $backgroundV.$ = 1;
     $backgroundColor.$ = 'rgb(200,200,200)';
     player.p.x = -DEFAULT_FRAME_WIDTH;
@@ -78,7 +85,7 @@ export default {
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
-      platform(0, -100, player.s.x * 10, 0, {
+      platform(0, -230, player.s.x * 10, 0, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
       boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {

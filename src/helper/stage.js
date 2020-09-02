@@ -16,7 +16,8 @@ import {
   graphics,
   $reflectionY,
   $backgroundV,
-  $backgroundColor
+  $backgroundColor,
+  $reflectionGradient
 } from '../state';
 import {
   KEY_STAGE_INITIATE,
@@ -71,6 +72,7 @@ export function setStage(stageIndex, wave) {
   $reflectionY.$ = undefined;
   $backgroundV.$ = 0;
   $backgroundColor.$ = undefined;
+  $reflectionGradient.$ = undefined;
   enemies.splice(0, enemies.length);
   platforms.splice(0, platforms.length);
   projectiles.splice(0, projectiles.length);

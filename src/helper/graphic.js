@@ -158,9 +158,14 @@ export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
   }, 2 * distance);
 };
 
-export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(z, ctx => {
+export const createLinearGradient = (ctx, y, h, colors, distance) => {
   const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h)));
   colors.forEach(color => grad.addColorStop(...color));
+  return grad;
+}
+
+export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(z, ctx => {
+  const grad = createLinearGradient(ctx, y, h, colors, distance);
   ctx.fillStyle = grad;
   ctx.fillRect(
     0, transform(vector(0, y), distance)[1],

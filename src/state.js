@@ -141,7 +141,7 @@ export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `cameraZoom: ${$cameraZoom.$.toFixed(3)}`);
 
-export const isReflected = object => $reflectionY.$ !== undefined && object.p.y > $reflectionY.$;
+export const isReflected = object => $reflectionY.$ !== undefined && object.p.y + object.s.y / 2 > $reflectionY.$;
 
 export function reflect(value, ratio = 1) {
   const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
@@ -280,3 +280,4 @@ export const draw = (zIndex, callback) =>
     : (drawStack[zIndex] = [callback]);
 
 export const $reflectionY = ref();
+export const $reflectionGradient = ref();

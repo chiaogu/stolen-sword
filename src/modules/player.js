@@ -18,7 +18,8 @@ import {
   $reflectionY,
   reflect,
   effects,
-  isReflected
+  isReflected,
+  $reflectionGradient
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -37,13 +38,11 @@ import {
   KEY_OBJECT_EVENT_GET_OFFSET
 } from '../constants';
 import { setStage } from '../helper/stage';
-import { ripple, checkRipple } from '../helper/graphic';
+import { ripple, checkRipple, createLinearGradient } from '../helper/graphic';
 
 listen(PRESS_UP, () => {
   dash();
 });
-
-let isPlayerUnderWater = false;
 
 function drawPlayer(player) {
   draw(26, ctx => {
@@ -72,17 +71,6 @@ function drawPlayer(player) {
   })
   
   draw(25, ctx => {
-    // draw character
-    if (isPlayerInvincibleAfterDamage()) {
-      ctx.fillStyle =
-        Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3
-          ? 'rgba(255,255,255, 0.1)'
-          : '#fff';
-    } else if ($dash.$ === 0) {
-      ctx.fillStyle = '#444';
-    } else {
-      ctx.fillStyle = '#fff';
-    }
     const { l, t, b } = getObjectBoundary(player);
     let height = transform(player.s.y);
     if (player[KEY_PLAYER_DEATH_FRAME]) {
@@ -96,12 +84,31 @@ function drawPlayer(player) {
       );
       height *= 1 - 0.7 * deathProgress;
     }
+    
+    // draw character
+    if (isPlayerInvincibleAfterDamage()) {
+      ctx.fillStyle =
+        Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3
+          ? 'rgba(255,255,255, 0.1)'
+          : '#fff';
+    } else if ($dash.$ === 0) {
+      ctx.fillStyle = '#444';
+    } else {
+      ctx.fillStyle = '#fff';
+    }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
     
+    if($reflectionGradient.$ && b <= $reflectionGradient.$[0]) {
+      const reflectionH = Math.min(player.s.y, Math.max(0, $reflectionY.$ - b));
+      ctx.fillStyle = createLinearGradient(ctx, ...$reflectionGradient.$);
+      ctx.fillRect(...transform(vector(l - 1, b - 1)), transform(player.s.x + 2), -transform(reflectionH + 2));
+    }
+    
     if(isReflected(player)) {
-      ctx.globalAlpha = 0.3;
-      ctx.fillRect(...reflect(vector(l, t)), transform(player.s.x), -height);
-      ctx.globalAlpha = 1;
+      const distance = t - $reflectionY.$;
+      const reflectionH = b > $reflectionY.$ ? height : transform(distance);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillRect(...reflect(vector(l, t)), transform(player.s.x), -reflectionH);
     }
   })
 }
