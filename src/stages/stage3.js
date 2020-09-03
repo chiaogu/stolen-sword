@@ -89,10 +89,10 @@ export default {
       platform(0, -230, player.s.x * 10, 0, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
-      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       })
     );

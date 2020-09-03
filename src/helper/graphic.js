@@ -22,14 +22,17 @@ import {
   $reflectionY,
   effects,
   reflect,
-  createLinearGradient
+  createLinearGradient,
+  pressingKeys,
+  collision,
+  player
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude, vectorStringify } from '../utils';
+import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude, vectorStringify, decompressPath } from '../utils';
 import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad, easeInOutQuart, easeInCirc, easeOutCirc } from '../easing';
 import { display } from '../modules/display';
 import { circular } from '../animation';
 
-const graphic = (x, y, draw) => ({
+export const graphic = (x, y, draw) => ({
   ...object(x, y, 0, 0),
   [KEY_OBJECT_ON_UPDATE]: [
     draw,
@@ -200,35 +203,3 @@ export const movingMountain = (x, y, z, distance = 1, scale = 1) => {
     drawMountain(x + offset + 100 * index, y, z, scale, `rgb(${bright}, ${bright}, ${bright})`, distance);
   }, $backgroundV.$);
 };
-
-function decompressPath(str) {
-  let z = 'charCodeAt';
-  let x = 0;
-  let y = 0;
-  let xMin = 0;
-  let yMin = 0
-  let xMax = 0;
-  let yMax = 0
-  const result = [];
-  str.split('').map(i => {
-    let j = i[z]();
-    let a = -(j >> 3) * 0.39 + 4.72;
-    let d = (j & 7) * 4 + 4;
-    x += d * Math.cos(a);
-    y -= d * Math.sin(a);
-    xMin = Math.min(x, xMin);
-    yMin = Math.min(y, yMin);
-    xMax = Math.max(x, xMax);
-    yMax = Math.max(y, yMax);
-    result.push(vector(x, y));
-  });
-  result.forEach(p => {
-    p.x -= (xMax - xMin) / 2;
-    p.y -= (yMax - yMin) / 2;
-  })
-  return {
-    p: result.splice(1, result.length),
-    w: xMax - xMin,
-    h: yMax - yMin
-  }
-}

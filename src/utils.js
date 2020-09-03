@@ -62,7 +62,7 @@ export const getObjectBoundary = ({ p, s }) => ({
   [SIDE_B]: p.y - s.y / 2,
 });
 
-const isOverlap = (objectA, objectB, timeRatio) => {
+export const isOverlap = (objectA, objectB, timeRatio) => {
   const boundaryA = getObjectBoundary(objectA);
   const boundaryB = getObjectBoundary(objectB);
   return (
@@ -83,7 +83,7 @@ const SIDES = [
   [SIDE_R, SIDE_B, SIDE_L, SIDE_B],
   [SIDE_L, SIDE_B, SIDE_L, SIDE_T],
 ];
-const isGoingThrough = (objectA, objectB, timeRatio) => {
+export const isGoingThrough = (objectA, objectB, timeRatio) => {
   const nextAPos = vectorOp((pos, v) => pos + v * timeRatio, [
     objectA.p,
     objectA.v,
@@ -99,11 +99,6 @@ const isGoingThrough = (objectA, objectB, timeRatio) => {
     if (isIntersected) return true;
   }
   return false;
-};
-
-export const collision = (objectA, objectB, timeRatio) => {
-  if (isOverlap(objectA, objectB, timeRatio) || isGoingThrough(objectA, objectB, timeRatio))
-    return getClosetSide(objectA, objectB);
 };
 
 export const getClosetSide = (objectA, objectB) => {
@@ -164,3 +159,36 @@ export const objectEvent = (callback, interval, options = {}) => {
 // export const fill = (ctx, ...args) => ctx.fill(...args);
 // export const fillText = (ctx, ...args) => ctx.fillText(...args);
 // export const fillRect = (ctx, ...args) => ctx.fillRect(...args);
+
+
+export function decompressPath(str) {
+  let z = 'charCodeAt';
+  let x = 0;
+  let y = 0;
+  let xMin = 0;
+  let yMin = 0
+  let xMax = 0;
+  let yMax = 0
+  const result = [];
+  str.split('').map(i => {
+    let j = i[z]();
+    let a = -(j >> 3) * 0.39 + 4.72;
+    let d = (j & 7) * 4 + 4;
+    x += d * Math.cos(a);
+    y -= d * Math.sin(a);
+    xMin = Math.min(x, xMin);
+    yMin = Math.min(y, yMin);
+    xMax = Math.max(x, xMax);
+    yMax = Math.max(y, yMax);
+    result.push(vector(x, y));
+  });
+  result.forEach(p => {
+    p.x -= (xMax - xMin) / 2;
+    p.y -= (yMax - yMin) / 2;
+  })
+  return {
+    p: result.splice(1, result.length),
+    w: xMax - xMin,
+    h: yMax - yMin
+  }
+}

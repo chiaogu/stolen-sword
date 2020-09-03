@@ -1,5 +1,5 @@
-import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw, effects, $backgroundV } from '../state';
-import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction, collision, vectorMagnitude } from '../utils';
+import { $timeRatio, player, resetDash, transform, playerDamage, setDash, $dash, draw, effects, $backgroundV, pressingKeys } from '../state';
+import { vector, object, approach, getObjectBoundary, vectorOp, getActionProgress, alternateProgress, objectAction, vectorMagnitude } from '../utils';
 import {
   SIDE_T,
   SIDE_B,
@@ -70,7 +70,10 @@ function handleBoundaryCollision(platform, platformBoundary, collidedSide) {
 }
 
 function drawPlatform(platform) {
-  if(platform[KEY_OBJECT_FRAME] === 0) return;
+  if(
+    platform[KEY_OBJECT_FRAME] === 0 
+    // || !pressingKeys.has('1')
+    ) return;
   draw(31, ctx => {
     const platformBoundary = getObjectBoundary(platform);
     ctx.lineWidth = 1;
@@ -92,7 +95,11 @@ export const boundary = (x, y, w, h, options = {}) => ({
 export const platform = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
-  [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision
+  [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision,
+  [KEY_OBJECT_ON_UPDATE]: [
+    // drawPlatform,
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ]
 });
 
 export const penetrablePlatform = (x, y, w, h, options) => ({

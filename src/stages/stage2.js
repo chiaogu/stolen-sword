@@ -19,7 +19,7 @@ import {
   enemies,
   $timeRatio,
   graphics,
-  $backgroundV
+  collision
 } from '../state';
 import {
   platform,
@@ -32,7 +32,7 @@ import {
 import { enemy, compund } from '../helper/enemy';
 import { easeInQuint } from '../easing';
 import { circularMovement } from '../animation';
-import { collision, object, vectorMagnitude, alternateProgress } from '../utils';
+import { object, vectorMagnitude, alternateProgress } from '../utils';
 import { wipe, staticBamboo } from '../helper/graphic';
 
 export default {
@@ -55,13 +55,11 @@ export default {
       staticBamboo(100, -10, 3200,  5, 0.5, 10),
     );
     platforms.push(
-      platform(0, -player.s.y / 2, player.s.x * 10, 0, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
-      }),
-      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
+      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
       horizontalBamboo(-50, 150, 150),
@@ -110,7 +108,7 @@ export default {
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(-136, 2900, 200, 30);
-    const collidedSide = collision(goalArea, player, $timeRatio.$);
+    const collidedSide = collision(player, goalArea);
     return (
       $stageWave.$ === -1 ||
       (collidedSide && Math.round(vectorMagnitude(player.v)) === 0)

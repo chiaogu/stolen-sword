@@ -1,4 +1,4 @@
-import { getObjectBoundary, collision } from '../utils';
+import { getObjectBoundary } from '../utils';
 import {
   enemies,
   platforms,
@@ -8,7 +8,8 @@ import {
   isOutOfScreen,
   $stage,
   graphics,
-  effects
+  effects,
+  collision
 } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
@@ -25,7 +26,7 @@ function objectLoop(object, ctx) {
   // collision
   if (object[KEY_OBJECT_ON_COLLIDED]) {
     const objBoundary = getObjectBoundary(object);
-    const collidedSide = collision(player, object, $timeRatio.$);
+    const collidedSide = collision(player, object);
     object[KEY_OBJECT_IS_COLLIDED] = !!collidedSide;
     object[KEY_OBJECT_ON_COLLIDED](object, objBoundary, collidedSide);
   }

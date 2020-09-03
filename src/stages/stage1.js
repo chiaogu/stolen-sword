@@ -8,6 +8,7 @@ import {
   KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_STAGE_ENDING_CUT_SCENE,
   KEY_OBJECT_Z_INDEX,
+  DEFAULT_FRAME_HEIGHT,
 } from '../constants';
 import {
   enemies,
@@ -41,13 +42,11 @@ export default {
     }
     $backgroundV.$ = 1;
     platforms.push(
-      platform(0, -player.s.y / 2, player.s.x * 10, 0, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
-      }),
-      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
+      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       })
     );

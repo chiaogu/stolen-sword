@@ -26,6 +26,10 @@ import {
   vectorMagnitude,
   vectorStringify,
   getObjectBoundary,
+  isOverlap,
+  isGoingThrough,
+  getClosetSide,
+  vectorAngle
 } from './utils';
 import { display } from './modules/display';
 import { easeOutQuint, easeInCirc, easeOutCirc, easeInQuint } from './easing';
@@ -215,6 +219,13 @@ export function isOutOfScreen(object) {
   );
 }
 
+export const collision = (objectA, objectB) => {
+  if (
+    !isOutOfScreen(objectB) &&
+    (isOverlap(objectA, objectB, $timeRatio.$) || isGoingThrough(objectA, objectB, $timeRatio.$)))
+    return getClosetSide(objectA, objectB);
+};
+
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
 display(() => `timeRatio: ${$timeRatio.$.toFixed(3)}`);
@@ -287,7 +298,6 @@ export const isInTranisition = () =>
 
 display(() => `stage: ${$stageIndex.$}`);
 display(() => `wave: ${$stageWave.$}`);
-display(() => `bgV: ${$backgroundV.$}`);
 
 export const $debug = ref(false);
 let clickPromises = {};

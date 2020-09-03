@@ -17,6 +17,14 @@ import {
   $stageWave,
   enemies,
   $timeRatio,
+  createLinearGradient,
+  graphics,
+  collision,
+  $g,
+  draw,
+  pressingKeys,
+  transform,
+  $backgroundColor
 } from '../state';
 import {
   water,
@@ -29,21 +37,90 @@ import {
 import { enemy, compund, recover, shell } from '../helper/enemy';
 import { easeInQuint } from '../easing';
 import { circularMovement } from '../animation';
-import { collision, object, vectorMagnitude, vector } from '../utils';
+import { object, vectorMagnitude, vector, decompressPath, getObjectBoundary } from '../utils';
+import { graphic } from '../helper/graphic';
+
+const cliffPaths = [
+  decompressPath(`¤g_nr#cssYre|ct''|##%''`),
+  decompressPath(`(¥'##%bsqc{qcfc`)
+];
+
+const cliff = (i, x, y, side) => {
+  const scale = 2.66;
+  const getPathPointPos = p => 
+    vector(
+      (x + p.x) * scale,
+      (y + p.y + cliffPaths[i].h / 2) * scale
+    )
+  return [
+    graphic(x, y, graphic => draw(10, ctx => {
+      if (pressingKeys.has('i')) graphic.p.y += 1;
+      if (pressingKeys.has('j')) graphic.p.x += -1;
+      if (pressingKeys.has('k')) graphic.p.y += -1;
+      if (pressingKeys.has('l')) graphic.p.x += 1;
+    
+      ctx.fillStyle = '#666';
+      ctx.beginPath();
+      cliffPaths[i].p.forEach(p => {
+        ctx.lineTo(...transform(getPathPointPos(p)));
+      })
+      ctx.fill();
+    })),
+    // vectorAngle(pressDownPos, cursorPos) / Math.PI
+    cliffPaths[i].p.slice(1, cliffPaths[i].p.length).reduce((result, p, index) => {
+      const p1 = getPathPointPos(p);
+      const p2 = getPathPointPos(cliffPaths[i].p[index]);
+      const w = p2.x - p1.x;
+      const h = p1.y - p2.y;
+      result.push(
+        platform(
+          (w > 0 ? p1.x : p2.x) + Math.abs(w) / 2,
+          (h > 0 ? p1.y : p2.y) - Math.abs(h) / 2,
+          Math.abs(w),
+          Math.abs(h),
+          {
+            [KEY_OBJECT_ON_UPDATE]: [
+              platform => draw(41, ctx => {
+                const platformBoundary = getObjectBoundary(platform);
+                ctx.strokeStyle = '#f00';
+                ctx.strokeRect(
+                  ...transform(vector(platformBoundary.l, platformBoundary.t)),
+                  transform(platform.s.x),
+                  transform(platform.s.y)
+                );
+              })
+            ]
+          }
+        )
+      )
+      return result;
+    }, [])
+  ]
+}
 
 export default {
   [KEY_STAGE_INITIATE]() {
     player.p.x = 0;
     cameraCenter.y = player.p.y + 200;
+    $backgroundColor.$ = 'rgb(200,200,200)';
     $cameraLoop.$ = () => {
       cameraCenter.y = 
         Math.max(player.p.y - player.s.y / 2, Math.min(200, cameraCenter.y))
     };
+    
+    [
+      cliff(0, -18, -46),
+      cliff(1, 223, -18)
+    ].forEach(([g, p]) => {
+      graphics.push(g);
+      platforms.push(...p);
+    })
+    
     platforms.push(
-      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
       water(0, -50, player.s.x * 10, 50, {
@@ -52,48 +129,8 @@ export default {
       platform(0, -50, player.s.x * 10, 0, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
-      platform(200, 75, 0, 250),
-      platform(-175, 135, 50, 370),
-      platform(175, 250, 50, 100),
-      platform(150, 325, 100, 50),
-      platform(110, 410, 180, 120),
-      platform(-200, 370, 0, 100),
-      platform(-175, 520, 50, 200),
-      platform(130, 490, 140, 40),
-      platform(150, 530, 100, 40),
-      platform(200, 600, 90, 100),
-      platform(-130, 590, 40, 100),
-      platform(-90, 650, 40, 90),
-      platform(-30, 715, 80, 120),
-      platform(25, 760, 30, 30),
-      platform(-30, 875, 240, 200),
-      platform(-160, 1015, 100, 80),
-      platform(-190, 1130, 40, 150),
-      platform(210, 1130, 40, 40),
-      platform(190, 1200, 80, 100),
-      platform(170, 1400, 120, 300),
-      platform(-220, 1455, 20, 500),
-      platform(220, 1850, 20, 600),
-      platform(155, 2170, 150, 40),
-      platform(105, 2200, 250, 20),
       flow(-40, 1602.5, 40, 1255, vector(0, -0.5)),
       flow(105, 2220, 250, 20, vector(-0.2, 0)),
-      platform(-215, 2595, 31, 382),
-      platform(-110, 2638, 179, 199),
-      platform(-21, 2538, 0, 0),
-      platform(7, 2705, 55, 208),
-      platform(61, 2766, 51, 225),
-      platform(224, 2773, 8, 1124),
-      platform(57, 3032, 12, 309),
-      platform(84, 3388, 287, 110),
-      platform(-62, 3245, 11, 293),
-      platform(-75, 3107, 13, 361),
-      platform(81, 3158, 37, 126),
-      platform(-90, 2953, 17, 170),
-      platform(-94, 3513, 67, 244),
-      platform(-69, 3740, 64, 212),
-      platform(-47, 3919, 58, 149),
-      platform(6, 4008, 124, 28),
     );
   },
   [KEY_STAGE_WAVES]: [
@@ -169,7 +206,7 @@ export default {
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(6, 4222, 124, 400);
-    const collidedSide = collision(goalArea, player, $timeRatio.$);
+    const collidedSide = collision(player, goalArea);
     return (
       $stageWave.$ === -1 ||
       (collidedSide && Math.round(vectorMagnitude(player.v)) === 0)
