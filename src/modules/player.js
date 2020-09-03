@@ -18,8 +18,9 @@ import {
   $reflectionY,
   reflect,
   effects,
-  isReflected,
-  $reflectionGradient
+  getReflection,
+  $reflectionGradient,
+  getWaterMask
 } from '../state';
 import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
 import {
@@ -38,7 +39,7 @@ import {
   KEY_OBJECT_EVENT_GET_OFFSET
 } from '../constants';
 import { setStage } from '../helper/stage';
-import { ripple, checkRipple, createLinearGradient } from '../helper/graphic';
+import { ripple, checkRipple } from '../helper/graphic';
 
 listen(PRESS_UP, () => {
   dash();
@@ -98,17 +99,16 @@ function drawPlayer(player) {
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
     
-    if($reflectionGradient.$ && b <= $reflectionGradient.$[0]) {
-      const reflectionH = Math.min(player.s.y, Math.max(0, $reflectionY.$ - b));
-      ctx.fillStyle = createLinearGradient(ctx, ...$reflectionGradient.$);
-      ctx.fillRect(...transform(vector(l - 1, b - 1)), transform(player.s.x + 2), -transform(reflectionH + 2));
+    const waterMask = getWaterMask(ctx, player);
+    if(waterMask) {
+      ctx.fillStyle = waterMask.g;
+      ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
     }
     
-    if(isReflected(player)) {
-      const distance = t - $reflectionY.$;
-      const reflectionH = b > $reflectionY.$ ? height : transform(distance);
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.fillRect(...reflect(vector(l, t)), transform(player.s.x), -reflectionH);
+    const reflection = getReflection(player);
+    if(reflection) {
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.fillRect(reflection.x, reflection.y, transform(player.s.x), reflection.h);
     }
   })
 }

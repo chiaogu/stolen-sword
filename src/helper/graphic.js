@@ -21,7 +21,8 @@ import {
   $backgroundV,
   $reflectionY,
   effects,
-  reflect
+  reflect,
+  createLinearGradient
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude, vectorStringify } from '../utils';
 import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad, easeInOutQuart, easeInCirc, easeOutCirc } from '../easing';
@@ -158,12 +159,6 @@ export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
   }, 2 * distance);
 };
 
-export const createLinearGradient = (ctx, y, h, colors, distance) => {
-  const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h)));
-  colors.forEach(color => grad.addColorStop(...color));
-  return grad;
-}
-
 export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(z, ctx => {
   const grad = createLinearGradient(ctx, y, h, colors, distance);
   ctx.fillStyle = grad;
@@ -176,31 +171,34 @@ export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(
 
 const mountainSprite = decompressPath(`	qaK^LWZMGGOWGOGGO`);
 mountainSprite.p[0].y = mountainSprite.p[mountainSprite.p.length - 1].y;
-const drawMountain = (x, y, z, scale = 1, color) => {
+const drawMountain = (x, y, z, scale = 1, color, distance) => {
   draw(z, ctx => {
     ctx.fillStyle = color;
     ctx.beginPath();
     mountainSprite.p.forEach(p => {
-      ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainSprite.h / 2) * scale), 0.5));
+      ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainSprite.h / 2) * scale), distance));
     })
     ctx.fill();
     
-    // if($reflectionY.$) {
-    //   ctx.fillStyle = color;
-    //   ctx.beginPath();
-    //   mountainSprite.p.forEach(p => {
-    //     ctx.lineTo(...reflect(vector((x + p.x) * scale, (y + p.y) * scale), 0.5));
-    //   })
-    //   ctx.fill();
-    // }
+    if($reflectionY.$ != undefined) {
+      ctx.fillStyle = createLinearGradient(ctx, y,  mountainSprite.h / 2, [
+        [0, color],
+        [1, 'rgba(70, 70, 70, 0.5)']
+      ], distance);
+      ctx.beginPath();
+      mountainSprite.p.forEach(p => {
+        ctx.lineTo(...transform(vector((x + p.x) * scale, (y - p.y - mountainSprite.h / 2 + 57) * scale), distance));
+      })
+      ctx.fill();
+    }
   })  
 }
 
 export const movingMountain = (x, y, z, distance = 1, scale = 1) => {
   return background((offset, index) => {
-    const bright = 300 * (1 - distance);
-    drawMountain(x + offset + 100 * index, y, z, scale, `rgb(${bright}, ${bright}, ${bright})`);
-  }, $backgroundV.$ * distance);
+    const bright = 100 + 110 * (1 - distance);
+    drawMountain(x + offset + 100 * index, y, z, scale, `rgb(${bright}, ${bright}, ${bright})`, distance);
+  }, $backgroundV.$);
 };
 
 function decompressPath(str) {

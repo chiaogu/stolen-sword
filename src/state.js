@@ -25,6 +25,7 @@ import {
   vectorDistance,
   vectorMagnitude,
   vectorStringify,
+  getObjectBoundary,
 } from './utils';
 import { display } from './modules/display';
 import { easeOutQuint, easeInCirc, easeOutCirc, easeInQuint } from './easing';
@@ -141,15 +142,38 @@ export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 display(() => `cameraZoom: ${$cameraZoom.$.toFixed(3)}`);
 
-export const isReflected = object => $reflectionY.$ !== undefined && object.p.y + object.s.y / 2 > $reflectionY.$;
+export const getReflection = object => {
+  const { l, t, b } = getObjectBoundary(object);
+  if($reflectionY.$ !== undefined && t > $reflectionY.$) {
+    const distance = t - $reflectionY.$;
+    const h = -transform(b > $reflectionY.$ ? object.s.y : distance);
+    const [x, y] = reflect(vector(l, t), $reflectionY.$);
+    return { x: x - Math.random() * 4 * $timeRatio.$, y, h }
+  }
+}
 
-export function reflect(value, ratio = 1) {
+export const getWaterMask = (ctx, object) => {
+  const { l, t, b } = getObjectBoundary(object);
+  if($reflectionGradient.$ && b <= $reflectionGradient.$[0]) {
+    const reflectionH = Math.min(object.s.y, Math.max(0, $reflectionY.$ - b));
+    const [x, y] = transform(vector(l - 0.5, b - 0.5));
+    return { 
+      x,
+      y,
+      w: transform(object.s.x + 1),
+      h: -transform(reflectionH + 1),
+      g: createLinearGradient(ctx, ...$reflectionGradient.$),
+    };
+  }
+}
+
+export function reflect(value, y, ratio = 1) {
   const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
   return [
     cameraFrameSize.x / 2 -
       (cameraCenter.x - value.x) * $cameraZoom.$ * scale * ratio,
     cameraFrameSize.y / 2 + 
-      (cameraCenter.y + value.y - $reflectionY.$) * $cameraZoom.$ * scale * ratio
+      (cameraCenter.y + value.y - y) * $cameraZoom.$ * scale * ratio
   ];
 }
 
@@ -281,3 +305,9 @@ export const draw = (zIndex, callback) =>
 
 export const $reflectionY = ref();
 export const $reflectionGradient = ref();
+
+export const createLinearGradient = (ctx, y, h, colors, distance) => {
+  const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h)));
+  colors.forEach(color => grad.addColorStop(...color));
+  return grad;
+}

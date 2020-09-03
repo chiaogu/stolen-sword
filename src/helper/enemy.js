@@ -22,7 +22,7 @@ import {
   FRAME_DURAITON,
   KEY_OBJECT_Z_INDEX
 } from '../constants';
-import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, isReflected } from '../state';
+import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, getReflection, getWaterMask } from '../state';
 import {
   object,
   getObjectBoundary,
@@ -73,38 +73,32 @@ function underAttack(enemy, enemyBoundary, collidedSide) {
   }
 }
 
+const getEnemyColor = enemy => {
+  let deathProgress = 1 - getActionProgress(
+    enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
+    ENEMY_DEATH_ANIMATION_DURATION,
+    false
+  );
+  deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
+  if (enemy[KEY_OBJECT_IS_COLLIDED]) {
+    return '#f00';
+  } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+    return `rgba(255,0,255,${deathProgress})`;
+  } else {
+    return `rgba(255,255,0,${deathProgress})`;
+  }
+}
+
 function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
   draw(enemy[KEY_OBJECT_Z_INDEX], ctx => {
-    let deathProgress = 1 - getActionProgress(
-      enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
-      ENEMY_DEATH_ANIMATION_DURATION,
-      false
-    );
-    deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
-    if (enemy[KEY_OBJECT_IS_COLLIDED]) {
-      ctx.fillStyle = '#f00';
-    } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
-      ctx.fillStyle = `rgba(255,0,255,${deathProgress})`;
-    } else {
-      ctx.fillStyle = `rgba(255,255,0,${deathProgress})`;
-    }
-    const { l, t, b } = getObjectBoundary(enemy);
+    const { l, t } = getObjectBoundary(enemy);
+    ctx.fillStyle = getEnemyColor(enemy);
     ctx.fillRect(
       ...transform(vector(l, t)),
       transform(enemy.s.x),
       transform(enemy.s.y)
     );
-    
-    if(isReflected(enemy)) {
-      ctx.globalAlpha = 0.3;
-      ctx.fillRect(
-        ...reflect(vector(l, t)),
-        transform(enemy.s.x),
-        -transform(enemy.s.y)
-      );
-      ctx.globalAlpha = 1;
-    }
     
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
@@ -115,16 +109,25 @@ function drawEnemy(enemy) {
         transform(size.x),
         transform(size.y)
       );
-      
-      if(isReflected(enemy)) {
-        ctx.globalAlpha = 0.3;
-        ctx.fillRect(
-          ...reflect(vector(shellBoundary.l, shellBoundary.t)),
-          transform(size.x),
-          -transform(size.y)
-        );
-        ctx.globalAlpha = 1;
-      }
+    }
+    
+    const waterMask = getWaterMask(ctx, enemy);
+    if(waterMask) {
+      ctx.fillStyle = waterMask.g;
+      ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
+    }
+    
+    const reflection = getReflection(enemy);
+    if(reflection) {
+      ctx.fillStyle = getEnemyColor(enemy);
+      ctx.globalAlpha = 0.1;
+      ctx.fillRect(
+        reflection.x,
+        reflection.y,
+        transform(enemy.s.x),
+        reflection.h
+      );
+      ctx.globalAlpha = 1;
     }
   })
 }
@@ -146,7 +149,7 @@ export const enemy = (x, y, w, h, options = {}) => ({
   [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
-  [KEY_OBJECT_Z_INDEX]: 11,
+  [KEY_OBJECT_Z_INDEX]: 31,
   ...options,
   [KEY_OBJECT_ON_UPDATE]: [
     dead,

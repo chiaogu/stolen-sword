@@ -12,7 +12,8 @@ import {
   reflect,
   projectiles,
   effects,
-  isReflected
+  getReflection,
+  getWaterMask
 } from '../state';
 import { object, getObjectBoundary, vector, vectorOp, vectorMagnitude } from '../utils';
 import { ripple, checkRipple } from './graphic';
@@ -34,12 +35,21 @@ function drawProjectile(projectile) {
       transform(projectile.s.y)
     );
     
-    if(isReflected(projectile)) {
-      ctx.globalAlpha = 0.3;
+    const waterMask = getWaterMask(ctx, projectile);
+    if(waterMask) {
+      ctx.fillStyle = waterMask.g;
+      ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
+    }
+    
+    const reflection = getReflection(projectile);
+    if(reflection) {
+      ctx.fillStyle = '#f00';
+      ctx.globalAlpha = 0.1;
       ctx.fillRect(
-        ...reflect(vector(l, t)),
+        reflection.x,
+        reflection.y,
         transform(projectile.s.x),
-        -transform(projectile.s.y)
+        reflection.h
       );
       ctx.globalAlpha = 1;
     }

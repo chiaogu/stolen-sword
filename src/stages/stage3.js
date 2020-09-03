@@ -60,26 +60,27 @@ export default {
     cameraCenter.y = player.p.y + 100;
     $reflectionY.$ = 0;
     $reflectionGradient.$ = [0, 230, [
-      [0.1, 'rgba(154, 154, 154, 1)'],
+      [0, 'rgba(154, 154, 154, 1)'],
       [0.4, 'rgba(125, 125, 125, 0.8)'],
       [1, 'rgba(72, 72, 72, 1)'],
     ]];
-    $backgroundV.$ = 1;
+    $backgroundV.$ = 0.5;
     $backgroundColor.$ = 'rgb(200,200,200)';
     player.p.x = -DEFAULT_FRAME_WIDTH;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
-        Math.max(player.p.y - player.s.y / 2 - 200, Math.min(100, cameraCenter.y))
+        Math.max(player.p.y - player.s.y / 2 - 100, Math.min(100, cameraCenter.y))
     };
     graphics.push(
-      gradient(100, 400, 0, 0.4, [
+      gradient(100, 400, 0, 0.1, [
         [0, 'rgb(200,200,200)'],
         [0.5, 'rgb(110,110,110, 1)'],
         [0.6, 'rgb(92,92,92, 0.9)'],
         [1, 'rgb(34, 34, 34, 0.9)'],
       ]),
-      ...movingMountain(0, -30, 10, 0.5, 2, 2),
-      ...movingMountain(0, -10, 10, 0.4, 1.2, 1.2),
+      ...movingMountain(177, 0, 10, 0.3, 2.8),
+      ...movingMountain(0, 40, 10, 0.2, 3.6),
+      ...movingMountain(-37, 40, 10, 0.15, 4),
     )
     platforms.push(
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
@@ -98,7 +99,7 @@ export default {
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
-      shell(50, 300, 30, 30, {
+      shell(50, 200, 30, 30, {
         [KEY_OBJECT_ON_UPDATE]:[
           slideIn(1000, 100, 550),
           circularMovement(3000, 10, 5, 1000)
