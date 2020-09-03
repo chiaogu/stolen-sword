@@ -7,6 +7,9 @@ import {
   KEY_STAGE_TRANSITION,
   KEY_ENEMY_IS_UNTOUCHABLE,
   FRAME_DURAITON,
+  KEY_OBJECT_ON_COLLIDED,
+  SIDE_L,
+  SIDE_R
 } from '../constants';
 import {
   platforms,
@@ -35,9 +38,9 @@ import {
   flow,
 } from '../helper/platform';
 import { enemy, compund, recover, shell } from '../helper/enemy';
-import { easeInQuint } from '../easing';
+import { easeInQuint, easeInQuad } from '../easing';
 import { circularMovement } from '../animation';
-import { object, vectorMagnitude, vector, decompressPath, getObjectBoundary } from '../utils';
+import { object, vectorMagnitude, vector, decompressPath, getObjectBoundary, vectorAngle } from '../utils';
 import { graphic } from '../helper/graphic';
 
 const cliffPaths = [
@@ -45,14 +48,15 @@ const cliffPaths = [
   decompressPath(`(¥'##%bsqc{qcfc`)
 ];
 
-const cliff = (i, x, y, side) => {
+const generateCiff = (i, x, y, side) => {
   const scale = 2.66;
   const getPathPointPos = p => 
     vector(
       (x + p.x) * scale,
       (y + p.y + cliffPaths[i].h / 2) * scale
     )
-  return [
+    
+  graphics.push(
     graphic(x, y, graphic => draw(10, ctx => {
       if (pressingKeys.has('i')) graphic.p.y += 1;
       if (pressingKeys.has('j')) graphic.p.x += -1;
@@ -65,42 +69,34 @@ const cliff = (i, x, y, side) => {
         ctx.lineTo(...transform(getPathPointPos(p)));
       })
       ctx.fill();
-    })),
-    // vectorAngle(pressDownPos, cursorPos) / Math.PI
-    cliffPaths[i].p.slice(1, cliffPaths[i].p.length).reduce((result, p, index) => {
-      const p1 = getPathPointPos(p);
-      const p2 = getPathPointPos(cliffPaths[i].p[index]);
-      const w = p2.x - p1.x;
-      const h = p1.y - p2.y;
-      result.push(
-        platform(
-          (w > 0 ? p1.x : p2.x) + Math.abs(w) / 2,
-          (h > 0 ? p1.y : p2.y) - Math.abs(h) / 2,
-          Math.abs(w),
-          Math.abs(h),
-          {
-            [KEY_OBJECT_ON_UPDATE]: [
-              platform => draw(41, ctx => {
-                const platformBoundary = getObjectBoundary(platform);
-                ctx.strokeStyle = '#f00';
-                ctx.strokeRect(
-                  ...transform(vector(platformBoundary.l, platformBoundary.t)),
-                  transform(platform.s.x),
-                  transform(platform.s.y)
-                );
-              })
-            ]
-          }
-        )
+    }))
+  );
+  
+  cliffPaths[i].p.slice(1, cliffPaths[i].p.length).forEach((p, index) => {
+    const p1 = getPathPointPos(p);
+    const p2 = getPathPointPos(cliffPaths[i].p[index]);
+    const w = p2.x - p1.x;
+    const h = p1.y - p2.y;
+    platforms.push(
+      platform(
+        (side == SIDE_L ? w > 0 ? p1.x : p2.x : w > 0 ? p2.x : p1.x),
+        (h > 0 ? p1.y : p2.y) - Math.abs(h) / 2,
+        0,
+        Math.abs(h)
+      ),
+      platform(
+        (w > 0 ? p1.x : p2.x) + Math.abs(w) / 2,
+        (side == SIDE_L ? w < 0 ? p1.y : p2.y : w < 0 ? p2.y : p1.y),
+        Math.abs(w),
+        0
       )
-      return result;
-    }, [])
-  ]
+    )
+  })
 }
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    player.p.x = 0;
+    player.p.x = -250;
     cameraCenter.y = player.p.y + 200;
     $backgroundColor.$ = 'rgb(200,200,200)';
     $cameraLoop.$ = () => {
@@ -108,13 +104,8 @@ export default {
         Math.max(player.p.y - player.s.y / 2, Math.min(200, cameraCenter.y))
     };
     
-    [
-      cliff(0, -18, -46),
-      cliff(1, 223, -18)
-    ].forEach(([g, p]) => {
-      graphics.push(g);
-      platforms.push(...p);
-    })
+    generateCiff(0, -18, -46, SIDE_L);
+    generateCiff(1, 223, -18, SIDE_R);
     
     platforms.push(
       boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
@@ -123,12 +114,8 @@ export default {
       boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      water(0, -50, player.s.x * 10, 50, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
-      }),
-      platform(0, -50, player.s.x * 10, 0, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
-      }),
+      water(0, -50, DEFAULT_FRAME_WIDTH * 2, 50),
+      platform(0, -50, DEFAULT_FRAME_WIDTH * 2, 0),
       flow(-40, 1602.5, 40, 1255, vector(0, -0.5)),
       flow(105, 2220, 250, 20, vector(-0.2, 0)),
     );
@@ -213,6 +200,6 @@ export default {
     );
   },
   [KEY_STAGE_TRANSITION](progress) {
-    // player.p.x = -500 * easeInQuint(1 - progress);
+    player.p.x = -250 * easeInQuad(1 - progress);
   },
 };

@@ -72,7 +72,7 @@ function handleBoundaryCollision(platform, platformBoundary, collidedSide) {
 function drawPlatform(platform) {
   if(
     platform[KEY_OBJECT_FRAME] === 0 
-    // || !pressingKeys.has('1')
+    || !pressingKeys.has('1')
     ) return;
   draw(31, ctx => {
     const platformBoundary = getObjectBoundary(platform);
@@ -94,10 +94,10 @@ export const boundary = (x, y, w, h, options = {}) => ({
 
 export const platform = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
-  ...options,
   [KEY_OBJECT_ON_COLLIDED]: handleStandardColiision,
+  ...options,
   [KEY_OBJECT_ON_UPDATE]: [
-    // drawPlatform,
+    drawPlatform,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
   ]
 });
@@ -173,6 +173,10 @@ export const water = (x, y, w, h, options = {}) => {
   return {
     ...object(x, y, w, h),
     ...options,
+    [KEY_OBJECT_ON_UPDATE]: [
+      drawPlatform,
+      ...(options[KEY_OBJECT_ON_UPDATE] || []),
+    ],
     [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
       if(collidedSide) {
         if(player.v.y < 0) resetDash();
