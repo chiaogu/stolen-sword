@@ -17,6 +17,7 @@ import {
   KEY_STAGE_TRANSITION_FRAME,
   KEY_STAGE_WAVES,
   G,
+  KEY_OBJECT_FORCE_CHECK_COLLISION,
 } from './constants';
 import {
   vector,
@@ -221,7 +222,7 @@ export function isOutOfScreen(object) {
 
 export const collision = (objectA, objectB) => {
   if (
-    !isOutOfScreen(objectB) &&
+    (objectB[KEY_OBJECT_FORCE_CHECK_COLLISION] || !isOutOfScreen(objectB)) &&
     (isOverlap(objectA, objectB, $timeRatio.$) || isGoingThrough(objectA, objectB, $timeRatio.$)))
     return getClosetSide(objectA, objectB);
 };

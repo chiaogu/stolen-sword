@@ -11,6 +11,7 @@ import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_FRAME,
   DEFAULT_FRAME_WIDTH,
+  KEY_OBJECT_FORCE_CHECK_COLLISION,
 } from '../constants';
 import { circularMovement } from '../animation';
 import { easeInQuad } from '../easing';
@@ -89,7 +90,11 @@ function drawPlatform(platform) {
 export const boundary = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
-  [KEY_OBJECT_ON_COLLIDED]: handleBoundaryCollision
+  [KEY_OBJECT_ON_COLLIDED]: handleBoundaryCollision,
+  [KEY_OBJECT_ON_UPDATE]: [
+    drawPlatform,
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ],
 });
 
 export const platform = (x, y, w, h, options = {}) => ({
@@ -191,6 +196,7 @@ export const water = (x, y, w, h, options = {}) => {
 export const flow = (x, y, w, h, v, options = {}) => ({
   ...object(x, y, w, h),
   ...options,
+  [KEY_OBJECT_FORCE_CHECK_COLLISION]: true,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
     if(collidedSide) {
       vectorOp((player, target) => player + target * $timeRatio.$, [player.v, v], player.v);

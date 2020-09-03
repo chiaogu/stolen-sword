@@ -25,6 +25,7 @@ export const KEY_OBJECT_FRAME = key();
 export const KEY_OBJECT_INITIAL_POS = key();
 export const KEY_OBJECT_ON_COLLIDED = key();
 export const KEY_OBJECT_IS_COLLIDED = key();
+export const KEY_OBJECT_FORCE_CHECK_COLLISION = key();
 export const KEY_OBJECT_EVENT_GET_OFFSET = key();
 export const KEY_OBJECT_EVENT_IS_REPEAT = key();
 export const KEY_OBJECT_EVENT_LAST_TRIGGER_FRAME = key();
