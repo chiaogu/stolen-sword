@@ -233,13 +233,16 @@ export const recover = (interval, max) =>
   }, interval);
   
 export const untouchable = (x, y, options = {}) => enemy(x, y, 30, 30, {
+  ...options,
   [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-  ...options
 })
 
 export const invincible = (x, y, options = {}) => enemy(x, y, 30, 30, {
-  [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)],
-  ...options
+  ...options,
+  [KEY_OBJECT_ON_UPDATE]: [
+    recover(FRAME_DURAITON, 2),
+    ...(options[KEY_OBJECT_ON_UPDATE] || []),
+  ],
 })
 
 export const chain = (head, amount, interval, coreIndex, getEnemy) => {

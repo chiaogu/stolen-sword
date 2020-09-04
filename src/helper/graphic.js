@@ -174,7 +174,9 @@ export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(
 
 const mountainSprite = decompressPath(`	qaK^LWZMGGOWGOGGO`);
 mountainSprite.p[0].y = mountainSprite.p[mountainSprite.p.length - 1].y;
-const drawMountain = (x, y, z, scale = 1, color, distance) => {
+const drawMountain = (x, y, z, scale = 1, distance) => {
+  const bright = 90 + 110 * (1 - distance);
+  const color = `rgb(${bright}, ${bright}, ${bright})`;
   draw(z, ctx => {
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -197,9 +199,11 @@ const drawMountain = (x, y, z, scale = 1, color, distance) => {
   })  
 }
 
-export const movingMountain = (x, y, z, distance = 1, scale = 1) => {
-  return background((offset, index) => {
-    const bright = 100 + 110 * (1 - distance);
-    drawMountain(x + offset + 100 * index, y, z, scale, `rgb(${bright}, ${bright}, ${bright})`, distance);
-  }, $backgroundV.$);
-};
+export const staticMountain = (x, y, z, distance, scale) => 
+  graphic(x, y,
+    () => drawMountain(x, y, z, scale, distance)
+  )
+
+export const movingMountain = (x, y, z, distance = 1, scale = 1) => background((offset, index) => {
+  drawMountain(x + offset + 100 * index, y, z, scale, distance);
+}, $backgroundV.$)

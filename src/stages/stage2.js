@@ -70,10 +70,10 @@ export default {
       horizontalBamboo(50, 870, 150),
       verticalBamboo(150, 1100, 200),
       verticalBamboo(-100, 1400, 500),
-      horizontalBamboo(250, 1350, 150),
+      horizontalBamboo(225, 1350, 100),
       horizontalBamboo(150, 1620, 150),
       horizontalBamboo(-50, 1920, 150),
-      horizontalBamboo(-250, 2220, 150),
+      horizontalBamboo(-225, 2220, 75),
       verticalBamboo(190, 2500, 500),
       horizontalBamboo(-136, 2900, 200)
     );
