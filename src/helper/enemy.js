@@ -230,3 +230,11 @@ export const recover = (interval, max) =>
   objectEvent(enemy => {
     enemy[KEY_ENEMY_HEALTH] = Math.min(max, enemy[KEY_ENEMY_HEALTH] + 1);
   }, interval);
+  
+export const untouchable = (x, y) => enemy(x, y, 30, 30, {
+  [KEY_ENEMY_IS_UNTOUCHABLE]: true
+})
+
+export const invincible = (x, y) => enemy(x, y, 30, 30, {
+  [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)]
+})

@@ -39,7 +39,7 @@ import {
   followPlayerY,
   flow,
 } from '../helper/platform';
-import { enemy, compund, recover, shell } from '../helper/enemy';
+import { enemy, compund, recover, shell, untouchable, invincible } from '../helper/enemy';
 import { easeInQuint, easeInQuad } from '../easing';
 import { circularMovement } from '../animation';
 import { object, vectorMagnitude, vector, decompressPath, getObjectBoundary, vectorAngle } from '../utils';
@@ -50,47 +50,24 @@ const cliffPaths = [
   [-51, -49, SIDE_L, 1.81, decompressPath(`¢gge|l	oodo~''$#'$'`)],
   [316, 613, SIDE_R, 1.93, decompressPath(`'¦%#nm	$'eeggt~eg`)],
   [289, 1229, SIDE_R, 1.93, decompressPath(`.{}'..#ggggggg`), [20, 23]],
-  [-6, 1513, SIDE_L, 1.93, decompressPath(`Qi{tl'3G;D=GOGE`), [13]]
+  [-6, 1513, SIDE_L, 1.93, decompressPath(`Qi{tl'3G;D=GOGE`), [13]],
+  [326, 1851, SIDE_R, 1.8, decompressPath(`8m''''/'6GFwr~gog~yogi`)],
+  [-34, 2775, SIDE_L, 2.08, decompressPath(`6grgo''''/`)]
 ];
-
-const scales = cliffPaths.map(([a,b,c,scale]) => scale);
-
-display(() => {
-  const index = 3;
-  if (pressingKeys.has('i')) graphics[index].p.y += 1;
-  if (pressingKeys.has('j')) graphics[index].p.x += -1;
-  if (pressingKeys.has('k')) graphics[index].p.y += -1;
-  if (pressingKeys.has('l')) graphics[index].p.x += 1;
-  if (pressingKeys.has('u')) scales[index] += -0.01;
-  if (pressingKeys.has('o')) scales[index] += 0.01;
-  
-  draw(100, ctx => {
-    ctx.strokeStyle = '#f00';
-    ctx.beginPath();
-    ctx.moveTo(transform(vector(-DEFAULT_FRAME_WIDTH / 2, 0))[0], 0);
-    ctx.lineTo(transform(vector(-DEFAULT_FRAME_WIDTH / 2, 0))[0], cameraFrameSize.y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(transform(vector(DEFAULT_FRAME_WIDTH / 2, 0))[0], 0);
-    ctx.lineTo(transform(vector(DEFAULT_FRAME_WIDTH / 2, 0))[0], cameraFrameSize.y);
-    ctx.stroke();
-  })
-  console.log(graphics[index].p, scales[index])
-});
 
 const generateCiff = ([x, y, side, scale, image, switchSideIndex = []], i) => {
   const getPathPointPos = p => 
     vector(
-      (x + p.x) * scales[i],
-      (y + p.y + image.h / 2) * scales[i]
+      (x + p.x) * scale,
+      (y + p.y + image.h / 2) * scale
     )
     
   graphics.push(
     graphic(x, y, graphic => draw(10, ctx => {
       const _getPathPointPos = p => 
         vector(
-          (graphic.p.x + p.x) * scales[i],
-          (graphic.p.y + p.y + image.h / 2) * scales[i]
+          (graphic.p.x + p.x) * scale,
+          (graphic.p.y + p.y + image.h / 2) * scale
         )
     
       ctx.fillStyle = '#666';
@@ -142,8 +119,8 @@ const generateCiff = ([x, y, side, scale, image, switchSideIndex = []], i) => {
 export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = 'rgb(200,200,200)';
-    player.p.x = 210;
-    player.p.y = 3137;
+    player.p.x = 0;
+    player.p.y = 0;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
@@ -163,44 +140,21 @@ export default {
       platform(0, -50, DEFAULT_FRAME_WIDTH * 2, 0),
       flow(-40, 1602.5, 40, 1255, vector(0, -0.5)),
       flow(105, 2220, 250, 20, vector(-0.2, 0)),
-      
-     
-      // platform(-30, 715, 80, 120),
-      // platform(25, 760, 30, 30),
-      // platform(-30, 875, 240, 200),
-      // platform(-160, 1015, 100, 80),
-      // platform(-190, 1130, 40, 150),
-      // platform(210, 1130, 40, 40),
-      // platform(190, 1200, 80, 100),
-      // platform(170, 1400, 120, 300),
-      // platform(-220, 1455, 20, 500),
-      // platform(220, 1850, 20, 600),
-      // platform(155, 2170, 150, 40),
-      // platform(105, 2200, 250, 20),
-      // platform(-215, 2595, 31, 382),
-      // platform(-110, 2638, 179, 199),
-      // platform(-21, 2538, 0, 0),
-      // platform(7, 2705, 55, 208),
-      // platform(61, 2766, 51, 225),
-      // platform(224, 2773, 8, 1124),
-      // platform(57, 3032, 12, 309),
-      // platform(84, 3388, 287, 110),
-      // platform(-62, 3245, 11, 293),
-      // platform(-75, 3107, 13, 361),
-      // platform(81, 3158, 37, 126),
-      // platform(-90, 2953, 17, 170),
-      // platform(-94, 3513, 67, 244),
-      // platform(-69, 3740, 64, 212),
-      // platform(-47, 3919, 58, 149),
-      // platform(6, 4008, 124, 28),
     );
   },
   [KEY_STAGE_WAVES]: [
     () =>
       enemies.push(
-        // enemy(24, 499, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
+        invincible(0, 4340),
+        invincible(-130, 4516),
+        invincible(-61, 4694),
+        invincible(4, 4850),
+        invincible(40, 5032),
+        invincible(124, 5194),
+        invincible(-49, 5319),
+        invincible(49, 5444),
+        invincible(27, 5611),
+        invincible(-76, 5740),
         // enemy(80, 545, 30, 30, {
         //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
         // }),
@@ -266,7 +220,7 @@ export default {
       ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
-    const goalArea = object(6, 4222, 124, 400);
+    const goalArea = object(-131, 6226, 200, 80);
     const collidedSide = collision(player, goalArea);
     return (
       $stageWave.$ === -1 ||
