@@ -34,6 +34,7 @@ import {
 } from '../utils';
 import { projectile } from '../helper/projectile';
 import { checkRipple } from './graphic';
+import { chase } from '../animation';
 
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
@@ -144,7 +145,7 @@ const dead = objectEvent(
   }
 );
 
-export const enemy = (x, y, w, h, options = {}) => ({
+export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
   ...object(x, y, w, h),
   [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
@@ -162,7 +163,7 @@ export const enemy = (x, y, w, h, options = {}) => ({
 export const compund = (core, ...children) => {
   core[KEY_OBJECT_ON_UPDATE].push(enemy => {
     children.forEach(child => {
-      child[KEY_ENEMY_HEALTH] = 2;
+      child[KEY_ENEMY_HEALTH] = Math.max(2, child[KEY_ENEMY_HEALTH]);
       if (enemy[KEY_ENEMY_DEAD_FRAME] && !child[KEY_ENEMY_DEAD_FRAME])
         child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
     })
@@ -231,10 +232,30 @@ export const recover = (interval, max) =>
     enemy[KEY_ENEMY_HEALTH] = Math.min(max, enemy[KEY_ENEMY_HEALTH] + 1);
   }, interval);
   
-export const untouchable = (x, y) => enemy(x, y, 30, 30, {
-  [KEY_ENEMY_IS_UNTOUCHABLE]: true
+export const untouchable = (x, y, options = {}) => enemy(x, y, 30, 30, {
+  [KEY_ENEMY_IS_UNTOUCHABLE]: true,
+  ...options
 })
 
-export const invincible = (x, y) => enemy(x, y, 30, 30, {
-  [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)]
+export const invincible = (x, y, options = {}) => enemy(x, y, 30, 30, {
+  [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)],
+  ...options
 })
+
+export const chain = (head, amount, interval, coreIndex, getEnemy) => {
+  let nodes = [
+    head,
+    ...chase(head, Array(amount).fill().map((_, i) => (i + 1) * interval))
+      .map((doChase, i) => {
+        const enemy = getEnemy(i, head);
+        enemy[KEY_OBJECT_ON_UPDATE].push(doChase);
+        return enemy;
+      })
+  ];
+  nodes = compund(
+    ...nodes.splice(coreIndex, 1),
+    ...nodes
+  );
+  nodes.splice(coreIndex, 0, nodes.splice(0, 1)[0]);
+  return nodes;
+}

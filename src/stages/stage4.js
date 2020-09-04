@@ -10,7 +10,8 @@ import {
   KEY_OBJECT_ON_COLLIDED,
   SIDE_L,
   SIDE_R,
-  DEFAULT_FRAME_HEIGHT
+  DEFAULT_FRAME_HEIGHT,
+  KEY_OBJECT_INITIAL_POS
 } from '../constants';
 import {
   platforms,
@@ -39,15 +40,15 @@ import {
   followPlayerY,
   flow,
 } from '../helper/platform';
-import { enemy, compund, recover, shell, untouchable, invincible } from '../helper/enemy';
-import { easeInQuint, easeInQuad } from '../easing';
-import { circularMovement } from '../animation';
-import { object, vectorMagnitude, vector, decompressPath, getObjectBoundary, vectorAngle } from '../utils';
+import { enemy, compund, recover, shell, untouchable, invincible, chain } from '../helper/enemy';
+import { easeInQuint, easeInQuad, easeInOutQuart, easeInOutQuint, easeInCirc, easeOutCirc, easeInOutQuad } from '../easing';
+import { circularMovement, chase, parabolas } from '../animation';
+import { object, vectorMagnitude, vector, decompressPath, getObjectBoundary, vectorAngle, objectAction, alternateProgress } from '../utils';
 import { graphic } from '../helper/graphic';
 import { display } from '../modules/display';
 
 const cliffPaths = [
-  [-51, -49, SIDE_L, 1.81, decompressPath(`¢gge|l	oodo~''$#'$'`)],
+  [-51, -65, SIDE_L, 1.81, decompressPath(`¢gge|l	oodo~''$#'$'`)],
   [316, 613, SIDE_R, 1.93, decompressPath(`'¦%#nm	$'eeggt~eg`)],
   [289, 1229, SIDE_R, 1.93, decompressPath(`.{}'..#ggggggg`), [20, 23]],
   [-6, 1513, SIDE_L, 1.93, decompressPath(`Qi{tl'3G;D=GOGE`), [13]],
@@ -119,8 +120,8 @@ const generateCiff = ([x, y, side, scale, image, switchSideIndex = []], i) => {
 export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = 'rgb(200,200,200)';
-    player.p.x = 0;
-    player.p.y = 0;
+    player.p.x = 215;
+    player.p.y = 3102;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = 
@@ -143,7 +144,7 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    () =>
+    () => {
       enemies.push(
         invincible(0, 4340),
         invincible(-130, 4516),
@@ -155,69 +156,21 @@ export default {
         invincible(49, 5444),
         invincible(27, 5611),
         invincible(-76, 5740),
-        // enemy(80, 545, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(121, 604, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(191, 675, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-180, 1230, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(80, 1402, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-172, 1632, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-224, 1742, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-136, 2099, 30, 30, {
-        //   [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)]
-        // }),
-        // enemy(136, 2900, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(80, 3205, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-40, 3203, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(30, 3076, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-50, 2980, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(33, 2890, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-8, 2829, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-8, 2829, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // ...Array(4).fill().map((_, i) =>
-        //   enemy(-183 + i * 50 * (Math.random() * 0.2 + 0.8), 2750, 30, 30, {
-        //     [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        //   })
-        // ),
-        // enemy(-208, 2814, 30, 30, {
-        //   [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        // }),
-        // enemy(-183, 2905, 30, 30, {
-        //   [KEY_OBJECT_ON_UPDATE]: [recover(FRAME_DURAITON, 2)]
-        // }),
-        // shell(-173, 3397, 30, 30, {
-        //   [KEY_OBJECT_ON_UPDATE]: [recover(2000, 3)]
-        // }),
-      ),
+        enemy(143, 750, 30, 30),
+        invincible(-141, 1596),
+        untouchable(80, 1509),
+        invincible(-119, 2127),
+        ...chain(untouchable(-300, 2767, {
+          [KEY_OBJECT_ON_UPDATE]: [
+            objectAction(5000, (enemy, progress) => {
+              progress = easeInOutQuad(alternateProgress(progress));
+              enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + 472 * progress;
+              enemy.p.x = enemy[KEY_OBJECT_INITIAL_POS].x + 400 * Math.sin(easeOutCirc(progress) * Math.PI / 2);
+            })
+          ],
+        }), 10, 300, 8, (i, head) => (i === 7 ? shell : untouchable)(head.p.x, head.p.y))
+      )
+    }
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(-131, 6226, 200, 80);
