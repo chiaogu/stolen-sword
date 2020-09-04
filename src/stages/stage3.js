@@ -31,7 +31,7 @@ import {
   $reflectionGradient
 } from '../state';
 import { alternateProgress, vector, objectAction, vectorOp } from '../utils';
-import { enemy, compund, fire, switchMode, shell, recover, firework } from '../helper/enemy';
+import { enemy, compund, fire, switchMode, shell, recover, firework, chain } from '../helper/enemy';
 import {
   water,
   boundary,
@@ -162,59 +162,38 @@ export default {
           enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
         }
       }
-
       enemies.push(core, ...children);
     },
     () => {
-      const head = shell(0, 300, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]: [
-          recover(3000, 3),
-          slideIn(2000, 250, 450),
-          firework(10, 6000, 1000),
-          lemniscateMovement(12000, 500, 2000)
-        ],
-      });
       enemies.push(
-        ...compund(
-          head,
-          ...chase(head, Array(6).fill().map((_, i) => (i + 1) * 300)).map((doChase, i) =>
-            enemy(250, 450, 30, 30, {
-              [KEY_ENEMY_IS_UNTOUCHABLE]: i === 0,
-              [KEY_OBJECT_ON_UPDATE]: [doChase],
-            })
-          )
-        )
-      );
+        ...chain(shell(0, 300, 30, 30, {
+          [KEY_OBJECT_ON_UPDATE]: [
+            recover(3000, 3),
+            slideIn(2000, 250, 450),
+            firework(10, 6000, 1000),
+            lemniscateMovement(12000, 500, 2000)
+          ],
+        }), 6, 300, 0, i => enemy(250, 450, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: i === 0,
+        }))
+      )
     },
     () => {
-      const coreIndex = 0;
-      const length = 6;
-      const head = enemy(0, 250, 30, 30, {
-        [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-        [KEY_OBJECT_ON_UPDATE]: [
-          slideIn(2000, 250, 450),
-          firework(10, 6000, 1000),
-          circularMovement(10000, 200, 250, 2000)
-        ],
-      });
-      const nodes = chase(head, Array(length).fill().map((_, i) => (i + 1) * 300)).map((doChase, i) =>
-        (i === coreIndex ? shell : enemy)(250, 450, 30, 30, {
+      enemies.push(
+        ...chain(enemy(0, 250, 30, 30, {
+          [KEY_ENEMY_IS_UNTOUCHABLE]: true,
+          [KEY_OBJECT_ON_UPDATE]: [
+            slideIn(2000, 250, 450),
+            firework(10, 6000, 1000),
+            circularMovement(10000, 200, 250, 2000)
+          ],
+        }), 6, 300, 1, i => (i === 0 ? shell : enemy)(250, 450, 30, 30, {
           [KEY_ENEMY_IS_UNTOUCHABLE]: i === length - 1,
           [KEY_OBJECT_ON_UPDATE]: [
-            doChase,
-            ...(i === coreIndex ? [recover(2500, 3)] : []),
+            ...(i === 0 ? [recover(2500, 3)] : []),
           ],
         }))
-      const dragon = compund(
-        ...nodes.splice(coreIndex, 1),
-        head,
-        ...nodes
-      );
-      enemies.push(
-        ...dragon.slice(1, coreIndex + 2),
-        dragon[0],
-        ...dragon.slice(coreIndex + 2, dragon.length),
-      );
+      )
     },
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
