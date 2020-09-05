@@ -2,7 +2,6 @@ import {
   circularMovement,
   follow,
   lemniscateMovement,
-  parabolas,
   slideIn,
 } from '../animation';
 import {
@@ -101,8 +100,8 @@ export default {
       enemies.push(
         shell(50, 200, 30, 30, {
           [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1000, 100, 550),
-            circularMovement(3000, 10, 5, 1000),
+            slideIn(1500, 100, 550),
+            circularMovement(3000, 10, 5, 1500),
           ],
         })
       ),
@@ -131,11 +130,11 @@ export default {
         })
       ),
     () => {
-      const core = enemy(0, 200, 30, 30, {
+      const core = enemy(0, 300, 30, 30, {
         [KEY_ENEMY_IS_UNTOUCHABLE]: true,
         [KEY_OBJECT_ON_UPDATE]: [
           slideIn(1700, 0, 550),
-          parabolas(10000, 300, 2300),
+          circularMovement(10000, 160, 288, 2300, progress => easeInOutQuad(alternateProgress(progress)) / -2),
           checkChildren,
         ],
       });
@@ -146,7 +145,7 @@ export default {
         vector(40, 0),
         vector(0, 40),
       ].map((offset, index) =>
-        shell(offset.x, 200 + offset.y, 30, 30, {
+        shell(offset.x, core.p.y + offset.y, 30, 30, {
           [KEY_OBJECT_ON_UPDATE]: [
             slideIn(
               2000 + index * 100,

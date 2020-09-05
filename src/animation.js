@@ -1,5 +1,5 @@
-import { vectorOp, objectAction, vector, alternateProgress, approach } from './utils';
-import { easeOutCubic, easeInOutCubic } from './easing';
+import { vectorOp, objectAction, vector, approach } from './utils';
+import { easeOutQuint } from './easing';
 import {
   KEY_OBJECT_FRAME,
   FRAME_DURAITON,
@@ -18,7 +18,7 @@ export const circular = (x, y, rx, ry, progress, ratio = 1) => vector(
   y + ry * Math.sin(progress * 2 * Math.PI) * ratio
 );
   
-export const circularMovement = (duration, xRadius, yRadius, startTime = 0) => {
+export const circularMovement = (duration, xRadius, yRadius, startTime = 0, getProgress = v => v) => {
   let radiusProgress = 0;
   return objectAction(
     duration,
@@ -31,7 +31,7 @@ export const circularMovement = (duration, xRadius, yRadius, startTime = 0) => {
             object[KEY_OBJECT_INITIAL_POS].y,
             xRadius,
             yRadius,
-            progress,
+            getProgress(progress),
             radiusProgress
           )
         ], object.p);
@@ -66,34 +66,13 @@ export const slideIn = (duration, x, y) =>
   objectAction(duration, (object, progress) => {
     if (!object[KEY_ENEMY_DEAD_FRAME] && progress > 0 && object[KEY_OBJECT_FRAME] < duration / FRAME_DURAITON) {
       vectorOp(
-        (to, from) => from + (to - from) * easeOutCubic(progress),
+        (to, from) => from + (to - from) * easeOutQuint(progress),
         [object[KEY_OBJECT_INITIAL_POS], vector(x, y)],
         object.p
       );
     }
   });
-
-export const parabolas = (duration, width, startTime) => {
-  let widthProgress = 0;
-  return objectAction(
-    duration,
-    (object, progress) => {
-      if(!object[KEY_ENEMY_DEAD_FRAME]) {
-        widthProgress = Math.max(progress, widthProgress);
-        progress = easeInOutCubic(alternateProgress(progress));
-        const from = object[KEY_OBJECT_INITIAL_POS].x - width / 2 * widthProgress;
-        const to = object[KEY_OBJECT_INITIAL_POS].x + width / 2 * widthProgress;
-        const x = from + (to - from) * progress;
-        object.p.x = x;
-        object.p.y = object[KEY_OBJECT_INITIAL_POS].y + 0.01 * x * x;
-      }
-    },
-    {
-      [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),
-    }
-  );
-};
-
+  
 export const follow = (object, offset, startTime) => 
   enemy => {
     if(!enemy[KEY_ENEMY_DEAD_FRAME] && enemy[KEY_OBJECT_FRAME] > startTime / FRAME_DURAITON) {

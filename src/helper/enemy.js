@@ -16,7 +16,6 @@ import {
   KEY_OBJECT_FRAME,
   KEY_OBJECT_IS_COLLIDED,
   KEY_OBJECT_ON_COLLIDED,
-  KEY_OBJECT_ON_DEAD,
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_Z_INDEX,
   KEY_PROJECTILE_SORUCE,
@@ -215,7 +214,6 @@ function drawEnemy(enemy) {
 const dead = objectEvent(
   (enemy) => {
     enemy[KEY_ENEMY_IS_DEAD] = true;
-    if (enemy[KEY_OBJECT_ON_DEAD]) enemy[KEY_OBJECT_ON_DEAD](enemy);
   },
   ENEMY_DEATH_ANIMATION_DURATION,
   {

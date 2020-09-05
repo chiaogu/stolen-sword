@@ -22,7 +22,6 @@ export const KEY_STAGE_ENDING_CUT_SCENE_KEY = key();
 export const KEY_STAGE_START_KEY = key();
 
 export const KEY_OBJECT_ON_UPDATE = key();
-export const KEY_OBJECT_ON_DEAD = key();
 export const KEY_OBJECT_FRAME = key();
 export const KEY_OBJECT_INITIAL_POS = key();
 export const KEY_OBJECT_ON_COLLIDED = key();
@@ -69,8 +68,8 @@ export const DEFAULT_HEALTH = 2;
 export const ENEMY_DEATH_ANIMATION_DURATION = 1000;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
 export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
-export const STAGE_TRANSITION_DURAION = 1000;
-// export const STAGE_TRANSITION_DURAION = 2000;
+// export const STAGE_TRANSITION_DURAION = 1000;
+export const STAGE_TRANSITION_DURAION = 2000;
 
 /**
  *  zIndex

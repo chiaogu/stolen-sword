@@ -133,7 +133,7 @@ function update(stage) {
 }
 
 const checkTransition = objectEvent(
-  (stage) => _setWave($stageNextWave.$),
+  () => _setWave($stageNextWave.$),
   STAGE_TRANSITION_DURAION,
   {
     [KEY_OBJECT_EVENT_GET_OFFSET]: (stage) =>

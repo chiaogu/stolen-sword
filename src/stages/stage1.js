@@ -66,19 +66,19 @@ export default {
     () =>
       enemies.push(
         bug('大', 50, 150, [
-          slideIn(1000, 250, 200),
-          circularMovement(3000, 10, 5, 1000),
+          slideIn(2000, 250, 200),
+          circularMovement(3000, 10, 5, 2000),
         ])
       ),
     () =>
       enemies.push(
-        bug('木', -100, 300, [
-          slideIn(1000, 250, 350),
-          circularMovement(5000, 10, 5, 1000),
+        bug('太', -100, 300, [
+          slideIn(2000, 250, 350),
+          circularMovement(5000, 10, 5, 2000),
         ]),
-        bug('本', 75, 350, [
-          slideIn(1000, 250, 450),
-          circularMovement(3000, 10, 5, 1000),
+        bug('木', 75, 350, [
+          slideIn(2000, 250, 450),
+          circularMovement(3000, 10, 5, 2000),
         ])
       ),
     () =>
@@ -105,13 +105,13 @@ export default {
     () =>
       enemies.push(
         ...compund(
-          bug('凶', 0, 300, [
+          bug('上', 0, 300, [
             fire(3000, 500),
             slideIn(2000, 250, 300),
             circularMovement(6000, 150, 10, 2000),
           ]),
           bug(
-            '回',
+            '下',
             0,
             220,
             [slideIn(1000, 250, 220), circularMovement(5000, 100, 10, 1000)],
