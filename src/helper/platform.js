@@ -142,10 +142,9 @@ export const horizontalBamboo = (x, y, w) =>
             ...transform(vector(l - 20, 0)),
             ...transform(vector(r + 20, 0))
           );
-          grad.addColorStop(0, '#333');
-          grad.addColorStop(0.2, '#aaa');
-          grad.addColorStop(0.8, '#aaa');
-          grad.addColorStop(1, '#333');
+          grad.addColorStop(0.1, '#B6D8D2');
+          grad.addColorStop(0.5, '#4E8F80');
+          grad.addColorStop(0.9, '#B6D8D2');
           ctx.strokeStyle = grad;
           ctx.lineWidth = transform(5);
           ctx.setLineDash([transform(80), transform(1)]);
@@ -181,10 +180,11 @@ export const verticalBamboo = (x, y, h) =>
             ...transform(vector(0, startY)),
             ...transform(vector(0, endY))
           );
-          grad.addColorStop(0, '#000');
-          grad.addColorStop(0.4, '#333');
-          grad.addColorStop(0.6, '#aaa');
-          grad.addColorStop(0.8, '#333');
+          grad.addColorStop(0, 'rgba(221,234,240, 0)');
+          grad.addColorStop(0.2, '#B6D8D2');
+          grad.addColorStop(0.4, '#B6D8D2');
+          grad.addColorStop(0.6, '#4E8F80');
+          grad.addColorStop(0.8, '#B6D8D2');
           ctx.strokeStyle = grad;
           ctx.lineWidth = transform(7);
           ctx.setLineDash([transform(80), transform(1)]);

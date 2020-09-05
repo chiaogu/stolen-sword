@@ -102,7 +102,7 @@ const background = (draw, v) =>
 const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
   const progress = Array(amount).fill().map(() => Math.random());
   const seeds = progress.map(() => Math.random());
-  const lineDashes = seeds.map(seed => 30 * seed + 70, distance);
+  const lineDashes = seeds.map(seed => 40 * seed + 120 * (distance / 1.5));
   const bright = 180 + 60 * (distance > 1 ? -0.3 : easeOutQuad(1 - distance));
   const strokeStyle = `rgb(${bright * 0.82}, ${bright}, ${bright * 0.96})`;
   return offset => draw(zIndex, ctx => {
@@ -111,7 +111,7 @@ const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
       const seed = seeds[i];
       progress[i] = progress[i] >= 1 ? 0 : progress[i] + (0.0005 + 0.001 * seed) * $timeRatio.$;
       ctx.lineWidth = transform(2 + 10 * distance * (0.4 + 0.6 * seed), distance);
-      ctx.setLineDash([transform(lineDashes[i]), 1]);
+      ctx.setLineDash([transform(lineDashes[i]), transform(1.5)]);
       ctx.beginPath();
       const rootX = x + offset + DEFAULT_FRAME_WIDTH / amount * i + 70 * seed;
       const rootY = y - 20 * seed;
@@ -132,7 +132,7 @@ const bamboo = (x, y, h, amount, distance, zIndex, amplitude) => {
           progress[i]
         ), distance)
       );
-      ctx.globalAlpha = 0.8;
+      ctx.globalAlpha = distance > 1 ? 0.6 : 0.8;
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
@@ -152,13 +152,20 @@ export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
   }, 2 * distance);
 };
 
-export const gradient = (y, h, z, distance, colors) => graphic(0, 0, () => draw(z, ctx => {
-  const grad = createLinearGradient(ctx, y, h, colors, distance);
+export const gradient = (y, h, z, distance, colors, depth) => graphic(0, 0, () => draw(z, ctx => {
+  const grad = createLinearGradient(ctx, y, h, colors, distance, depth);
+  // ctx.strokeStyle = '#f00';
+  // ctx.lineWidth = 1;
+  // ctx.strokeRect(
+  //   0, transform(vector(0, y), distance)[1],
+  //   cameraFrameSize.x * 2,
+  //   transform(h)
+  // );
   ctx.fillStyle = grad;
   ctx.fillRect(
     0, transform(vector(0, y), distance)[1],
     cameraFrameSize.x * 2,
-    transform(h)
+    transform(h, depth ? distance : undefined)
   );
 }));
 

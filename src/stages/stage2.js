@@ -11,7 +11,7 @@ import {
 } from '../constants';
 import { easeInQuint } from '../easing';
 import { enemy } from '../helper/enemy';
-import { staticBamboo, wipe } from '../helper/graphic';
+import { staticBamboo, wipe, gradient } from '../helper/graphic';
 import {
   boundary,
   followPlayerY,
@@ -28,12 +28,15 @@ import {
   graphics,
   platforms,
   player,
+  $backgroundColor,
 } from '../state';
 import { object, vectorMagnitude } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    player.p.x = -240;
+    // player.p.x = -240;
+    player.p.x = 171;
+    player.p.y = 1630;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(
@@ -41,14 +44,22 @@ export default {
         Math.max(player.p.y + player.s.y / 2, cameraCenter.y)
       );
     };
+    $backgroundColor.$ = 'rgb(221,234,240)';
     graphics.push(
-      staticBamboo(330, -10, 2900, 1, 1.5, 51),
+      gradient(200, 400, 0, 0.4, [
+        [0, 'rgb(221,234,240)'],
+        [0.9, 'rgba(104,158,131,0.6)'],
+      ]),
+      gradient(3000, 4000, 1, 0.6, [
+        [0, 'rgb(221,234,240)'],
+        [0.5, 'rgba(144,198,151,0.2)'],
+        [1, 'rgba(221,234,240,0)'],
+      ], true),
+      staticBamboo(330, -20, 2900, 1, 1.5, 51),
       staticBamboo(30, -10, 2900, 2, 1.2, 51),
       staticBamboo(0, 0, 2900, 3, 0.9, 10),
-      staticBamboo(-67, 0, 3000, 5, 0.7, 10),
-      staticBamboo(67, -10, 3100, 5, 0.7, 10),
-      staticBamboo(-100, -10, 3200, 5, 0.5, 10),
-      staticBamboo(100, -10, 3200, 5, 0.5, 10)
+      staticBamboo(-67, 0, 3000, 5, 0.8, 10),
+      staticBamboo(67, 60, 3100, 5, 0.7, 10),
     );
     platforms.push(
       platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),

@@ -306,8 +306,8 @@ export const draw = (zIndex, callback) =>
 export const $reflectionY = ref();
 export const $reflectionGradient = ref();
 
-export const createLinearGradient = (ctx, y, h, colors, distance) => {
-  const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h)));
+export const createLinearGradient = (ctx, y, h, colors, distance, depth) => {
+  const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h), depth ? distance : undefined));
   colors.forEach(color => grad.addColorStop(...color));
   return grad;
 }
