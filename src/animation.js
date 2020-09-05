@@ -6,6 +6,7 @@ import {
   KEY_OBJECT_INITIAL_POS,
   KEY_OBJECT_EVENT_GET_OFFSET,
   KEY_OBJECT_ON_UPDATE,
+  KEY_ENEMY_DEAD_FRAME,
 } from './constants';
 import { $timeRatio } from './state';
 
@@ -22,17 +23,19 @@ export const circularMovement = (duration, xRadius, yRadius, startTime = 0) => {
   return objectAction(
     duration,
     (object, progress) => {
-      radiusProgress = Math.max(progress, radiusProgress);
-      vectorOp(pos => pos, [
-        circular(
-          object[KEY_OBJECT_INITIAL_POS].x,
-          object[KEY_OBJECT_INITIAL_POS].y,
-          xRadius,
-          yRadius,
-          progress,
-          radiusProgress
-        )
-      ], object.p);
+      if(!object[KEY_ENEMY_DEAD_FRAME]) {
+        radiusProgress = Math.max(progress, radiusProgress);
+        vectorOp(pos => pos, [
+          circular(
+            object[KEY_OBJECT_INITIAL_POS].x,
+            object[KEY_OBJECT_INITIAL_POS].y,
+            xRadius,
+            yRadius,
+            progress,
+            radiusProgress
+          )
+        ], object.p);
+      }
     },
     {
       [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),
@@ -45,11 +48,13 @@ export const lemniscateMovement = (duration, radius, startTime = 0) => {
   return objectAction(
     duration,
     (object, progress) => {
-      radiusProgress = Math.max(progress, radiusProgress);
-      const theta = progress * 2 * Math.PI;
-      const scale = radius * radiusProgress / (3 - Math.cos(2 * theta));
-      object.p.x = object[KEY_OBJECT_INITIAL_POS].x + scale * Math.cos(theta);
-      object.p.y = object[KEY_OBJECT_INITIAL_POS].y + scale * Math.sin(2*theta) / 2;
+      if(!object[KEY_ENEMY_DEAD_FRAME]) {
+        radiusProgress = Math.max(progress, radiusProgress);
+        const theta = progress * 2 * Math.PI;
+        const scale = radius * radiusProgress / (3 - Math.cos(2 * theta));
+        object.p.x = object[KEY_OBJECT_INITIAL_POS].x + scale * Math.cos(theta);
+        object.p.y = object[KEY_OBJECT_INITIAL_POS].y + scale * Math.sin(2*theta) / 2;
+      }
     },
     {
       [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),
@@ -59,7 +64,7 @@ export const lemniscateMovement = (duration, radius, startTime = 0) => {
 
 export const slideIn = (duration, x, y) =>
   objectAction(duration, (object, progress) => {
-    if (progress > 0 && object[KEY_OBJECT_FRAME] < duration / FRAME_DURAITON) {
+    if (!object[KEY_ENEMY_DEAD_FRAME] && progress > 0 && object[KEY_OBJECT_FRAME] < duration / FRAME_DURAITON) {
       vectorOp(
         (to, from) => from + (to - from) * easeOutCubic(progress),
         [object[KEY_OBJECT_INITIAL_POS], vector(x, y)],
@@ -73,13 +78,15 @@ export const parabolas = (duration, width, startTime) => {
   return objectAction(
     duration,
     (object, progress) => {
-      widthProgress = Math.max(progress, widthProgress);
-      progress = easeInOutCubic(alternateProgress(progress));
-      const from = object[KEY_OBJECT_INITIAL_POS].x - width / 2 * widthProgress;
-      const to = object[KEY_OBJECT_INITIAL_POS].x + width / 2 * widthProgress;
-      const x = from + (to - from) * progress;
-      object.p.x = x;
-      object.p.y = object[KEY_OBJECT_INITIAL_POS].y + 0.01 * x * x;
+      if(!object[KEY_ENEMY_DEAD_FRAME]) {
+        widthProgress = Math.max(progress, widthProgress);
+        progress = easeInOutCubic(alternateProgress(progress));
+        const from = object[KEY_OBJECT_INITIAL_POS].x - width / 2 * widthProgress;
+        const to = object[KEY_OBJECT_INITIAL_POS].x + width / 2 * widthProgress;
+        const x = from + (to - from) * progress;
+        object.p.x = x;
+        object.p.y = object[KEY_OBJECT_INITIAL_POS].y + 0.01 * x * x;
+      }
     },
     {
       [KEY_OBJECT_EVENT_GET_OFFSET]: getOffset(startTime),
@@ -89,7 +96,7 @@ export const parabolas = (duration, width, startTime) => {
 
 export const follow = (object, offset, startTime) => 
   enemy => {
-    if(enemy[KEY_OBJECT_FRAME] > startTime / FRAME_DURAITON) {
+    if(!enemy[KEY_ENEMY_DEAD_FRAME] && enemy[KEY_OBJECT_FRAME] > startTime / FRAME_DURAITON) {
       enemy.p.y = object.p.y + offset.y;
       enemy.p.x = object.p.x + offset.x;
     }
@@ -108,11 +115,13 @@ export const chase = (head, durations) => {
   });
   return durations.map(duration => {
     return enemy => {
-      const pos = path[Math.floor(duration / FRAME_DURAITON) - 1];
-      const prevPos = path[Math.floor(duration / FRAME_DURAITON) - 2];
-      if(pos && prevPos) {
-        enemy.p.x = approach(enemy.p.x, pos.x, (pos.x - prevPos.x) * $timeRatio.$)
-        enemy.p.y = approach(enemy.p.y, pos.y, (pos.y - prevPos.y) * $timeRatio.$)
+      if(!enemy[KEY_ENEMY_DEAD_FRAME]) {
+        const pos = path[Math.floor(duration / FRAME_DURAITON) - 1];
+        const prevPos = path[Math.floor(duration / FRAME_DURAITON) - 2];
+        if(pos && prevPos) {
+          enemy.p.x = approach(enemy.p.x, pos.x, (pos.x - prevPos.x) * $timeRatio.$)
+          enemy.p.y = approach(enemy.p.y, pos.y, (pos.y - prevPos.y) * $timeRatio.$)
+        }
       }
     }
   })

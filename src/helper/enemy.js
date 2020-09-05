@@ -21,9 +21,10 @@ import {
   KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
   FRAME_DURAITON,
   KEY_OBJECT_Z_INDEX,
-  KEY_ENEMY_APPEARANCE
+  KEY_ENEMY_APPEARANCE,
+  KEY_OBJECT_INITIAL_POS
 } from '../constants';
-import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, getReflection, getWaterMask } from '../state';
+import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, getReflection, getWaterMask, $backgroundColor, $backgroundV, $timeRatio, $g } from '../state';
 import {
   object,
   getObjectBoundary,
@@ -32,10 +33,12 @@ import {
   objectEvent,
   vectorOp,
   vectorMagnitude,
+  vectorAngle,
 } from '../utils';
 import { projectile } from '../helper/projectile';
 import { checkRipple } from './graphic';
-import { chase } from '../animation';
+import { chase, circular } from '../animation';
+import { easeInOutQuart, easeOutQuad, easeOutQuint, easeOutQuart } from '../easing';
 
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
@@ -46,7 +49,7 @@ function handleCollision(enemy, enemyBoundary, collidedSide) {
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       bounceBack(enemy, enemyBoundary, collidedSide);
     } 
-    underAttack(enemy, enemyBoundary, collidedSide);
+    takeDamage(enemy, enemyBoundary, collidedSide);
   }
 }
 
@@ -66,35 +69,44 @@ function bounceBack(enemy, enemyBoundary, collidedSide) {
   }
 }
 
-function underAttack(enemy, enemyBoundary, collidedSide) {
+function takeDamage(enemy, enemyBoundary, collidedSide) {
   setDash(1);
   if(enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] > 20) {
     enemy[KEY_ENEMY_HEALTH] --;
     enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] = enemy[KEY_OBJECT_FRAME];
-    if(enemy[KEY_ENEMY_HEALTH] === 0) enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+    if(enemy[KEY_ENEMY_HEALTH] === 0) {
+      enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+      vectorOp(v => v * 0.3, [player.v], enemy.v);
+    }
   }
 }
 
 const getEnemyColor = enemy => {
+  if (enemy[KEY_OBJECT_IS_COLLIDED] && Math.round(enemy[KEY_OBJECT_FRAME]) % 4 > 1) {
+    return 'rgba(200,200,200,0.9)';
+  } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+    return `rgb(255,0,255)`;
+  } else {
+    return `rgb(70,70,70)`;
+  }
+}
+
+const getDeathProgress = enemy => {
   let deathProgress = 1 - getActionProgress(
     enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_DEAD_FRAME],
     ENEMY_DEATH_ANIMATION_DURATION,
     false
   );
   deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
-  if (enemy[KEY_OBJECT_IS_COLLIDED] && Math.round(enemy[KEY_OBJECT_FRAME]) % 4 > 1) {
-    return 'rgba(255,255,255,0.9)';
-  } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
-    return `rgba(255,0,255,${deathProgress})`;
-  } else {
-    return `rgba(70,70,70,${deathProgress})`;
-  }
+  return Math.max(0, deathProgress);
 }
 
 function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
   draw(enemy[KEY_OBJECT_Z_INDEX], ctx => {
     const { l, t } = getObjectBoundary(enemy);
+    
+    // collision area
     // ctx.lineWidth = 1;
     // ctx.strokeStyle = getEnemyColor(enemy);
     // ctx.strokeRect(
@@ -102,14 +114,30 @@ function drawEnemy(enemy) {
     //   transform(enemy.s.x),
     //   transform(enemy.s.y)
     // );
+    
+    // body
+    ctx.globalAlpha = getDeathProgress(enemy);
+    ctx.shadowBlur = 3;
     ctx.fillStyle = getEnemyColor(enemy);
     ctx.shadowColor = getEnemyColor(enemy);
-    ctx.shadowBlur = 3;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.font = `bold ${transform(36)}px sans-serif`;
     ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
     ctx.shadowBlur = 0;
+    
+    // eye
+    const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
+    const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 8);
+    const eyePos = circular(eyeCenter.x, eyeCenter.y, 1.6, 1.6, angle);
+    ctx.beginPath();
+    ctx.fillStyle = '#eee';
+    ctx.ellipse(...transform(eyeCenter), transform(4), transform(4), 0, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.fillStyle = '#d55';
+    ctx.ellipse(...transform(eyePos), transform(2.4), transform(2.4), 0, 0, 2 * Math.PI);
+    ctx.fill();
     
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
@@ -140,6 +168,7 @@ function drawEnemy(enemy) {
       );
       ctx.globalAlpha = 1;
     }
+    ctx.globalAlpha = 1;
   })
 }
 
@@ -167,6 +196,14 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
     drawEnemy,
+    enemy => {
+      if(enemy[KEY_ENEMY_DEAD_FRAME]) {
+        enemy.v.y -= $g.$ / 2 * $timeRatio.$;
+        enemy.v.x -= $backgroundV.$ * 0.2 * $timeRatio.$;
+        enemy.p.x += enemy.v.x * $timeRatio.$;
+        enemy.p.y += enemy.v.y * $timeRatio.$;
+      }
+    },
     checkRipple()
   ],
 });
@@ -276,5 +313,5 @@ export const chain = (head, amount, interval, coreIndex, getEnemy) => {
 
 export const bug = (x, y, actions) => enemy(x, y, 30, 30, {
   [KEY_OBJECT_ON_UPDATE]:[...actions],
-  [KEY_ENEMY_APPEARANCE]: '木'
+  [KEY_ENEMY_APPEARANCE]: '大'
 })
