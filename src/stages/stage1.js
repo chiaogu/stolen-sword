@@ -20,19 +20,22 @@ import {
   graphics,
   effects,
   $backgroundV,
-  slowDown
+  slowDown,
+  $backgroundColor,
+  $reflectionGradient
 } from '../state';
 import { alternateProgress, vector, objectAction, approach, vectorOp } from '../utils';
-import { enemy, compund, fire } from '../helper/enemy';
+import { enemy, compund, fire, bug } from '../helper/enemy';
 import { platform, boundary, followPlayerX, followPlayerY } from '../helper/platform';
 import { easeInOutQuad, easeOutCubic, easeOutQuad, easeInCubic, easeInQuad, easeOutCirc, easeOutQuint, easeInQuint } from '../easing';
 import { circularMovement, slideIn } from '../animation';
-import { wipe, movingBamboo } from '../helper/graphic';
+import { wipe, movingBamboo, gradient } from '../helper/graphic';
 
 let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
+    $backgroundColor.$ = 'rgb(221,234,240)';
     player.p.x = -240;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
@@ -51,8 +54,12 @@ export default {
       })
     );
     graphics.push(
-      ...movingBamboo(0, -20, 1250, 1, 1.5, 51),
-      ...movingBamboo(50, -40, 1250, 2, 1.1, 51),
+      gradient(200, 400, 0, 0.5, [
+        [0, 'rgb(221,234,240)'],
+        [0.9, 'rgb(104,158,131)'],
+      ]),
+      ...movingBamboo(0, -40, 1250, 1, 1.5, 51),
+      ...movingBamboo(50, -50, 1250, 1, 1.1, 51),
       ...movingBamboo(0, 30, 1250, 5, 0.9),
       ...movingBamboo(50, 30, 1250, 5, 0.75, 8),
       ...movingBamboo(20, 30, 1250, 5, 0.6, 8)
@@ -60,12 +67,10 @@ export default {
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
-      enemy(50, 150, 30, 30, {
-        [KEY_OBJECT_ON_UPDATE]:[
-          slideIn(1000, 250, 200),
-          circularMovement(3000, 10, 5, 1000)
-        ]
-      })
+      bug(50, 150, [
+        slideIn(1000, 250, 200),
+        circularMovement(3000, 10, 5, 1000)
+      ])
     ),
     () => enemies.push(
       enemy(-100, 300, 30, 30, {

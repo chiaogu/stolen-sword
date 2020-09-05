@@ -7,9 +7,6 @@ const ctx = canvas.getContext("2d");
 
 let devicePixelRatio;
 
-canvas.style.border = '1px solid #fff';
-canvas.style.boxSizing = 'border-box';
-
 function resize() {
   devicePixelRatio = window.devicePixelRatio;
   let vw = window.innerWidth;

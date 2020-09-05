@@ -20,7 +20,8 @@ import {
   KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
   FRAME_DURAITON,
-  KEY_OBJECT_Z_INDEX
+  KEY_OBJECT_Z_INDEX,
+  KEY_ENEMY_APPEARANCE
 } from '../constants';
 import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, getReflection, getWaterMask } from '../state';
 import {
@@ -81,12 +82,12 @@ const getEnemyColor = enemy => {
     false
   );
   deathProgress = isNaN(deathProgress) ? 1 : deathProgress;
-  if (enemy[KEY_OBJECT_IS_COLLIDED]) {
-    return '#f00';
+  if (enemy[KEY_OBJECT_IS_COLLIDED] && Math.round(enemy[KEY_OBJECT_FRAME]) % 4 > 1) {
+    return 'rgba(255,255,255,0.9)';
   } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
     return `rgba(255,0,255,${deathProgress})`;
   } else {
-    return `rgba(255,255,0,${deathProgress})`;
+    return `rgba(70,70,70,${deathProgress})`;
   }
 }
 
@@ -94,12 +95,21 @@ function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
   draw(enemy[KEY_OBJECT_Z_INDEX], ctx => {
     const { l, t } = getObjectBoundary(enemy);
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = getEnemyColor(enemy);
+    // ctx.strokeRect(
+    //   ...transform(vector(l, t)),
+    //   transform(enemy.s.x),
+    //   transform(enemy.s.y)
+    // );
     ctx.fillStyle = getEnemyColor(enemy);
-    ctx.fillRect(
-      ...transform(vector(l, t)),
-      transform(enemy.s.x),
-      transform(enemy.s.y)
-    );
+    ctx.shadowColor = getEnemyColor(enemy);
+    ctx.shadowBlur = 3;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.font = `bold ${transform(36)}px sans-serif`;
+    ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
+    ctx.shadowBlur = 0;
     
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       const size = vectorOp(size => size * (enemy[KEY_ENEMY_HEALTH] - 1) / 2, [enemy.s]);
@@ -150,7 +160,8 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
   [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
-  [KEY_OBJECT_Z_INDEX]: 31,
+  [KEY_OBJECT_Z_INDEX]: 15,
+  [KEY_ENEMY_APPEARANCE]: '勿',
   ...options,
   [KEY_OBJECT_ON_UPDATE]: [
     dead,
@@ -262,3 +273,8 @@ export const chain = (head, amount, interval, coreIndex, getEnemy) => {
   nodes.splice(coreIndex, 0, nodes.splice(0, 1)[0]);
   return nodes;
 }
+
+export const bug = (x, y, actions) => enemy(x, y, 30, 30, {
+  [KEY_OBJECT_ON_UPDATE]:[...actions],
+  [KEY_ENEMY_APPEARANCE]: '木'
+})

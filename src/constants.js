@@ -7,6 +7,7 @@ export const KEY_ENEMY_DEAD_FRAME = key();
 export const KEY_ENEMY_IS_DEAD = key();
 export const KEY_ENEMY_HEALTH = key();
 export const KEY_ENEMY_LAST_DAMAGE_FRAME = key();
+export const KEY_ENEMY_APPEARANCE = key();
 
 export const KEY_STAGE_INITIATE = key();
 export const KEY_STAGE_IS_WAVE_CLEAN = key();
@@ -48,7 +49,7 @@ export const SIDE_L = 'l';
 export const ASPECT_RATIO = 16 / 11;
 export const DEFAULT_FRAME_HEIGHT = 667;
 export const DEFAULT_FRAME_WIDTH = DEFAULT_FRAME_HEIGHT / ASPECT_RATIO;
-export const SLOW_DOWN_DURATION = 4000;
+export const SLOW_DOWN_DURATION = 3000;
 export const SLOW_MOTION_TIME_RATIO = 0.05;
 export const NORAML_TIME_RATIO = 1;
 export const FRAME_DURAITON = 16;
@@ -67,8 +68,8 @@ export const DEFAULT_HEALTH = 2;
 export const ENEMY_DEATH_ANIMATION_DURATION = 500;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
 export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
-// export const STAGE_TRANSITION_DURAION = 100;
-export const STAGE_TRANSITION_DURAION = 2000;
+export const STAGE_TRANSITION_DURAION = 1000;
+// export const STAGE_TRANSITION_DURAION = 2000;
 
 /**
  *  zIndex
