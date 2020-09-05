@@ -1,52 +1,41 @@
 import {
-  $isPressing,
-  $timeRatio,
-  player,
-  transform,
-  playerTrajectory,
-  $dash,
-  isAbleToDash,
-  isReleaseVelocityEnough,
-  dash,
-  isPlayerInvincibleAfterDamage,
-  $health,
-  $stageIndex,
-  $g,
-  $stageWave,
-  draw,
-  cameraFrameSize,
-  $reflectionY,
-  reflect,
-  effects,
-  getReflection,
-  $reflectionGradient,
-  getWaterMask
-} from '../state';
-import { PLAYER_POS_CHANGE, PRESS_UP, emit, listen } from '../events';
-import {
-  vectorOp,
-  vector,
-  getObjectBoundary,
-  getActionProgress,
-  objectEvent,
-  vectorMagnitude
-} from '../utils';
-import {
-  KEY_OBJECT_ON_UPDATE,
+  KEY_OBJECT_EVENT_GET_OFFSET,
   KEY_OBJECT_FRAME,
+  KEY_OBJECT_ON_UPDATE,
   KEY_PLAYER_DEATH_FRAME,
   PLAYER_DEATH_ANIMATION_DURATION,
-  KEY_OBJECT_EVENT_GET_OFFSET
 } from '../constants';
+import { checkRipple } from '../helper/graphic';
 import { setStage } from '../helper/stage';
-import { ripple, checkRipple } from '../helper/graphic';
-
-listen(PRESS_UP, () => {
-  dash();
-});
+import {
+  $dash,
+  $g,
+  $health,
+  $isPressing,
+  $stageIndex,
+  $stageWave,
+  $timeRatio,
+  draw,
+  getReflection,
+  getWaterMask,
+  isAbleToDash,
+  isPlayerInvincibleAfterDamage,
+  isReleaseVelocityEnough,
+  player,
+  playerTrajectory,
+  transform,
+  $cameraLoop,
+} from '../state';
+import {
+  getActionProgress,
+  getObjectBoundary,
+  objectEvent,
+  vector,
+  vectorOp,
+} from '../utils';
 
 function drawPlayer(player) {
-  draw(26, ctx => {
+  draw(26, (ctx) => {
     // visualize velocity
     ctx.strokeStyle = '#f0f';
     ctx.lineWidth = 1;
@@ -57,7 +46,7 @@ function drawPlayer(player) {
       ...transform(vectorOp((pos, v) => pos + v * 5, [player.p, player.v]))
     );
     ctx.stroke();
-  
+
     if ($isPressing.$ && isAbleToDash()) {
       ctx.strokeStyle = `rgba(0,255,0,${isReleaseVelocityEnough() ? 1 : 0})`;
       ctx.lineWidth = 1;
@@ -69,9 +58,9 @@ function drawPlayer(player) {
       });
       ctx.stroke();
     }
-  })
-  
-  draw(25, ctx => {
+  });
+
+  draw(25, (ctx) => {
     const { l, t, b } = getObjectBoundary(player);
     let height = transform(player.s.y);
     if (player[KEY_PLAYER_DEATH_FRAME]) {
@@ -85,7 +74,7 @@ function drawPlayer(player) {
       );
       height *= 1 - 0.7 * deathProgress;
     }
-    
+
     // draw character
     if (isPlayerInvincibleAfterDamage()) {
       ctx.fillStyle =
@@ -98,19 +87,24 @@ function drawPlayer(player) {
       ctx.fillStyle = '#fff';
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
-    
+
     const waterMask = getWaterMask(ctx, player);
-    if(waterMask) {
+    if (waterMask) {
       ctx.fillStyle = waterMask.g;
       ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
     }
-    
+
     const reflection = getReflection(player);
-    if(reflection) {
+    if (reflection) {
       ctx.fillStyle = 'rgba(255,255,255,0.1)';
-      ctx.fillRect(reflection.x, reflection.y, transform(player.s.x), reflection.h);
+      ctx.fillRect(
+        reflection.x,
+        reflection.y,
+        transform(player.s.x),
+        reflection.h
+      );
     }
-  })
+  });
 }
 
 function update(player) {
@@ -123,12 +117,12 @@ function update(player) {
 
   // update position
   vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);
-  emit(PLAYER_POS_CHANGE, player.p);
+  if($cameraLoop.$) $cameraLoop.$();
 }
 
 const death = objectEvent(
   () => {
-    setStage($stageIndex.$, $stageWave.$)
+    setStage($stageIndex.$, $stageWave.$);
   },
   PLAYER_DEATH_ANIMATION_DURATION,
   {

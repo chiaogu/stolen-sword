@@ -1,39 +1,35 @@
+import { circularMovement } from '../animation';
 import {
+  DEFAULT_FRAME_WIDTH,
+  KEY_ENEMY_IS_UNTOUCHABLE,
+  KEY_OBJECT_ON_UPDATE,
+  KEY_STAGE_ENDING_CUT_SCENE,
   KEY_STAGE_INITIATE,
   KEY_STAGE_IS_WAVE_CLEAN,
-  KEY_STAGE_WAVES,
-  DEFAULT_FRAME_WIDTH,
-  KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_TRANSITION,
-  KEY_ENEMY_IS_UNTOUCHABLE,
-  KEY_STAGE_ENDING_CUT_SCENE,
-  SIDE_T
+  KEY_STAGE_WAVES,
 } from '../constants';
+import { easeInQuint } from '../easing';
+import { enemy } from '../helper/enemy';
+import { staticBamboo, wipe } from '../helper/graphic';
 import {
-  platforms,
-  player,
-  cameraCenter,
-  $cameraLoop,
-  $cameraZoom,
-  $stageWave,
-  enemies,
-  $timeRatio,
-  graphics,
-  collision
-} from '../state';
-import {
-  platform,
   boundary,
-  followPlayerX,
   followPlayerY,
   horizontalBamboo,
-  verticalBamboo
+  platform,
+  verticalBamboo,
 } from '../helper/platform';
-import { enemy, compund } from '../helper/enemy';
-import { easeInQuint } from '../easing';
-import { circularMovement } from '../animation';
-import { object, vectorMagnitude, alternateProgress } from '../utils';
-import { wipe, staticBamboo } from '../helper/graphic';
+import {
+  $cameraLoop,
+  $stageWave,
+  cameraCenter,
+  collision,
+  enemies,
+  graphics,
+  platforms,
+  player,
+} from '../state';
+import { object, vectorMagnitude } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -47,12 +43,12 @@ export default {
     };
     graphics.push(
       staticBamboo(330, -10, 2900, 1, 1.5, 51),
-      staticBamboo(30, -10, 2900,  2, 1.2, 51),
-      staticBamboo(0, 0, 2900,  3, 0.9, 10),
-      staticBamboo(-67, 0, 3000,  5, 0.7, 10),
-      staticBamboo(67, -10, 3100,  5, 0.7, 10),
-      staticBamboo(-100, -10, 3200,  5, 0.5, 10),
-      staticBamboo(100, -10, 3200,  5, 0.5, 10),
+      staticBamboo(30, -10, 2900, 2, 1.2, 51),
+      staticBamboo(0, 0, 2900, 3, 0.9, 10),
+      staticBamboo(-67, 0, 3000, 5, 0.7, 10),
+      staticBamboo(67, -10, 3100, 5, 0.7, 10),
+      staticBamboo(-100, -10, 3200, 5, 0.5, 10),
+      staticBamboo(100, -10, 3200, 5, 0.5, 10)
     );
     platforms.push(
       platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
@@ -119,6 +115,6 @@ export default {
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
     [() => graphics.push(wipe())],
-    [() => {}, 1000]
-  ]
+    [() => {}, 1000],
+  ],
 };

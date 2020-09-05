@@ -1,22 +1,18 @@
 import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
-  KEY_PROJECTILE_IS_COMSUMED
+  KEY_PROJECTILE_IS_COMSUMED,
 } from '../constants';
 import {
-  transform,
   $timeRatio,
-  playerDamage,
   draw,
-  $reflectionY,
-  reflect,
-  projectiles,
-  effects,
   getReflection,
-  getWaterMask
+  getWaterMask,
+  playerDamage,
+  transform,
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp, vectorMagnitude } from '../utils';
-import { ripple, checkRipple } from './graphic';
+import { getObjectBoundary, object, vector, vectorOp } from '../utils';
+import { checkRipple } from './graphic';
 
 function handleCollision(projectile, projectileBoundary, collidedSide) {
   if (collidedSide) {
@@ -26,7 +22,7 @@ function handleCollision(projectile, projectileBoundary, collidedSide) {
 }
 
 function drawProjectile(projectile) {
-  draw(35, ctx => {
+  draw(35, (ctx) => {
     ctx.fillStyle = '#ec5751';
     const { l, t, b } = getObjectBoundary(projectile);
     ctx.fillRect(
@@ -34,15 +30,15 @@ function drawProjectile(projectile) {
       transform(projectile.s.x),
       transform(projectile.s.y)
     );
-    
+
     const waterMask = getWaterMask(ctx, projectile);
-    if(waterMask) {
+    if (waterMask) {
       ctx.fillStyle = waterMask.g;
       ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
     }
-    
+
     const reflection = getReflection(projectile);
-    if(reflection) {
+    if (reflection) {
       ctx.fillStyle = '#ec5751';
       ctx.globalAlpha = 0.1;
       ctx.fillRect(
@@ -73,7 +69,7 @@ export const projectile = (pos, size, v, options = {}) => {
       move,
       ...(options[KEY_OBJECT_ON_UPDATE] || []),
       drawProjectile,
-      checkRipple()
+      checkRipple(),
     ],
   };
 };

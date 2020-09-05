@@ -25,15 +25,12 @@ import {
   vectorOp,
   vectorDistance,
   vectorMagnitude,
-  vectorStringify,
   getObjectBoundary,
   isOverlap,
   isGoingThrough,
   getClosetSide,
-  vectorAngle
 } from './utils';
-import { display } from './modules/display';
-import { easeOutQuint, easeInCirc, easeOutCirc, easeInQuint } from './easing';
+import { easeOutQuint } from './easing';
 
 const ref = (defaultValue) =>
   new Proxy(
@@ -54,10 +51,6 @@ export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);
 export const $g = ref(G);
 export const $maxReleaseVelocity = ref(MAX_RELEASE_VELOCITY);
-
-display(() => `play.v: ${vectorStringify(player.v)}`);
-display(() => `health: ${$health.$}`);
-display(() => `dash: ${$dash.$}`);
 
 export function getReleaseVelocity() {
   const v = vector(
@@ -145,7 +138,6 @@ export const $cameraLoop = ref();
 export const cameraCenter = vector(0, 0);
 export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
-display(() => `cameraZoom: ${$cameraZoom.$.toFixed(3)}`);
 
 export const getReflection = object => {
   const { l, t, b } = getObjectBoundary(object);
@@ -229,7 +221,6 @@ export const collision = (objectA, objectB) => {
 
 // Time
 export const $timeRatio = ref(NORAML_TIME_RATIO);
-display(() => `timeRatio: ${$timeRatio.$.toFixed(3)}`);
 export const animations = [];
 let animationId = 0;
 let cancelTimeRatioAnimation;
@@ -296,9 +287,6 @@ export const isInTranisition = () =>
   $stage.$ &&
   ($stageWave.$ === $stage.$[KEY_STAGE_WAVES].length ||
     $stage.$[KEY_STAGE_TRANSITION_FRAME] !== undefined);
-
-display(() => `stage: ${$stageIndex.$}`);
-display(() => `wave: ${$stageWave.$}`);
 
 export const $debug = ref(false);
 let clickPromises = {};

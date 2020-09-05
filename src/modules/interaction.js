@@ -1,4 +1,3 @@
-import { PRESS_DOWN, PRESS_UP, emit } from '../events';
 import {
   cursorPos,
   pressDownPos,
@@ -7,10 +6,12 @@ import {
   detransform,
   cameraFrameSize,
   resolveClick,
-  graphics,
+  dash,
+  slowDown,
+  backToNormal,
+  isAbleToDash,
 } from '../state';
 import { vector } from '../utils';
-import { wipe } from '../helper/graphic';
 
 const canvas = document.querySelector('canvas');
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
@@ -27,13 +28,14 @@ function onPressDown({ clientX, clientY }) {
   pressDownPos.x = clientX;
   pressDownPos.y = clientY;
   $isPressing.$ = true;
-  emit(PRESS_DOWN);
   resolveClick();
+  if(isAbleToDash()) slowDown();
 }
 
 function onPressUp() {
   $isPressing.$ = false;
-  emit(PRESS_UP);
+  dash();
+  backToNormal()
 }
 
 window.addEventListener('mousemove', onPressMove);
@@ -50,7 +52,7 @@ export default (ctx) => {
   if (x > cameraFrameSize.x - 40) x -= 40;
   if (y < 40) y += 60;
 
-  ctx.font = `20px`;
+  ctx.font = `10px sans-serif`;
   ctx.fillStyle = '#fff';
   ctx.fillText(
     `${(cursorPos.x - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`,

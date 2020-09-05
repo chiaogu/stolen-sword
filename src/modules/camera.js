@@ -1,16 +1,9 @@
 import {
-  cameraCenter,
   cameraFrameSize,
   $cameraZoom,
   pressingKeys,
-  $cameraLoop,
   player,
 } from '../state';
-import { PLAYER_POS_CHANGE, listen } from '../events';
-
-listen(PLAYER_POS_CHANGE, () => {
-  if($cameraLoop.$) $cameraLoop.$();
-});
 
 export default (ctx) => {
   cameraFrameSize.x = Math.floor(ctx.canvas.width / window.devicePixelRatio);

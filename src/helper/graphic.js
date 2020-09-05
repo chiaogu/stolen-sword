@@ -1,35 +1,22 @@
 import {
-  KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
-  KEY_PROJECTILE_IS_COMSUMED,
   KEY_OBJECT_FRAME,
   KEY_GRAPHIC_IS_ANIMATION_FINISH,
-  SIDE_R,
   SIDE_T,
   DEFAULT_FRAME_WIDTH,
-  DEFAULT_FRAME_HEIGHT
 } from '../constants';
 import {
   transform,
   $timeRatio,
-  playerDamage,
-  projectiles,
   cameraFrameSize,
-  detransform,
-  graphics,
   draw,
   $backgroundV,
   $reflectionY,
   effects,
-  reflect,
-  createLinearGradient,
-  pressingKeys,
-  collision,
-  player
+  createLinearGradient
 } from '../state';
-import { object, getObjectBoundary, vector, vectorOp, getActionProgress, alternateProgress, vectorMagnitude, vectorStringify, decompressPath } from '../utils';
-import { easeInOutQuad, easeInOutCirc, easeInQuint, easeOutQuint, easeInQuad, easeOutQuad, easeInOutQuart, easeInCirc, easeOutCirc } from '../easing';
-import { display } from '../modules/display';
+import { object, vector, getActionProgress, vectorMagnitude, decompressPath } from '../utils';
+import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
 import { circular } from '../animation';
 
 export const graphic = (x, y, draw) => ({
