@@ -67,35 +67,35 @@ export default {
   },
   [KEY_STAGE_WAVES]: [
     () => enemies.push(
-      bug(50, 150, [
+      bug('大', 50, 150, [
         slideIn(1000, 250, 200),
         circularMovement(3000, 10, 5, 1000)
       ])
     ),
     () => enemies.push(
-      bug(-100, 300, [
+      bug('木', -100, 300, [
         slideIn(1000, 250, 350),
         circularMovement(5000, 10, 5, 1000)
       ]),
-      bug(75, 350, [
+      bug('本', 75, 350, [
         slideIn(1000, 250, 450),
         circularMovement(3000, 10, 5, 1000)
       ])
     ),
     () => enemies.push(
       ...compund(
-        bug(0, 450, [
+        bug('父', 0, 450, [
           slideIn(2000, 250, 330),
           circularMovement(5000, 10, 0, 2000)
         ]),
-        bug(0, 300, [
+        bug('人', 0, 300, [
           slideIn(1000, 250, 300),
           circularMovement(6000, 100, 50, 1000)
         ])
       )
     ),
     () => enemies.push(
-      bug(0, 350, [
+      bug('火', 0, 350, [
         slideIn(1000, 250, 400),
         fire(3000, 500),
         circularMovement(10000, 100, 10, 1000)
@@ -103,18 +103,15 @@ export default {
     ),
     () => enemies.push(
       ...compund(
-        bug(0, 300, [
+        bug('凶', 0, 300, [
             fire(3000, 500),
             slideIn(2000, 250, 300),
             circularMovement(6000, 150, 10, 2000)
           ]),
-        enemy(0, 220, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1000, 250, 220),
-            circularMovement(5000, 100, 10, 1000)
-          ],
-          [KEY_ENEMY_IS_UNTOUCHABLE]: true
-        })
+        bug('回', 0, 220, [
+          slideIn(1000, 250, 220),
+          circularMovement(5000, 100, 10, 1000)
+        ], true)
       )
     ),
   ],

@@ -27,7 +27,7 @@ function handleCollision(projectile, projectileBoundary, collidedSide) {
 
 function drawProjectile(projectile) {
   draw(35, ctx => {
-    ctx.fillStyle = '#f00';
+    ctx.fillStyle = '#ec5751';
     const { l, t, b } = getObjectBoundary(projectile);
     ctx.fillRect(
       ...transform(vector(l, t)),
@@ -43,7 +43,7 @@ function drawProjectile(projectile) {
     
     const reflection = getReflection(projectile);
     if(reflection) {
-      ctx.fillStyle = '#f00';
+      ctx.fillStyle = '#ec5751';
       ctx.globalAlpha = 0.1;
       ctx.fillRect(
         reflection.x,

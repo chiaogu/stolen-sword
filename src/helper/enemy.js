@@ -22,7 +22,7 @@ import {
   FRAME_DURAITON,
   KEY_OBJECT_Z_INDEX,
   KEY_ENEMY_APPEARANCE,
-  KEY_OBJECT_INITIAL_POS
+  KEY_ENEMY_COMPUND_PARENT
 } from '../constants';
 import { transform, setDash, player, enemies, projectiles, playerDamage, draw, $reflectionY, reflect, getReflection, getWaterMask, $backgroundColor, $backgroundV, $timeRatio, $g } from '../state';
 import {
@@ -38,7 +38,7 @@ import {
 import { projectile } from '../helper/projectile';
 import { checkRipple } from './graphic';
 import { chase, circular } from '../animation';
-import { easeInOutQuart, easeOutQuad, easeOutQuint, easeOutQuart } from '../easing';
+import { easeInOutQuart, easeOutQuad, easeOutQuint, easeOutQuart, easeInQuint, easeInQuad } from '../easing';
 
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
@@ -83,9 +83,9 @@ function takeDamage(enemy, enemyBoundary, collidedSide) {
 
 const getEnemyColor = enemy => {
   if (enemy[KEY_OBJECT_IS_COLLIDED] && Math.round(enemy[KEY_OBJECT_FRAME]) % 4 > 1) {
-    return 'rgba(200,200,200,0.9)';
+    return `rgba(200,200,200,${0.9 * getDeathProgress(enemy)})`;
   } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
-    return `rgb(255,0,255)`;
+    return `#ec5751`;
   } else {
     return `rgb(70,70,70)`;
   }
@@ -116,7 +116,7 @@ function drawEnemy(enemy) {
     // );
     
     // body
-    ctx.globalAlpha = getDeathProgress(enemy);
+    ctx.globalAlpha = easeInQuad(getDeathProgress(enemy)) * (!enemy[KEY_ENEMY_IS_UNTOUCHABLE] && enemy[KEY_ENEMY_COMPUND_PARENT] ? 0.4 : 1);
     ctx.shadowBlur = 3;
     ctx.fillStyle = getEnemyColor(enemy);
     ctx.shadowColor = getEnemyColor(enemy);
@@ -128,14 +128,14 @@ function drawEnemy(enemy) {
     
     // eye
     const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
-    const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 8);
+    const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 10);
     const eyePos = circular(eyeCenter.x, eyeCenter.y, 1.6, 1.6, angle);
     ctx.beginPath();
     ctx.fillStyle = '#eee';
     ctx.ellipse(...transform(eyeCenter), transform(4), transform(4), 0, 0, 2 * Math.PI);
     ctx.fill();
     ctx.beginPath();
-    ctx.fillStyle = '#d55';
+    ctx.fillStyle = '#ec5751';
     ctx.ellipse(...transform(eyePos), transform(2.4), transform(2.4), 0, 0, 2 * Math.PI);
     ctx.fill();
     
@@ -211,6 +211,7 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
 export const compund = (core, ...children) => {
   core[KEY_OBJECT_ON_UPDATE].push(enemy => {
     children.forEach(child => {
+      child[KEY_ENEMY_COMPUND_PARENT] = core;
       child[KEY_ENEMY_HEALTH] = Math.max(2, child[KEY_ENEMY_HEALTH]);
       if (enemy[KEY_ENEMY_DEAD_FRAME] && !child[KEY_ENEMY_DEAD_FRAME])
         child[KEY_ENEMY_DEAD_FRAME] = child[KEY_OBJECT_FRAME];
@@ -311,7 +312,8 @@ export const chain = (head, amount, interval, coreIndex, getEnemy) => {
   return nodes;
 }
 
-export const bug = (x, y, actions) => enemy(x, y, 30, 30, {
-  [KEY_OBJECT_ON_UPDATE]:[...actions],
-  [KEY_ENEMY_APPEARANCE]: '大'
+export const bug = (appearance, x, y, actions, isUntouchable) => enemy(x, y, 30, 30, {
+  [KEY_OBJECT_ON_UPDATE]: actions,
+  [KEY_ENEMY_APPEARANCE]: appearance,
+  [KEY_ENEMY_IS_UNTOUCHABLE]: isUntouchable
 })
