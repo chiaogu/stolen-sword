@@ -121,6 +121,7 @@ function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
   draw(enemy[KEY_OBJECT_Z_INDEX], (ctx) => {
     const { l, t } = getObjectBoundary(enemy);
+    const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
 
     // collision area
     // ctx.lineWidth = 1;
@@ -144,10 +145,29 @@ function drawEnemy(enemy) {
     ctx.textAlign = 'center';
     ctx.font = `bold ${transform(36)}px sans-serif`;
     ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
+    
+    if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+      ctx.setLineDash([
+        transform(30), 
+        transform(60 * (1 - (enemy[KEY_ENEMY_HEALTH] - 1) / 2))
+      ]);
+      ctx.lineWidth = transform(4);
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = getEnemyColor(enemy);
+      ctx.beginPath();
+      ctx.ellipse(
+        ...transform(enemy.p),
+        transform(24),
+        transform(24),
+        -Math.PI * 0.45 - 2 * Math.PI * angle,
+        0,
+        Math.PI * 0.9
+      );
+      ctx.stroke();
+    }
     ctx.shadowBlur = 0;
 
     // eye
-    const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
     const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 10);
     const eyePos = circular(eyeCenter.x, eyeCenter.y, 1.6, 1.6, angle);
     ctx.beginPath();
@@ -172,22 +192,6 @@ function drawEnemy(enemy) {
       2 * Math.PI
     );
     ctx.fill();
-
-    if (enemy[KEY_ENEMY_IS_DEFENCING]) {
-      const size = vectorOp(
-        (size) => (size * (enemy[KEY_ENEMY_HEALTH] - 1)) / 2,
-        [enemy.s]
-      );
-      const shellBoundary = getObjectBoundary(
-        object(enemy.p.x, enemy.p.y, size.x, size.y)
-      );
-      ctx.fillStyle = '#0ff';
-      ctx.fillRect(
-        ...transform(vector(shellBoundary.l, shellBoundary.t)),
-        transform(size.x),
-        transform(size.y)
-      );
-    }
 
     const waterMask = getWaterMask(ctx, enemy);
     if (waterMask) {
@@ -224,12 +228,12 @@ const dead = objectEvent(
 
 export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
   ...object(x, y, w, h),
-  [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
   [KEY_OBJECT_Z_INDEX]: 15,
   [KEY_ENEMY_APPEARANCE]: '勿',
   ...options,
+  [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_UPDATE]: [
     dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
@@ -237,7 +241,7 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
     (enemy) => {
       if (enemy[KEY_ENEMY_DEAD_FRAME]) {
         enemy.v.y -= ($g.$ / 2) * $timeRatio.$;
-        enemy.v.x -= $backgroundV.$ * 0.2 * $timeRatio.$;
+        enemy.v.x -= $backgroundV.$ * 0.1 * $timeRatio.$;
         enemy.p.x += enemy.v.x * $timeRatio.$;
         enemy.p.y += enemy.v.y * $timeRatio.$;
       }
@@ -257,16 +261,6 @@ export const compund = (core, ...children) => {
   });
   return [core, ...children];
 };
-
-export const shell = (x, y, w, h, options = {}) =>
-  enemy(x, y, w, h, {
-    ...options,
-    [KEY_ENEMY_HEALTH]: 3,
-    [KEY_OBJECT_ON_UPDATE]: [
-      (enemy) => (enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1),
-      ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    ],
-  });
 
 export const switchMode = (interval) =>
   objectEvent(
@@ -334,7 +328,9 @@ export const firework = (amount, interval, startTime = 0) =>
 export const recover = (interval, max) =>
   objectEvent((enemy) => {
     enemy[KEY_ENEMY_HEALTH] = Math.min(max, enemy[KEY_ENEMY_HEALTH] + 1);
-  }, interval);
+  }, interval, {
+    [KEY_OBJECT_EVENT_GET_OFFSET]: (enemy) => enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] || 0
+  });
 
 export const untouchable = (x, y, options = {}) =>
   enemy(x, y, 30, 30, {
@@ -370,9 +366,16 @@ export const chain = (head, amount, interval, coreIndex, getEnemy) => {
   return nodes;
 };
 
-export const bug = (appearance, x, y, actions, isUntouchable) =>
+export const bug = (appearance, x, y, actions, isUntouchable, health) =>
   enemy(x, y, 30, 30, {
     [KEY_OBJECT_ON_UPDATE]: actions,
     [KEY_ENEMY_APPEARANCE]: appearance,
     [KEY_ENEMY_IS_UNTOUCHABLE]: isUntouchable,
+    [KEY_ENEMY_HEALTH]: health
   });
+
+export const shell = (appearance, x, y, actions) =>
+  bug(appearance, x, y, [
+    enemy => (enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1),
+    ...actions
+  ], false, 3);

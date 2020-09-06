@@ -105,7 +105,7 @@ export default {
         bug('中', 150, 1580, [circularMovement(3000, 50, 5)], true),
         bug('串', 75, 1800, [circularMovement(4000, 5, 50)], true),
         bug('申', -120, 2220, [circularMovement(6000, 80, 80)], true),
-        bug('車', -120, 2800, [circularMovement(6000, 5, 20)])
+        bug('屮', -120, 2800, [circularMovement(6000, 5, 20)])
       ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {

@@ -17,7 +17,7 @@ import {
   KEY_STAGE_WAVES,
 } from '../constants';
 import { easeInOutQuad, easeInQuad } from '../easing';
-import { chain, enemy, fire, firework, recover, shell } from '../helper/enemy';
+import { chain, enemy, fire, firework, recover, shell, bug } from '../helper/enemy';
 import { gradient, movingMountain } from '../helper/graphic';
 import {
   boundary,
@@ -96,118 +96,95 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
+    // () =>
+    //   enemies.push(
+    //     shell('丁', 50, 200, [
+    //       slideIn(1500, 100, 550),
+    //       circularMovement(3000, 10, 5, 1500),
+    //     ])
+    //   ),
     () =>
       enemies.push(
-        shell(50, 200, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(1500, 100, 550),
-            circularMovement(3000, 10, 5, 1500),
-          ],
-        })
-      ),
-    () =>
-      enemies.push(
-        enemy(10, 350, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            fire(6000, 3000),
-            slideIn(3500, 0, 550),
-            circularMovement(8000, 100, 30, 3500),
-          ],
-        }),
-        shell(-100, 100, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(2000, -100, -150),
-            recover(3000, 3),
-            circularMovement(5000, 10, 15, 2000),
-          ],
-        }),
-        shell(100, 200, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            recover(3000, 3),
-            slideIn(2500, 100, -150),
-            circularMovement(6000, 10, 15, 2500),
-          ],
-        })
+        bug('丌', 10, 350, [
+          fire(6000, 3000),
+          slideIn(3500, 0, 550),
+          circularMovement(8000, 100, 30, 3500),
+        ]),
+        shell('士', -100, 100, [
+          slideIn(2000, -100, -150),
+          recover(3000, 3),
+          circularMovement(5000, 10, 15, 2000),
+        ]),
+        shell('干', 100, 200, [
+          recover(3000, 3),
+          slideIn(2500, 100, -150),
+          circularMovement(6000, 10, 15, 2500),
+        ])
       ),
     () => {
-      const core = enemy(0, 300, 30, 30, {
-        [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-        [KEY_OBJECT_ON_UPDATE]: [
-          slideIn(1700, 0, 550),
-          circularMovement(10000, 160, 288, 2300, progress => easeInOutQuad(alternateProgress(progress)) / -2),
-          checkChildren,
-        ],
-      });
+      const core = bug('十', 0, 300, [
+        slideIn(2300, 0, 550),
+        circularMovement(10000, 160, 288, 2300, progress => easeInOutQuad(alternateProgress(progress)) / -2),
+        enemy => {
+          if (
+            !enemy[KEY_ENEMY_DEAD_FRAME] &&
+            children.filter((child) => child[KEY_ENEMY_IS_DEAD]).length ===
+              children.length
+          ) {
+            enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+          }
+        },
+      ], true);
 
       const children = [
-        vector(-40, 0),
-        vector(0, -40),
-        vector(40, 0),
-        vector(0, 40),
-      ].map((offset, index) =>
-        shell(offset.x, core.p.y + offset.y, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [
-            slideIn(
-              2000 + index * 100,
-              250 * (index > 1 ? 1 : -1),
-              index % 2 === 1 ? 400 : 550
-            ),
-            follow(core, offset, 2300),
-          ],
-        })
+        ['巛', vector(-50, 0)],
+        ['三', vector(0, -50)],
+        ['川', vector(50, 0)],
+        ['彡', vector(0, 50)],
+      ].map(([appearance, offset], index) =>
+        shell(appearance, offset.x, core.p.y + offset.y, [
+          slideIn(
+            2000 + index * 100,
+            250 * (index > 1 ? 1 : -1),
+            index % 2 === 1 ? 400 : 550
+          ),
+          follow(core, offset, 2290),
+        ])
       );
-
-      function checkChildren(enemy) {
-        if (
-          !enemy[KEY_ENEMY_DEAD_FRAME] &&
-          children.filter((child) => child[KEY_ENEMY_IS_DEAD]).length ===
-            children.length
-        ) {
-          enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
-        }
-      }
-      enemies.push(core, ...children);
+      
+      enemies.push(core, ...children)
     },
     () => {
       enemies.push(
         ...chain(
-          shell(0, 300, 30, 30, {
-            [KEY_OBJECT_ON_UPDATE]: [
-              recover(3000, 3),
-              slideIn(2000, 250, 450),
-              firework(10, 6000, 1000),
-              lemniscateMovement(12000, 500, 2000),
-            ],
-          }),
-          6,
-          300,
+          shell('米', 0, 300, [
+            recover(3000, 3),
+            slideIn(2000, 250, 450),
+            firework(10, 6000, 1000),
+            lemniscateMovement(12000, 500, 2000),
+          ]),
+          10,
+          200,
           0,
-          (i) =>
-            enemy(250, 450, 30, 30, {
-              [KEY_ENEMY_IS_UNTOUCHABLE]: i === 0,
-            })
+          (i) => bug(i === 0 ? '十' : '乂', 250, 450, [], i === 0)
         )
       );
     },
     () => {
       enemies.push(
         ...chain(
-          enemy(0, 250, 30, 30, {
-            [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-            [KEY_OBJECT_ON_UPDATE]: [
-              slideIn(2000, 250, 450),
-              firework(10, 6000, 1000),
-              circularMovement(10000, 200, 250, 2000),
-            ],
-          }),
-          6,
-          300,
+          bug('由', 0, 250, [
+            slideIn(2000, 250, 450),
+            firework(10, 6000, 1000),
+            circularMovement(10000, 200, 250, 2000),
+          ], true),
+          10,
+          200,
           1,
           (i) =>
-            (i === 0 ? shell : enemy)(250, 450, 30, 30, {
-              [KEY_ENEMY_IS_UNTOUCHABLE]: i === length - 1,
-              [KEY_OBJECT_ON_UPDATE]: [...(i === 0 ? [recover(2500, 3)] : [])],
-            })
+            (i === 0 ? shell : bug)(i % 2 == 0 ? '口' : '回', 250, 450, [
+              ...(i === 0 ? [recover(2500, 3)] : [])
+            ], i === 9)
         )
       );
     },
