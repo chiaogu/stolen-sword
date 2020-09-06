@@ -141,10 +141,10 @@ export const $cameraZoom = ref(1);
 
 export const getReflection = object => {
   const { l, t, b } = getObjectBoundary(object);
-  if($reflectionY.$ !== undefined && t > $reflectionY.$) {
+  if($reflectionY.$ !== undefined && object.p.y > $reflectionY.$) {
     const distance = t - $reflectionY.$;
     const h = -transform(b > $reflectionY.$ ? object.s.y : distance);
-    const [x, y] = reflect(vector(l, t), $reflectionY.$);
+    const [x, y] = reflect(object.p, $reflectionY.$);
     return { x: x - Math.random() * 4 * $timeRatio.$, y, h }
   }
 }

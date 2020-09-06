@@ -40,9 +40,9 @@ function drawProjectile(projectile) {
     const reflection = getReflection(projectile);
     if (reflection) {
       ctx.fillStyle = '#ec5751';
-      ctx.globalAlpha = 0.1;
+      ctx.globalAlpha = 0.2;
       ctx.fillRect(
-        reflection.x,
+        reflection.x - transform(projectile.s.x) / 2,
         reflection.y,
         transform(projectile.s.x),
         reflection.h

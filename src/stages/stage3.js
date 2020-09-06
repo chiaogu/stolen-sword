@@ -55,8 +55,7 @@ export default {
       100,
       340,
       [
-        [0.3, 'rgb(130,148,147, 0.9)'],
-        [0.4, 'rgb(117,137,160, 0.9)'],
+        [0.3, 'rgb(117,137,160, 0.9)'],
         [1, '#2b435b'],
       ]
     ];
@@ -98,27 +97,24 @@ export default {
   [KEY_STAGE_WAVES]: [
     () =>
       enemies.push(
-        // shell('丁', 50, 200, [
-        //   slideIn(1500, 100, 550),
-        //   circularMovement(3000, 10, 5, 1500),
-        // ])
-        shell('丁', 50, 100, [
-          circularMovement(3000, 10, 200)
+        shell('亞', 75, 50, [
+          slideIn(2000, 270, -40),
+          circularMovement(7000, 0, 90, 2000)
         ])
       ),
     () =>
       enemies.push(
-        bug('丌', 10, 350, [
+        bug('工', 10, 300, [
           fire(6000, 3000),
           slideIn(3500, 0, 550),
           circularMovement(8000, 100, 30, 3500),
         ]),
-        shell('士', -100, 100, [
+        shell('干', -100, 100, [
           slideIn(2000, -100, -150),
           recover(3000, 3),
           circularMovement(5000, 10, 15, 2000),
         ]),
-        shell('干', 100, 200, [
+        shell('士', 100, 150, [
           recover(3000, 3),
           slideIn(2500, 100, -150),
           circularMovement(6000, 10, 15, 2500),
@@ -143,7 +139,7 @@ export default {
         ['巛', vector(-50, 0)],
         ['三', vector(0, -50)],
         ['川', vector(50, 0)],
-        ['彡', vector(0, 50)],
+        ['二', vector(0, 50)],
       ].map(([appearance, offset], index) =>
         shell(appearance, offset.x, core.p.y + offset.y, [
           slideIn(
@@ -160,34 +156,34 @@ export default {
     () => {
       enemies.push(
         ...chain(
-          shell('米', 0, 300, [
+          shell('十', 0, 300, [
             recover(3000, 3),
-            slideIn(2000, 250, 450),
+            slideIn(4000, 250, 450),
             firework(10, 6000, 1000),
-            lemniscateMovement(12000, 500, 2000),
+            lemniscateMovement(12000, 500, 3000),
           ]),
-          10,
-          200,
+          9,
+          250,
           0,
-          (i) => bug(i === 0 ? '十' : '乂', 250, 450, [], i === 0)
+          (i) => bug(i === 0 ? '米' : '乂', 250, 450, [], i === 0)
         )
       );
     },
     () => {
       enemies.push(
         ...chain(
-          bug('由', 0, 250, [
-            slideIn(2000, 250, 450),
-            firework(10, 6000, 1000),
-            circularMovement(10000, 200, 250, 2000),
+          bug('回', 0, 200, [
+            slideIn(5000, 270, -200),
+            firework(10, 6000, 2000),
+            circularMovement(10000, 200, 210, 5000),
           ], true),
-          10,
-          200,
+          9,
+          250,
           1,
           (i) =>
-            (i === 0 ? shell : bug)(i % 2 == 0 ? '口' : '回', 250, 450, [
+            (i === 0 ? shell : bug)(i === 0 ? '由' : i % 2 == 1 ? '口' : '回', 270, -200, [
               ...(i === 0 ? [recover(2500, 3)] : [])
-            ], i === 9)
+            ], i === 8)
         )
       );
     },

@@ -39,6 +39,7 @@ import {
   setDash,
   transform,
   createLinearGradient,
+  detransform,
 } from '../state';
 import {
   getActionProgress,
@@ -102,7 +103,7 @@ const getEnemyColor = (enemy) => {
   } else if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
     return `#ec5751`;
   } else {
-    return `rgb(70,70,70)`;
+    return `#464646`;
   }
 };
 
@@ -123,9 +124,7 @@ const drawEnemyBody = (ctx, enemy) => {
   ctx.textAlign = 'center';
   ctx.font = `bold ${transform(36)}px sans-serif`;
   ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
-}
-
-const drawEnemyShell = (ctx, enemy) => {
+  
   const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
   if (enemy[KEY_ENEMY_IS_DEFENCING]) {
     ctx.setLineDash([
@@ -182,41 +181,37 @@ function drawEnemy(enemy) {
     ctx.globalAlpha =
       easeInQuad(getDeathProgress(enemy)) *
       (!enemy[KEY_ENEMY_IS_UNTOUCHABLE] && enemy[KEY_ENEMY_COMPUND_PARENT]
-        ? 0.4
+        ? 0.3
         : 1);
     ctx.shadowBlur = 3;
     ctx.fillStyle = color;
     ctx.strokeStyle = color;
     ctx.shadowColor = color;
     drawEnemyBody(ctx, enemy);
-    drawEnemyShell(ctx, enemy);
     ctx.shadowBlur = 0;
-    
-    drawEnemyEye(ctx, enemy);
-
-    const waterMask = getWaterMask(ctx, enemy, color);
-    if (waterMask) {
-      ctx.globalAlpha = 0.75;
-      ctx.fillStyle = waterMask.g;
-      ctx.strokeStyle = waterMask.g;
-      // ctx.fillRect(100, 100, 100, 800);
-      drawEnemyBody(ctx, enemy);
-      drawEnemyShell(ctx, enemy);
-      ctx.globalAlpha = 1;
-    }
 
     const reflection = getReflection(enemy);
     if (reflection) {
       ctx.fillStyle = color;
-      ctx.globalAlpha = 0.1;
-      ctx.fillRect(
-        reflection.x,
-        reflection.y,
-        transform(enemy.s.x),
-        reflection.h
-      );
+      ctx.globalAlpha = 0.3;
+      let appearance = enemy[KEY_ENEMY_APPEARANCE];
+      if(appearance == '士') appearance = '干';
+      else if(appearance == '干') appearance = '士';
+      else if(appearance == '由') appearance = '甲';
+      ctx.fillText(appearance, reflection.x, reflection.y);
       ctx.globalAlpha = 1;
     }
+
+    const waterMask = getWaterMask(ctx, enemy, color);
+    if (waterMask && (!enemy[KEY_ENEMY_COMPUND_PARENT] || enemy[KEY_ENEMY_IS_UNTOUCHABLE])) {
+      ctx.globalAlpha = 0.75;
+      ctx.fillStyle = waterMask.g;
+      ctx.strokeStyle = waterMask.g;
+      drawEnemyBody(ctx, enemy);
+      ctx.globalAlpha = 1;
+    }
+    
+    drawEnemyEye(ctx, enemy);
     ctx.globalAlpha = 1;
   });
 }
@@ -372,16 +367,19 @@ export const chain = (head, amount, interval, coreIndex, getEnemy) => {
   return nodes;
 };
 
-export const bug = (appearance, x, y, actions, isUntouchable, health) =>
+export const bug = (appearance, x, y, actions, isUntouchable) =>
   enemy(x, y, 30, 30, {
     [KEY_OBJECT_ON_UPDATE]: actions,
     [KEY_ENEMY_APPEARANCE]: appearance,
-    [KEY_ENEMY_IS_UNTOUCHABLE]: isUntouchable,
-    [KEY_ENEMY_HEALTH]: health
+    [KEY_ENEMY_IS_UNTOUCHABLE]: isUntouchable
   });
 
 export const shell = (appearance, x, y, actions) =>
-  bug(appearance, x, y, [
-    enemy => (enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1),
-    ...actions
-  ], false, 3);
+  enemy(x, y, 40, 40, {
+    [KEY_OBJECT_ON_UPDATE]: [
+      enemy => (enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1),
+      ...actions
+    ],
+    [KEY_ENEMY_APPEARANCE]: appearance,
+    [KEY_ENEMY_HEALTH]: 3
+  });

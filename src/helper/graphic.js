@@ -13,7 +13,8 @@ import {
   $backgroundV,
   $reflectionY,
   effects,
-  createLinearGradient
+  createLinearGradient,
+  $backgroundColor
 } from '../state';
 import { object, vector, getActionProgress, vectorMagnitude, decompressPath } from '../utils';
 import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
@@ -86,7 +87,7 @@ export const checkRipple = isUnderWater => object => {
   if(object[KEY_OBJECT_FRAME] > 0 && $reflectionY.$ !== undefined) {
     const isNowUnderWater = object.p.y - object.s.y / 2 <= 0;
     if(isUnderWater !== isNowUnderWater) {
-      if(isUnderWater !== undefined) effects.push(ripple(object.p.x, $reflectionY.$, vectorMagnitude(object.v) * 5 + 100));
+      if(isUnderWater !== undefined && effects.length < 10) effects.push(ripple(object.p.x, $reflectionY.$, vectorMagnitude(object.v) * 5 + 100));
       isUnderWater = isNowUnderWater;
     }
   }
@@ -176,7 +177,10 @@ const getMountainColor = (bright, distance, a = 1) => `rgba(${bright * (0.64 + 0
 const drawMountain = (x, y, z, scale = 1, distance) => {
   let bright = 157 + 70 * (1 - distance / 0.4);
   draw(z, ctx => {
-    ctx.fillStyle = getMountainColor(bright, distance);
+    ctx.fillStyle = createLinearGradient(ctx, y + 400 * (1 - distance / 0.4),  -mountainSprite.h, [
+      [0, getMountainColor(bright * 0.9, distance)],
+      [0.1, getMountainColor(bright, distance)]
+    ], distance);
     ctx.beginPath();
     mountainSprite.p.forEach(p => {
       ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainSprite.h / 2) * scale), distance));
@@ -184,10 +188,10 @@ const drawMountain = (x, y, z, scale = 1, distance) => {
     ctx.fill();
     
     if($reflectionY.$ != undefined) {
-      bright *= 0.9;
-      ctx.fillStyle = createLinearGradient(ctx, y,  mountainSprite.h, [
-        [0.5, getMountainColor(bright, distance)],
-        [1, getMountainColor(bright, distance, 0.1)]
+      ctx.fillStyle = createLinearGradient(ctx, y + 500 * (1 - distance / 0.35),  mountainSprite.h, [
+        [0, getMountainColor(bright * 0.8, distance)],
+        [0.1, getMountainColor(bright * 0.9, distance)],
+        [1, getMountainColor(bright * 0.9, distance, 0.3)],
       ], distance);
       ctx.beginPath();
       mountainSprite.p.forEach(p => {

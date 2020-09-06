@@ -109,9 +109,10 @@ export default {
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(-136, 2900, 200, 30);
     const collidedSide = collision(player, goalArea);
+    console.log(Math.abs(vectorMagnitude(player.v)))
     return (
       $stageWave.$ === -1 ||
-      (collidedSide && Math.round(vectorMagnitude(player.v)) === 0)
+      (collidedSide && Math.abs(vectorMagnitude(player.v)) < 0.01)
     );
   },
   [KEY_STAGE_TRANSITION](progress) {
