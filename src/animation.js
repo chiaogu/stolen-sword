@@ -62,11 +62,11 @@ export const lemniscateMovement = (duration, radius, startTime = 0) => {
   );
 };
 
-export const slideIn = (duration, x, y) =>
+export const slideIn = (duration, x, y, timingFunc = easeOutQuint) =>
   objectAction(duration, (object, progress) => {
     if (!object[KEY_ENEMY_DEAD_FRAME] && progress > 0 && object[KEY_OBJECT_FRAME] < duration / FRAME_DURAITON) {
       vectorOp(
-        (to, from) => from + (to - from) * easeOutQuint(progress),
+        (to, from) => from + (to - from) * timingFunc(progress),
         [object[KEY_OBJECT_INITIAL_POS], vector(x, y)],
         object.p
       );

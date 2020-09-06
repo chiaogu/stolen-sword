@@ -11,7 +11,7 @@ import {
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
 import { bug, compund, enemy, fire } from '../helper/enemy';
-import { gradient, movingBamboo, wipe } from '../helper/graphic';
+import { gradient, movingBamboo, wipe, letterBox, drawCaption } from '../helper/graphic';
 import { boundary, followPlayerY, platform } from '../helper/platform';
 import {
   $backgroundColor,
@@ -31,7 +31,7 @@ let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    $backgroundColor.$ = 'rgb(221,234,240)';
+    $backgroundColor.$ = '#ddeaf0';
     player.p.x = -240;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
@@ -43,16 +43,16 @@ export default {
     $backgroundV.$ = 1;
     platforms.push(
       platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
-      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
+      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
+      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       })
     );
     graphics.push(
       gradient(200, 400, 0, 0.5, [
-        [0, 'rgb(221,234,240)'],
+        [0, '#ddeaf0'],
         [0.9, 'rgba(104,158,131,0.6)'],
       ]),
       ...movingBamboo(0, -40, 1250, 1, 1.5, 51),
@@ -72,7 +72,7 @@ export default {
       ),
     () =>
       enemies.push(
-        bug('太', -100, 300, [
+        bug('不', -100, 300, [
           slideIn(2000, 250, 350),
           circularMovement(5000, 10, 5, 2000),
         ]),
@@ -131,15 +131,19 @@ export default {
     else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
-    [() => (tempPlayerPos = vector(player.p.x, player.p.y))],
+    [() => {
+      tempPlayerPos = vector(player.p.x, player.p.y);
+      graphics.push(...letterBox());
+    }],
     [
       (progress) => {
-        $backgroundV.$ = 1 + easeOutQuad(progress) * 3;
+        $backgroundV.$ = 1 + easeOutQuad(progress) * 2;
         player.p.x =
-          tempPlayerPos.x + (-140 - tempPlayerPos.x) * easeInOutQuad(progress);
+          tempPlayerPos.x + (-100 - tempPlayerPos.x) * easeInOutQuad(progress);
       },
       2000,
     ],
+    [() => drawCaption("Can't find the theft."), 500, true],
     [
       () =>
         enemies.push(
@@ -182,7 +186,7 @@ export default {
     ],
     [
       (progress) => {
-        player.p.x = -140 + 390 * easeInQuad(progress);
+        player.p.x = -100 + 390 * easeInQuad(progress);
         $backgroundV.$ = 4 + easeOutQuad(progress) * 2;
       },
       1000,

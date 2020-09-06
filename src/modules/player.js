@@ -80,11 +80,11 @@ function drawPlayer(player) {
       ctx.fillStyle =
         Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3
           ? 'rgba(255,255,255, 0.1)'
-          : '#fff';
+          : '#000';
     } else if ($dash.$ === 0) {
       ctx.fillStyle = '#444';
     } else {
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = '#000';
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
 

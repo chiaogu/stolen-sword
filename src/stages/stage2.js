@@ -1,17 +1,20 @@
 import { circularMovement } from '../animation';
 import {
   DEFAULT_FRAME_WIDTH,
-  KEY_ENEMY_IS_UNTOUCHABLE,
   KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_ENDING_CUT_SCENE,
   KEY_STAGE_INITIATE,
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
+  KEY_STAGE_ENDING_CUT_SCENE_FRAME,
+  KEY_STAGE_ENDING_CUT_SCENE_INDEX,
+  KEY_OBJECT_FRAME,
+  KEY_OBJECT_Z_INDEX,
 } from '../constants';
-import { easeInQuint } from '../easing';
-import { enemy } from '../helper/enemy';
-import { staticBamboo, wipe, gradient } from '../helper/graphic';
+import { easeInQuint, easeInOutQuint, easeInOutQuad, easeOutQuint, easeOutQuad, easeInQuad } from '../easing';
+import {  bug, enemy } from '../helper/enemy';
+import { staticBamboo, wipe, gradient, letterBox, drawCaption } from '../helper/graphic';
 import {
   boundary,
   followPlayerY,
@@ -29,14 +32,23 @@ import {
   platforms,
   player,
   $backgroundColor,
+  effects,
+  $stage,
+  projectiles,
+  draw,
+  $g,
 } from '../state';
-import { object, vectorMagnitude } from '../utils';
+import { object, vectorMagnitude, vector, alternateProgress } from '../utils';
+
+let tempCamCenter;
+let tempPlayerPos;
+
 
 export default {
   [KEY_STAGE_INITIATE]() {
     // player.p.x = -240;
-    player.p.x = 171;
-    player.p.y = 1630;
+    player.p.x = -124;
+    player.p.y = 2968;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(
@@ -44,14 +56,14 @@ export default {
         Math.max(player.p.y + player.s.y / 2, cameraCenter.y)
       );
     };
-    $backgroundColor.$ = 'rgb(221,234,240)';
+    $backgroundColor.$ = '#ddeaf0';
     graphics.push(
       gradient(200, 400, 0, 0.4, [
-        [0, 'rgb(221,234,240)'],
+        [0, '#ddeaf0'],
         [0.9, 'rgba(104,158,131,0.6)'],
       ]),
       gradient(3000, 4000, 1, 0.6, [
-        [0, 'rgb(221,234,240)'],
+        [0, '#ddeaf0'],
         [0.5, 'rgba(144,198,151,0.2)'],
         [1, 'rgba(221,234,240,0)'],
       ], true),
@@ -63,10 +75,10 @@ export default {
     );
     platforms.push(
       platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
-      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
+      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
+      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
       }),
       horizontalBamboo(-50, 150, 150),
@@ -88,29 +100,12 @@ export default {
   [KEY_STAGE_WAVES]: [
     () =>
       enemies.push(
-        enemy(25, 790, 30, 30, {
-          [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(3000, 50, 5)],
-        }),
-        enemy(-20, 1150, 30, 30, {
-          [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(6000, 5, 10)],
-        }),
-        enemy(150, 1580, 30, 30, {
-          [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(3000, 50, 5)],
-        }),
-        enemy(75, 1800, 30, 30, {
-          [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(4000, 5, 50)],
-        }),
-        enemy(-120, 2220, 30, 30, {
-          [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(6000, 80, 80)],
-        }),
-        enemy(-120, 2800, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(6000, 5, 20)],
-        })
+        bug('卡', 25, 790, [circularMovement(3000, 50, 5)], true),
+        bug('ㄚ', -20, 1150, [circularMovement(6000, 5, 10)], true),
+        bug('中', 150, 1580, [circularMovement(3000, 50, 5)], true),
+        bug('串', 75, 1800, [circularMovement(4000, 5, 50)], true),
+        bug('申', -120, 2220, [circularMovement(6000, 80, 80)], true),
+        bug('車', -120, 2800, [circularMovement(6000, 5, 20)])
       ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
@@ -122,10 +117,67 @@ export default {
     );
   },
   [KEY_STAGE_TRANSITION](progress) {
-    player.p.x = -500 * easeInQuint(1 - progress);
+    // player.p.x = -500 * easeInQuint(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
-    [() => graphics.push(wipe())],
+    [() => {
+      $cameraLoop.$ = undefined;
+      tempCamCenter = vector(cameraCenter.x, cameraCenter.y);
+      tempPlayerPos = vector(player.p.x, player.p.y);
+      graphics.push(...letterBox());
+    }],
+    [progress => {
+      player.p.x =
+        tempPlayerPos.x + (-100 - tempPlayerPos.x) * easeInOutQuad(progress);
+    }, 1000],
+    [() => drawCaption('Still not found the theft.'), 500, true],
+    [progress => {
+      cameraCenter.y = tempCamCenter.y + (player.p.y - tempCamCenter.y - 120) * easeInOutQuad(progress)
+    }, 2000],
+    [
+      () =>
+        enemies.push(
+          enemy(-56, 2504, 20, 20, {
+            [KEY_OBJECT_Z_INDEX]: 3,
+          })
+        ),
+    ],
+    [
+      (progress) => {
+        enemies[0].p.x = -56 + 135 * progress;
+        enemies[0].p.y =
+        2504 + 96 * easeOutQuad(progress);
+      },
+      500,
+    ],
+    [
+      (progress) => {
+        enemies[0].p.x = 79 - 141 * progress;
+        enemies[0].p.y =
+        2600 + 100 * easeOutQuad(progress);
+      },
+      500,
+    ],
+    [
+      (progress) => {
+        progress *= 1.4;
+        enemies[0].p.x = -62 + 248 * progress;
+        enemies[0].p.y =
+          2700 + 100 * easeOutQuad(1 - alternateProgress(progress));
+      },
+      1600,
+    ],
+    [
+      (progress) => {
+        $g.$ = 0;
+        progress *= 1.6;
+        player.p.x = -100 + 240 * progress;
+        player.p.y =
+          2913 + 50 * easeOutQuad(1 - alternateProgress(progress));
+      },
+      1000,
+    ],
+    [() => effects.push(wipe())],
     [() => {}, 1000],
   ],
 };

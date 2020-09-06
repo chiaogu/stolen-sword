@@ -105,6 +105,7 @@ export const boundary = (x, y, w, h, options = {}) => ({
     drawPlatform,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
   ],
+  [KEY_OBJECT_FORCE_CHECK_COLLISION]: true
 });
 
 export const platform = (x, y, w, h, options = {}) => ({

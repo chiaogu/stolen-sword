@@ -1,4 +1,4 @@
-import { cameraFrameSize, drawStack, $backgroundColor } from '../state';
+import { cameraFrameSize, drawStack, $backgroundColor, graphics, effects } from '../state';
 
 export default ctx => {
   ctx.fillStyle = $backgroundColor.$ || '#000';

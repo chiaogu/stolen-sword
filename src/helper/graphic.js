@@ -13,16 +13,19 @@ import {
   $backgroundV,
   $reflectionY,
   effects,
-  createLinearGradient
+  createLinearGradient,
+  detransform,
+  graphics
 } from '../state';
 import { object, vector, getActionProgress, vectorMagnitude, decompressPath } from '../utils';
 import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
-import { circular } from '../animation';
+import { circular, slideIn } from '../animation';
 
-export const graphic = (x, y, draw) => ({
+export const graphic = (x, y, draw, animations = []) => ({
   ...object(x, y, 0, 0),
   [KEY_OBJECT_ON_UPDATE]: [
-    draw,
+    graphic => graphic[KEY_OBJECT_FRAME] > 0 && draw(graphic),
+    ...animations
   ],
 });
 
@@ -32,11 +35,11 @@ const effect = (x, y, duration, draw) => graphic(x, y, (graphic) => {
   if(!graphic[KEY_GRAPHIC_IS_ANIMATION_FINISH]) draw(progress, graphic);
 });
 
-export const wipe = side => effect(0, 0, 2000, (progress) => {
+export const wipe = side => effect(0, 0, 2400, (progress) => {
   draw(61, ctx => {
     const axis = side === SIDE_T ? 'y' : 'x';
-    const pos = cameraFrameSize[axis] - cameraFrameSize[axis] * Math.min(1, easeInQuad(progress / 0.25));
-    const size = progress < 0.75 ? cameraFrameSize[axis] : cameraFrameSize[axis] * Math.max(0, 1 - easeOutQuad((progress - 0.75) / 0.25));
+    const pos = cameraFrameSize[axis] - cameraFrameSize[axis] * Math.min(1, easeInQuad(progress / 0.3));
+    const size = progress < 0.7 ? cameraFrameSize[axis] : cameraFrameSize[axis] * Math.max(0, 1 - easeOutQuad((progress - 0.7) / 0.3));
     ctx.fillStyle = '#000';
     if(side === SIDE_T) {
       ctx.fillRect(0, pos, cameraFrameSize.x, size)
@@ -204,3 +207,27 @@ export const staticMountain = (x, y, z, distance, scale) =>
 export const movingMountain = (x, y, z, distance = 1, scale = 1) => background((offset, index) => {
   drawMountain(x + offset + 100 * index, y, z, scale, distance);
 }, $backgroundV.$)
+
+export const letterBox = () => {
+  const height = transform(83);
+  const drawLetterbox = graphic => draw(61, ctx => {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, graphic.p.y, cameraFrameSize.x, height);
+  });
+  return [
+    graphic(0, 0, drawLetterbox, [slideIn(3000, 0, -height)]),
+    graphic(0, cameraFrameSize.y - height, drawLetterbox, [slideIn(3000, 0, cameraFrameSize.y)]),
+  ]
+}
+
+export const drawCaption = text => draw(62, ctx => {
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.lineWidth = transform(0.3);
+  ctx.fillStyle = '#eec918';
+  ctx.strokeStyle = '#000';
+  ctx.font = `${transform(20)}px serif`;
+  const args = [text, cameraFrameSize.x / 2, cameraFrameSize.y - transform(120)];
+  ctx.fillText(...args);
+  ctx.strokeText(...args);
+});
