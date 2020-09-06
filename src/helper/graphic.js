@@ -13,9 +13,7 @@ import {
   $backgroundV,
   $reflectionY,
   effects,
-  createLinearGradient,
-  detransform,
-  graphics
+  createLinearGradient
 } from '../state';
 import { object, vector, getActionProgress, vectorMagnitude, decompressPath } from '../utils';
 import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
@@ -52,7 +50,7 @@ export const wipe = side => effect(0, 0, 2400, (progress) => {
 export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => {
   graphic.p.x -= $backgroundV.$ * $timeRatio.$;
   const r = transform(maxR) * (progress + 0.1);
-  const color = (a = 0) => `rgba(110,110,110,${a})`;
+  const color = (a = 0) => `rgba(80,100,120,${a})`;
   const drawRipple = (ctx, colors, ...args) => {
     const grad = ctx.createRadialGradient(
       ...transform(graphic.p),
@@ -174,11 +172,11 @@ export const gradient = (y, h, z, distance, colors, depth) => graphic(0, 0, () =
 
 const mountainSprite = decompressPath(`	qaK^LWZMGGOWGOGGO`);
 mountainSprite.p[0].y = mountainSprite.p[mountainSprite.p.length - 1].y;
+const getMountainColor = (bright, distance, a = 1) => `rgba(${bright * (0.64 + 0.3 * (1 - distance / 0.3))}, ${bright * (0.8 + 0.1 * (1 - distance / 0.3))}, ${bright}, ${a})`;
 const drawMountain = (x, y, z, scale = 1, distance) => {
-  const bright = 90 + 110 * (1 - distance);
-  const color = `rgb(${bright}, ${bright}, ${bright})`;
+  let bright = 157 + 70 * (1 - distance / 0.4);
   draw(z, ctx => {
-    ctx.fillStyle = color;
+    ctx.fillStyle = getMountainColor(bright, distance);
     ctx.beginPath();
     mountainSprite.p.forEach(p => {
       ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainSprite.h / 2) * scale), distance));
@@ -186,9 +184,10 @@ const drawMountain = (x, y, z, scale = 1, distance) => {
     ctx.fill();
     
     if($reflectionY.$ != undefined) {
-      ctx.fillStyle = createLinearGradient(ctx, y,  mountainSprite.h / 2, [
-        [0, color],
-        [1, 'rgba(70, 70, 70, 0.5)']
+      bright *= 0.9;
+      ctx.fillStyle = createLinearGradient(ctx, y,  mountainSprite.h, [
+        [0.5, getMountainColor(bright, distance)],
+        [1, getMountainColor(bright, distance, 0.1)]
       ], distance);
       ctx.beginPath();
       mountainSprite.p.forEach(p => {

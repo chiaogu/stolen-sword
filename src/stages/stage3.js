@@ -61,7 +61,7 @@ export default {
       ],
     ];
     $backgroundV.$ = 0.5;
-    $backgroundColor.$ = 'rgb(200,200,200)';
+    $backgroundColor.$ = '#D8DBE6';
     player.p.x = -DEFAULT_FRAME_WIDTH;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.max(
@@ -70,15 +70,15 @@ export default {
       );
     };
     graphics.push(
-      gradient(100, 400, 0, 0.1, [
-        [0, 'rgb(200,200,200)'],
-        [0.5, 'rgb(110,110,110, 1)'],
-        [0.6, 'rgb(92,92,92, 0.9)'],
-        [1, 'rgb(34, 34, 34, 0.9)'],
+      gradient(1100, 1350, 10, 0.1, [
+        [0, 'rgba(216,219,230,0)'],
+        [0.1, 'rgba(109,130,152, 0)'],
+        [0.5, 'rgb(109,130,152, 0.9)'],
+        [1, '#2b435b'],
       ]),
-      ...movingMountain(177, 0, 10, 0.3, 2.8),
-      ...movingMountain(0, 40, 10, 0.2, 3.6),
-      ...movingMountain(-37, 40, 10, 0.15, 4)
+      ...movingMountain(177, 0, 9, 0.3, 2.8),
+      ...movingMountain(0, 40, 9, 0.2, 3.6),
+      ...movingMountain(-37, 60, 9, 0.15, 4)
     );
     platforms.push(
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {

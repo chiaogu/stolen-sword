@@ -46,9 +46,7 @@ let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    // player.p.x = -240;
-    player.p.x = -124;
-    player.p.y = 2968;
+    player.p.x = -240;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(
@@ -117,7 +115,7 @@ export default {
     );
   },
   [KEY_STAGE_TRANSITION](progress) {
-    // player.p.x = -500 * easeInQuint(1 - progress);
+    player.p.x = -500 * easeInQuint(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
     [() => {
