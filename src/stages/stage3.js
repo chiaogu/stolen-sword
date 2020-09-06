@@ -52,13 +52,13 @@ export default {
     cameraCenter.y = player.p.y + 100;
     $reflectionY.$ = 0;
     $reflectionGradient.$ = [
-      0,
-      230,
+      100,
+      340,
       [
-        [0, 'rgba(154, 154, 154, 1)'],
-        [0.4, 'rgba(125, 125, 125, 0.8)'],
-        [1, 'rgba(72, 72, 72, 1)'],
-      ],
+        [0.3, 'rgb(130,148,147, 0.9)'],
+        [0.4, 'rgb(117,137,160, 0.9)'],
+        [1, '#2b435b'],
+      ]
     ];
     $backgroundV.$ = 0.5;
     $backgroundColor.$ = '#D8DBE6';
@@ -96,13 +96,16 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    // () =>
-    //   enemies.push(
-    //     shell('丁', 50, 200, [
-    //       slideIn(1500, 100, 550),
-    //       circularMovement(3000, 10, 5, 1500),
-    //     ])
-    //   ),
+    () =>
+      enemies.push(
+        // shell('丁', 50, 200, [
+        //   slideIn(1500, 100, 550),
+        //   circularMovement(3000, 10, 5, 1500),
+        // ])
+        shell('丁', 50, 100, [
+          circularMovement(3000, 10, 200)
+        ])
+      ),
     () =>
       enemies.push(
         bug('丌', 10, 350, [

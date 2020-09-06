@@ -149,17 +149,19 @@ export const getReflection = object => {
   }
 }
 
-export const getWaterMask = (ctx, object) => {
+export const getWaterMask = (ctx, object, color) => {
   const { l, t, b } = getObjectBoundary(object);
-  if($reflectionGradient.$ && b <= $reflectionGradient.$[0]) {
+  if($reflectionGradient.$ && b <= $reflectionY.$) {
     const reflectionH = Math.min(object.s.y, Math.max(0, $reflectionY.$ - b));
     const [x, y] = transform(vector(l - 0.5, b - 0.5));
+    const colors = $reflectionGradient.$[2].slice();
+    if(color) colors.unshift([colors[0][0] - 0.01, color]);
     return { 
       x,
       y,
       w: transform(object.s.x + 1),
       h: -transform(reflectionH + 1),
-      g: createLinearGradient(ctx, ...$reflectionGradient.$),
+      g: createLinearGradient(ctx, $reflectionGradient.$[0], $reflectionGradient.$[1], colors),
     };
   }
 }

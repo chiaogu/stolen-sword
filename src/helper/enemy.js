@@ -38,6 +38,7 @@ import {
   projectiles,
   setDash,
   transform,
+  createLinearGradient,
 } from '../state';
 import {
   getActionProgress,
@@ -117,91 +118,96 @@ const getDeathProgress = (enemy) => {
   return Math.max(0, deathProgress);
 };
 
+const drawEnemyBody = (ctx, enemy) => {
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${transform(36)}px sans-serif`;
+  ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
+}
+
+const drawEnemyShell = (ctx, enemy) => {
+  const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
+  if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+    ctx.setLineDash([
+      transform(30), 
+      transform(60 * (1 - (enemy[KEY_ENEMY_HEALTH] - 1) / 2))
+    ]);
+    ctx.lineWidth = transform(4);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.ellipse(
+      ...transform(enemy.p),
+      transform(24),
+      transform(24),
+      -Math.PI * 0.45 - 2 * Math.PI * angle,
+      0,
+      Math.PI * 0.9
+    );
+    ctx.stroke();
+  }
+}
+
+const drawEnemyEye = (ctx, enemy) => {
+  const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
+  const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 10);
+  const eyePos = circular(eyeCenter.x, eyeCenter.y, 1.6, 1.6, angle);
+  ctx.beginPath();
+  ctx.fillStyle = '#eee';
+  ctx.ellipse(
+    ...transform(eyeCenter),
+    transform(4),
+    transform(4),
+    0,
+    0,
+    2 * Math.PI
+  );
+  ctx.fill();
+  ctx.beginPath();
+  ctx.fillStyle = '#ec5751';
+  ctx.ellipse(
+    ...transform(eyePos),
+    transform(2.4),
+    transform(2.4),
+    0,
+    0,
+    2 * Math.PI
+  );
+  ctx.fill();
+}
+
 function drawEnemy(enemy) {
   if (enemy[KEY_OBJECT_FRAME] === 0) return;
   draw(enemy[KEY_OBJECT_Z_INDEX], (ctx) => {
-    const { l, t } = getObjectBoundary(enemy);
-    const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
-
-    // collision area
-    // ctx.lineWidth = 1;
-    // ctx.strokeStyle = getEnemyColor(enemy);
-    // ctx.strokeRect(
-    //   ...transform(vector(l, t)),
-    //   transform(enemy.s.x),
-    //   transform(enemy.s.y)
-    // );
-
-    // body
+    const color = getEnemyColor(enemy);
     ctx.globalAlpha =
       easeInQuad(getDeathProgress(enemy)) *
       (!enemy[KEY_ENEMY_IS_UNTOUCHABLE] && enemy[KEY_ENEMY_COMPUND_PARENT]
         ? 0.4
         : 1);
     ctx.shadowBlur = 3;
-    ctx.fillStyle = getEnemyColor(enemy);
-    ctx.shadowColor = getEnemyColor(enemy);
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    ctx.font = `bold ${transform(36)}px sans-serif`;
-    ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
-    
-    if (enemy[KEY_ENEMY_IS_DEFENCING]) {
-      ctx.setLineDash([
-        transform(30), 
-        transform(60 * (1 - (enemy[KEY_ENEMY_HEALTH] - 1) / 2))
-      ]);
-      ctx.lineWidth = transform(4);
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = getEnemyColor(enemy);
-      ctx.beginPath();
-      ctx.ellipse(
-        ...transform(enemy.p),
-        transform(24),
-        transform(24),
-        -Math.PI * 0.45 - 2 * Math.PI * angle,
-        0,
-        Math.PI * 0.9
-      );
-      ctx.stroke();
-    }
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.shadowColor = color;
+    drawEnemyBody(ctx, enemy);
+    drawEnemyShell(ctx, enemy);
     ctx.shadowBlur = 0;
+    
+    drawEnemyEye(ctx, enemy);
 
-    // eye
-    const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 10);
-    const eyePos = circular(eyeCenter.x, eyeCenter.y, 1.6, 1.6, angle);
-    ctx.beginPath();
-    ctx.fillStyle = '#eee';
-    ctx.ellipse(
-      ...transform(eyeCenter),
-      transform(4),
-      transform(4),
-      0,
-      0,
-      2 * Math.PI
-    );
-    ctx.fill();
-    ctx.beginPath();
-    ctx.fillStyle = '#ec5751';
-    ctx.ellipse(
-      ...transform(eyePos),
-      transform(2.4),
-      transform(2.4),
-      0,
-      0,
-      2 * Math.PI
-    );
-    ctx.fill();
-
-    const waterMask = getWaterMask(ctx, enemy);
+    const waterMask = getWaterMask(ctx, enemy, color);
     if (waterMask) {
+      ctx.globalAlpha = 0.75;
       ctx.fillStyle = waterMask.g;
-      ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
+      ctx.strokeStyle = waterMask.g;
+      // ctx.fillRect(100, 100, 100, 800);
+      drawEnemyBody(ctx, enemy);
+      drawEnemyShell(ctx, enemy);
+      ctx.globalAlpha = 1;
     }
 
     const reflection = getReflection(enemy);
     if (reflection) {
-      ctx.fillStyle = getEnemyColor(enemy);
+      ctx.fillStyle = color;
       ctx.globalAlpha = 0.1;
       ctx.fillRect(
         reflection.x,
