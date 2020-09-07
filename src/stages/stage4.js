@@ -12,7 +12,7 @@ import {
   G,
 } from '../constants';
 import { easeInOutQuad, easeOutCirc, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint } from '../easing';
-import { chain, enemy, invincible, shell, untouchable, bug } from '../helper/enemy';
+import { chain, enemy, invincible, shell, untouchable, bug, compund } from '../helper/enemy';
 import { gradient, graphic, staticMountain, ripple } from '../helper/graphic';
 import {
   boundary,
@@ -118,15 +118,7 @@ const generateCiff = ([x, y, side, scale, image, switchSideIndex = []], i) => {
     }
   });
 };
-const randomMovement = () => ({
-  [KEY_OBJECT_ON_UPDATE]: [
-    circularMovement(
-      Math.random() * 1000 + 2000,
-      Math.random() * 10,
-      Math.random() * 10
-    ),
-  ],
-});
+
 const _randomMovement = () => [
   circularMovement(
     Math.random() * 1000 + 2000,
@@ -134,6 +126,7 @@ const _randomMovement = () => [
     Math.random() * 10
   ),
 ];
+
 export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = '#D8DBE6';
@@ -222,38 +215,41 @@ export default {
   [KEY_STAGE_WAVES]: [
     () => {
       enemies.push(
-        invincible(0, 4340, randomMovement()),
-        invincible(-130, 4516, randomMovement()),
-        invincible(-61, 4694, randomMovement()),
-        invincible(4, 4850, randomMovement()),
-        invincible(40, 5032, randomMovement()),
-        invincible(124, 5194, randomMovement()),
-        invincible(-49, 5319, randomMovement()),
-        invincible(49, 5444, randomMovement()),
-        invincible(27, 5611, randomMovement()),
-        invincible(-76, 5740, randomMovement()),
-        invincible(-141, 1596, randomMovement()),
-        invincible(-119, 2127, randomMovement()),
-        shell('卍', -179, 3409, [circularMovement(3000, 20, 5)]),
-        bug('Q', 143, 750, _randomMovement()),
-        bug('Q', 80, 1509, _randomMovement(), 1),
-        bug('Q', -160, 3790, [circularMovement(2500, 40, 5)], 1),
+        ...compund(
+          bug('巾', -160, 3790, [circularMovement(2500, 40, 5)], 1),
+          ...[
+            ['亓', 0, 4340],
+            ['冂', -130, 4516],
+            ['兀', -61, 4694],
+            ['ㄢ', 4, 4850],
+            ['个', 40, 5032],
+            ['天', 124, 5194],
+            ['云', -49, 5319],
+            ['四', 49, 5444],
+            ['弓', 27, 5611],
+            ['六', -76, 5740],
+            ['廾', -141, 1596],
+            ['爪', -119, 2127],
+            ['孓', -173, 2927],
+          ].map(([appearance, x, y]) => bug(appearance, x, y, _randomMovement()))
+        ),
+        shell('卞', -179, 3409, [circularMovement(3000, 20, 5)]),
+        bug('卝', 143, 750, _randomMovement()),
+        bug('从', 80, 1509, _randomMovement(), 1),
         ...chain(
-          untouchable(-300, 2767, {
-            [KEY_OBJECT_ON_UPDATE]: [
-              objectAction(5000, (enemy, progress) => {
-                progress = easeInOutQuad(alternateProgress(progress));
-                enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + 472 * progress;
-                enemy.p.x =
-                  enemy[KEY_OBJECT_INITIAL_POS].x +
-                  400 * Math.sin((easeOutCirc(progress) * Math.PI) / 2);
-              }),
-            ],
-          }),
+          bug('公', -300, 2767, [
+            objectAction(5000, (enemy, progress) => {
+              progress = easeInOutQuad(alternateProgress(progress));
+              enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + 472 * progress;
+              enemy.p.x =
+                enemy[KEY_OBJECT_INITIAL_POS].x +
+                400 * Math.sin((easeOutCirc(progress) * Math.PI) / 2);
+            }),
+          ], 1),
           10,
           300,
           8,
-          (i, head) => (i === 7 ? untouchable : untouchable)(head.p.x, head.p.y)
+          (i, head) => (i === 7 ? shell : bug)('ㄙ', head.p.x, head.p.y, [], 1)
         ),
       );
     },

@@ -121,14 +121,14 @@ const getDeathProgress = (enemy) => {
   return Math.max(0, deathProgress);
 };
 
-const drawEnemyShell = (ctx, enemy) => {
+const drawEnemyShell = (ctx, enemy, width) => {
   const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
   if (enemy[KEY_ENEMY_IS_DEFENCING]) {
     ctx.setLineDash([
       transform(30), 
       transform(60 * (1 - (enemy[KEY_ENEMY_HEALTH] - 1) / 2))
     ]);
-    ctx.lineWidth = transform(4);
+    ctx.lineWidth = transform(width);
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.ellipse(
@@ -152,36 +152,17 @@ function drawEnemy(enemy) {
       (!enemy[KEY_ENEMY_IS_UNTOUCHABLE] && enemy[KEY_ENEMY_COMPUND_PARENT]
         ? 0.3
         : 1);
+    ctx.shadowBlur = 3;
+    ctx.shadowColor = color;
     ctx.fillStyle = color;
     ctx.strokeStyle = color;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.font = `bold ${transform(36)}px sans-serif`;
     ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
-    drawEnemyShell(ctx, enemy);
-
-    if (
-      $reflectionGradient.$ &&
-      getObjectBoundary(enemy).b <= $reflectionY.$
-    ) {
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = $reflectionGradient.$;
-      ctx.strokeStyle = $reflectionGradient.$;
-      ctx.fillRect(...transform(vector(enemy.p.x - 17, enemy.p.y + 17)), transform(34), transform(34));
-      drawEnemyShell(ctx, enemy);
-    }
-    
-    const reflection = getReflection(enemy);
-    if (reflection) {
-      ctx.fillStyle = color;
-      ctx.globalAlpha = 0.3 * reflection.d;
-      let appearance = enemy[KEY_ENEMY_APPEARANCE];
-      if(appearance == '士') appearance = '干';
-      else if(appearance == '干') appearance = '士';
-      else if(appearance == '由') appearance = '甲';
-      ctx.fillText(appearance, reflection.x, reflection.y);
-      ctx.globalAlpha = 1;
-    }
+    drawEnemyShell(ctx, enemy, 4);
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
     
     const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
     const eyeCenter = vector(enemy.p.x + 0, enemy.p.y + 10);
@@ -208,6 +189,29 @@ function drawEnemy(enemy) {
       2 * Math.PI
     );
     ctx.fill();
+
+    if (
+      $reflectionGradient.$ &&
+      getObjectBoundary(enemy).b <= $reflectionY.$
+    ) {
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = $reflectionGradient.$;
+      ctx.strokeStyle = $reflectionGradient.$;
+      ctx.fillRect(...transform(vector(enemy.p.x - 18, enemy.p.y + 18)), transform(36), transform(36));
+      drawEnemyShell(ctx, enemy, 6);
+    }
+    
+    const reflection = getReflection(enemy);
+    if (reflection) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.3 * reflection.d;
+      let appearance = enemy[KEY_ENEMY_APPEARANCE];
+      if(appearance == '士') appearance = '干';
+      else if(appearance == '干') appearance = '士';
+      else if(appearance == '由') appearance = '甲';
+      ctx.fillText(appearance, reflection.x, reflection.y);
+      ctx.globalAlpha = 1;
+    }
   });
 }
 
