@@ -12,7 +12,7 @@ import {
 import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
 import { bug, compund, enemy, fire } from '../helper/enemy';
 import { gradient, movingBamboo, wipe, letterBox, drawCaption } from '../helper/graphic';
-import { boundary, followPlayerY, platform } from '../helper/platform';
+import { boundary, followPlayerY, platform, boundarySet } from '../helper/platform';
 import {
   $backgroundColor,
   $backgroundV,
@@ -41,15 +41,7 @@ export default {
       );
     };
     $backgroundV.$ = 1;
-    platforms.push(
-      platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
-      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      })
-    );
+    platforms.push(...boundarySet());
     graphics.push(
       gradient(200, 400, 0, 0.5, [
         [0, '#ddeaf0'],

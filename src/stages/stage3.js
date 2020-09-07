@@ -9,22 +9,26 @@ import {
   KEY_ENEMY_DEAD_FRAME,
   KEY_ENEMY_IS_DEAD,
   KEY_ENEMY_IS_UNTOUCHABLE,
-  KEY_OBJECT_FRAME,
+  KEY_STAGE_ENDING_CUT_SCENE,
   KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_INITIATE,
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
+  KEY_OBJECT_Z_INDEX,
+  KEY_OBJECT_FRAME,
+  KEY_OBJECT_EVENT_GET_OFFSET,
 } from '../constants';
-import { easeInOutQuad, easeInQuad } from '../easing';
+import { easeInOutQuad, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint, easeInCirc, easeOutCirc } from '../easing';
 import { chain, enemy, fire, firework, recover, shell, bug } from '../helper/enemy';
-import { gradient, movingMountain } from '../helper/graphic';
+import { gradient, movingMountain, letterBox, drawCaption, wipe } from '../helper/graphic';
 import {
   boundary,
   followPlayerX,
   followPlayerY,
   platform,
   water,
+  boundarySet,
 } from '../helper/platform';
 import {
   $backgroundColor,
@@ -40,8 +44,9 @@ import {
   graphics,
   platforms,
   player,
+  effects,
 } from '../state';
-import { alternateProgress, vector } from '../utils';
+import { alternateProgress, vector, object, objectAction } from '../utils';
 
 let tempPlayerPos;
 
@@ -83,15 +88,7 @@ export default {
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
         [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
       }),
-      platform(0, -230, player.s.x * 10, 0, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
-      }),
-      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      })
+      ...boundarySet(-230)
     );
   },
   [KEY_STAGE_WAVES]: [
@@ -201,4 +198,78 @@ export default {
     if (progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
     else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
   },
+  [KEY_STAGE_ENDING_CUT_SCENE]: [
+    [() => {
+      $g.$ = 0;
+      player.v.y = 0;
+      graphics.push(...letterBox());
+      tempPlayerPos = vector(player.p.x, player.p.y);
+      const offset = player[KEY_OBJECT_FRAME];
+      player[KEY_OBJECT_ON_UPDATE].push(objectAction(2000, (player, progress) => {
+        player.p.y = 200 * easeOutQuad(1 - alternateProgress(progress));
+        player.p.x =
+          tempPlayerPos.x + (-100 - tempPlayerPos.x) * easeInOutQuad(progress);
+          if(Math.round(player.p.x) === -100) tempPlayerPos = vector(player.p.x, player.p.y);
+      }, {
+        [KEY_OBJECT_EVENT_GET_OFFSET]: () => offset
+      }));
+    }],
+    [
+      (progress) => {
+        $backgroundV.$ = 1 + easeOutQuad(progress) * 2;
+      },
+      2000,
+    ],
+    [() => drawCaption("Can't find the theft."), 500, true],
+    [
+      () =>
+        enemies.push(
+          enemy(-300, 0, 20, 20, {
+            [KEY_OBJECT_Z_INDEX]: 11,
+          })
+        ),
+    ],
+    [
+      (progress) => {
+        enemies[0].p.x = -300 + 100 * progress;
+        enemies[0].p.y = 200 - 200 * easeInQuad(progress);
+      },
+      1000
+    ],
+    [
+      (progress) => {
+        enemies[0].p.x = -200 + 100 * progress;
+        enemies[0].p.y =
+          100 * easeOutQuad(1 - alternateProgress(progress));
+      },
+      800,
+    ],
+    [
+      (progress) => {
+        enemies[0].p.x = -100 + 200 * progress;
+        enemies[0].p.y =
+          100 * easeOutQuad(1 - alternateProgress(progress));
+      },
+      800,
+    ],
+    [
+      (progress) => {
+        enemies[0].p.x = 100 + 300 * progress;
+        enemies[0].p.y =
+          300 * easeOutQuad(1 - alternateProgress(progress));
+      },
+      1200,
+    ],
+    [() => {
+      player[KEY_OBJECT_ON_UPDATE].pop();
+      tempPlayerPos = vector(player.p.x, player.p.y);
+    }],
+    [progress => {
+      player.p.y = 
+        tempPlayerPos.y + 100 * easeOutQuad(1 - alternateProgress(progress * 1.5));
+        player.p.x = -100 + 500 * easeOutQuad(progress);
+    }, 1800],
+    [() => effects.push(wipe())],
+    [() => {}, 1000],
+  ],
 };

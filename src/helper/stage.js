@@ -94,7 +94,7 @@ function update(stage) {
       () => setWave(0)
     );
   } else if($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
-    const [callback, duration = FRAME_DURAITON * 2, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
+    const [callback, duration = FRAME_DURAITON, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
     const frameDiff = stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
     if(frameDiff >= Math.round(duration / FRAME_DURAITON)) {
       stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];

@@ -21,6 +21,7 @@ import {
   horizontalBamboo,
   platform,
   verticalBamboo,
+  boundarySet,
 } from '../helper/platform';
 import {
   $cameraLoop,
@@ -72,13 +73,7 @@ export default {
       staticBamboo(67, 60, 3100, 5, 0.7, 10),
     );
     platforms.push(
-      platform(0, -player.s.y / 2, DEFAULT_FRAME_WIDTH * 2, 0),
-      boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      }),
+      ...boundarySet(),
       horizontalBamboo(-50, 150, 150),
       horizontalBamboo(120, 300, 200),
       horizontalBamboo(-120, 450, 200),
@@ -109,7 +104,6 @@ export default {
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(-136, 2900, 200, 30);
     const collidedSide = collision(player, goalArea);
-    console.log(Math.abs(vectorMagnitude(player.v)))
     return (
       $stageWave.$ === -1 ||
       (collidedSide && Math.abs(vectorMagnitude(player.v)) < 0.01)

@@ -10,6 +10,7 @@ import {
   SIDE_R,
   SIDE_T,
   WALL_FRICTION,
+  DEFAULT_FRAME_WIDTH,
 } from '../constants';
 import {
   $backgroundV,
@@ -253,3 +254,13 @@ export const flow = (x, y, w, h, v, options = {}) => ({
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
   ],
 });
+
+export const boundarySet = (groundY = -player.s.y / 2) => [
+  platform(0, groundY, DEFAULT_FRAME_WIDTH * 2, 0),
+  boundary(DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+    [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
+  }),
+  boundary(-DEFAULT_FRAME_WIDTH / 2, 0, 0, player.s.y * 10, {
+    [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
+  }),
+]
