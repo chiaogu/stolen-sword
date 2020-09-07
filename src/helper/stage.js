@@ -36,7 +36,8 @@ import {
   KEY_STAGE_ENDING_CUT_SCENE_INDEX,
   FRAME_DURAITON,
   KEY_STAGE_ENDING_CUT_SCENE_KEY,
-  KEY_STAGE_START_KEY
+  KEY_STAGE_START_KEY,
+  KEY_PLAYER_DEATH_FRAME
 } from '../constants';
 import stages from '../stages/index';
 
@@ -126,7 +127,7 @@ function update(stage) {
     );
     if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](progress);
   } else {
-    if (stage[KEY_STAGE_IS_WAVE_CLEAN] && stage[KEY_STAGE_IS_WAVE_CLEAN]()) {
+    if (!player[KEY_PLAYER_DEATH_FRAME] && stage[KEY_STAGE_IS_WAVE_CLEAN] && stage[KEY_STAGE_IS_WAVE_CLEAN]()) {
       ($stageWave.$ === stage[KEY_STAGE_WAVES].length - 1 ? _setWave : setWave)($stageWave.$ + 1);
     }
   }

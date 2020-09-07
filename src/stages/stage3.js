@@ -266,8 +266,9 @@ export default {
     }],
     [progress => {
       player.p.y = 
-        tempPlayerPos.y + 100 * easeOutQuad(1 - alternateProgress(progress * 1.5));
+        tempPlayerPos.y + 100 * easeOutQuad(1 - alternateProgress(progress * 2));
         player.p.x = -100 + 500 * easeOutQuad(progress);
+        $backgroundV.$ = 4 + easeOutQuad(progress) * 5;
     }, 1800],
     [() => effects.push(wipe())],
     [() => {}, 1000],
