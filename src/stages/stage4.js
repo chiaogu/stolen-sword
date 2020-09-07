@@ -12,13 +12,14 @@ import {
 } from '../constants';
 import { easeInOutQuad, easeOutCirc } from '../easing';
 import { chain, enemy, invincible, shell, untouchable } from '../helper/enemy';
-import { gradient, graphic, staticMountain } from '../helper/graphic';
+import { gradient, graphic, staticMountain, ripple } from '../helper/graphic';
 import {
   boundary,
   flow,
   followPlayerY,
   platform,
   water,
+  boundarySet,
 } from '../helper/platform';
 import {
   $backgroundColor,
@@ -34,6 +35,7 @@ import {
   platforms,
   player,
   transform,
+  effects,
 } from '../state';
 import {
   alternateProgress,
@@ -42,6 +44,7 @@ import {
   objectAction,
   vector,
   vectorMagnitude,
+  objectEvent,
 } from '../utils';
 
 const cliffPaths = [
@@ -66,7 +69,7 @@ const generateCiff = ([x, y, side, scale, image, switchSideIndex = []], i) => {
             (graphic.p.y + p.y + image.h / 2) * scale
           );
 
-        ctx.fillStyle = '#666';
+        ctx.fillStyle = '#415061';
         ctx.beginPath();
         image.p.forEach((p) => {
           ctx.lineTo(...transform(_getPathPointPos(p)));
@@ -123,19 +126,16 @@ const randomMovement = () => ({
 });
 export default {
   [KEY_STAGE_INITIATE]() {
-    $backgroundColor.$ = 'rgb(200,200,200)';
+    $backgroundColor.$ = '#D8DBE6';
     $reflectionY.$ = 0;
     $reflectionGradient.$ = [
-      0,
-      230,
+      100,
+      340,
       [
-        [0, 'rgba(154, 154, 154, 1)'],
-        [0.4, 'rgba(125, 125, 125, 0.8)'],
-        [1, 'rgba(72, 72, 72, 1)'],
-      ],
+        [0.3, 'rgb(117,137,160, 0.9)'],
+        [1, '#2b435b'],
+      ]
     ];
-    player.p.x = -112;
-    player.p.y = 3480;
     player.p.x = 0;
     player.p.y = 0;
     cameraCenter.y = player.p.y + 200;
@@ -149,34 +149,48 @@ export default {
     cliffPaths.forEach(generateCiff);
 
     platforms.push(
-      boundary(DEFAULT_FRAME_WIDTH / 2 - 1, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      }),
-      boundary(-DEFAULT_FRAME_WIDTH / 2 + 1, 0, 0, player.s.y * 10, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerY],
-      }),
+      ...boundarySet(-12),
       water(0, -24, DEFAULT_FRAME_WIDTH * 2, 50),
-      platform(0, -12, DEFAULT_FRAME_WIDTH * 2, 0),
       flow(-40, 1602.5, 40, 1255, vector(0, -0.5)),
       flow(105, 2220, 250, 20, vector(-0.2, 0))
     );
 
     const cloudGradient = [
-      [0, 'rgba(255,255,255, 0)'],
-      [0.5, 'rgba(255,255,255, 0.9)'],
-      [0.6, 'rgba(255,255,255, 0)'],
+      [0, 'rgba(255,255,255,0)'],
+      [0.5, 'rgba(255,255,255,0.9)'],
+      [1, 'rgba(255,255,255,0)'],
     ];
     graphics.push(
-      gradient(100, 400, 0, 0.05, [
-        [0, 'rgb(200,200,200)'],
-        [0.5, 'rgb(110,110,110, 1)'],
-        [0.6, 'rgb(92,92,92, 0.9)'],
-        [1, 'rgb(34, 34, 34, 0.9)'],
+      gradient(1100, 1350, 10, 0.1, [
+        [0, 'rgba(216,219,230,0)'],
+        [0.1, 'rgba(109,130,152, 0)'],
+        [0.5, 'rgb(109,130,152, 0.9)'],
+        [1, '#2b435b'],
       ]),
-      gradient(4821, 400, 10, 0.1, cloudGradient),
-      gradient(4821, 400, 10, 0.5, cloudGradient),
-      gradient(4821, 400, 51, 1, cloudGradient),
-      gradient(4821, 600, 51, 2, cloudGradient),
+      gradient(3000, 14000, 9, 0.03, [
+        [0, 'rgba(216,219,230,0)'],
+        [1, 'rgba(216,219,230,1)'],
+      ], 1),
+      gradient(1200, 6550, 1, 0.06, [
+        [0, 'rgba(216,219,230,1)'],
+        [1, 'rgba(43,67,91,0)'],
+      ], 1),
+      graphic(0, 0, () => draw(10, ctx => {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(...transform(vector(-232, 2)), transform(76), transform(140));
+      }), [
+        objectEvent(
+          () => effects.push(ripple(-232, 2, 100)),
+          3000
+        )
+      ]),
+      gradient(5421, 300, 51, 1.5, cloudGradient, 1),
+      gradient(5421, 300, 51, 1.2, cloudGradient, 1),
+      gradient(5421, 300, 10, 0.7, cloudGradient, 1),
+      gradient(5421, 300, 10, 0.5, cloudGradient, 1),
+      gradient(5421, 300, 10, 0.4, cloudGradient, 1),
+      gradient(5421, 300, 10, 0.35, cloudGradient, 1),
+      gradient(5421, 300, 10, 0.3, cloudGradient, 1),
       staticMountain(-80, -42, 9, 0.6, 5),
       staticMountain(177, 0, 9, 0.5, 3),
       staticMountain(177, 0, 9, 0.3, 2.8),
@@ -221,11 +235,9 @@ export default {
           10,
           300,
           8,
-          (i, head) => (i === 7 ? shell : untouchable)(head.p.x, head.p.y)
+          (i, head) => (i === 7 ? untouchable : untouchable)(head.p.x, head.p.y)
         ),
-        shell(-179, 3409, 30, 30, {
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(3000, 20, 5)],
-        }),
+        shell('當', -179, 3409, [circularMovement(3000, 20, 5)]),
         untouchable(-160, 3790, {
           [KEY_OBJECT_ON_UPDATE]: [circularMovement(2500, 40, 5)],
         })
