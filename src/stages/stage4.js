@@ -9,8 +9,9 @@ import {
   KEY_STAGE_WAVES,
   SIDE_L,
   SIDE_R,
+  G,
 } from '../constants';
-import { easeInOutQuad, easeOutCirc } from '../easing';
+import { easeInOutQuad, easeOutCirc, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint } from '../easing';
 import { chain, enemy, invincible, shell, untouchable } from '../helper/enemy';
 import { gradient, graphic, staticMountain, ripple } from '../helper/graphic';
 import {
@@ -36,6 +37,7 @@ import {
   player,
   transform,
   effects,
+  $g,
 } from '../state';
 import {
   alternateProgress,
@@ -136,8 +138,10 @@ export default {
         [1, '#2b435b'],
       ]
     ];
-    player.p.x = 0;
-    player.p.y = 0;
+    player.p.x = -250;
+    player.p.y = 400;
+    $g.$ = 0;
+    console.log($g.$)
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.max(
@@ -151,8 +155,8 @@ export default {
     platforms.push(
       ...boundarySet(-12),
       water(0, -24, DEFAULT_FRAME_WIDTH * 2, 50),
-      flow(-40, 1602.5, 40, 1255, vector(0, -0.5)),
-      flow(105, 2220, 250, 20, vector(-0.2, 0))
+      flow(-55, 1592.5, 40, 1235, vector(0, -0.5), 30),
+      flow(90, 2225, 270, 30, vector(-0.2, 0), 10)
     );
 
     const cloudGradient = [
@@ -179,19 +183,25 @@ export default {
         ctx.fillStyle = '#000';
         ctx.fillRect(...transform(vector(-232, 2)), transform(76), transform(140));
       }), [
-        objectEvent(
-          () => effects.push(ripple(-232, 2, 100)),
-          3000
-        )
+        objectEvent(() => {
+          if(Math.random() > 0.5) effects.push(ripple(-190, 0, 300))
+        }, 1000)
       ]),
-      gradient(5421, 300, 51, 1.5, cloudGradient, 1),
-      gradient(5421, 300, 51, 1.2, cloudGradient, 1),
-      gradient(5421, 300, 10, 0.7, cloudGradient, 1),
-      gradient(5421, 300, 10, 0.5, cloudGradient, 1),
-      gradient(5421, 300, 10, 0.4, cloudGradient, 1),
-      gradient(5421, 300, 10, 0.35, cloudGradient, 1),
-      gradient(5421, 300, 10, 0.3, cloudGradient, 1),
-      staticMountain(-80, -42, 9, 0.6, 5),
+      graphic(0, 0, () => draw(10, ctx => {
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.beginPath();
+        ctx.moveTo(...transform(vector(-45, 2210)));
+        ctx.arc(...transform(vector(-45, 2210)), transform(30), Math.PI, -Math.PI / 2);
+        ctx.fill();
+      })),
+      gradient(5421, 250, 51, 1.5, cloudGradient, 1),
+      gradient(5421, 250, 51, 1.2, cloudGradient, 1),
+      gradient(5421, 250, 10, 0.7, cloudGradient, 1),
+      gradient(5421, 250, 10, 0.5, cloudGradient, 1),
+      gradient(5421, 250, 10, 0.4, cloudGradient, 1),
+      gradient(5421, 250, 10, 0.35, cloudGradient, 1),
+      gradient(5421, 250, 10, 0.3, cloudGradient, 1),
+      staticMountain(-100, -42, 9, 0.6, 5),
       staticMountain(177, 0, 9, 0.5, 3),
       staticMountain(177, 0, 9, 0.3, 2.8),
       staticMountain(-50, 40, 9, 0.2, 3.6),
@@ -253,6 +263,10 @@ export default {
     );
   },
   [KEY_STAGE_TRANSITION](progress) {
-    // player.p.x = -250 * easeInQuad(1 - progress);
+    $g.$ = G;
+    player.v.y = 0;
+    player.p.y =
+      (1 - easeInQuad((progress))) * 400;
+    player.p.x = -1600 * easeInQuad(1 - progress);
   },
 };

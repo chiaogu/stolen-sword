@@ -22,6 +22,8 @@ import {
   resetDash,
   setDash,
   transform,
+  platforms,
+  createLinearGradient,
 } from '../state';
 import {
   approach,
@@ -29,7 +31,10 @@ import {
   object,
   vector,
   vectorOp,
+  alternateProgress,
+  getActionProgress,
 } from '../utils';
+import { easeInQuint } from '../easing';
 
 export function followPlayerX(platform) {
   platform.p.x = player.p.x;
@@ -225,9 +230,8 @@ export const water = (x, y, w, h, options = {}) => {
   };
 };
 
-export const flow = (x, y, w, h, v, options = {}) => ({
+export const flow = (x, y, w, h, v, z) => ({
   ...object(x, y, w, h),
-  ...options,
   [KEY_OBJECT_FORCE_CHECK_COLLISION]: true,
   [KEY_OBJECT_ON_COLLIDED](platform, platformBoundary, collidedSide) {
     if (collidedSide) {
@@ -241,9 +245,16 @@ export const flow = (x, y, w, h, v, options = {}) => ({
   [KEY_OBJECT_ON_UPDATE]: [
     (platform) => {
       if (platform[KEY_OBJECT_FRAME] === 0) return;
-      draw(31, (ctx) => {
+      draw(z, (ctx) => {
         const platformBoundary = getObjectBoundary(platform);
-        ctx.fillStyle = 'rgba(0,0,255,0.5)';
+        const progress = 1 - getActionProgress(platform[KEY_OBJECT_FRAME], 300);
+        ctx.fillStyle = platform.s.x > platform.s.y ? `rgba(255,255,255,0.6)` : createLinearGradient(
+          ctx,
+          platform.p.y + platform.s.y / 2 + progress * platform.s.y / 10 ,
+          platform.s.y,
+          Array(20).fill().map((_, i) => [i * 0.05, `rgba(255,255,255,${i % 2 == 0 ? 0.8 : 0.6})`]),
+          1
+        )
         ctx.fillRect(
           ...transform(vector(platformBoundary.l, platformBoundary.t)),
           transform(platform.s.x),
@@ -251,7 +262,6 @@ export const flow = (x, y, w, h, v, options = {}) => ({
         );
       });
     },
-    ...(options[KEY_OBJECT_ON_UPDATE] || []),
   ],
 });
 
