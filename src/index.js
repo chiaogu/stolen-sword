@@ -1,6 +1,6 @@
 import modules from './modules/index';
 import { $debug } from './state';
-import { ASPECT_RATIO } from './constants';
+import { ASPECT_RATIO, FRAME_DURAITON } from './constants';
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -21,7 +21,7 @@ function resize() {
   ctx.scale(scale, scale);
 }
 
-window.addEventListener('resize', resize);
+window.addEventListener('resize', () => setTimeout(resize, FRAME_DURAITON));
 resize();
 
 function tick() { 

@@ -7,7 +7,7 @@ const template = script => `
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
   </head>
-  <body style="display:flex;justify-content:center;align-items:center;margin:0;background:#000;overflow:hidden;">
+  <body style="display:flex;justify-content:center;align-items:center;margin:0;background:#000;overflow:hidden;user-select: none;pointer-events: none;">
     <canvas></canvas>
     ${script}
   </body>

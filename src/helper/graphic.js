@@ -34,17 +34,12 @@ const effect = (x, y, duration, draw) => graphic(x, y, (graphic) => {
   if(!graphic[KEY_GRAPHIC_IS_ANIMATION_FINISH]) draw(progress, graphic);
 });
 
-export const wipe = side => effect(0, 0, 2400, (progress) => {
+export const wipe = () => effect(0, 0, 2400, (progress) => {
   draw(61, ctx => {
-    const axis = side === SIDE_T ? 'y' : 'x';
-    const pos = cameraFrameSize[axis] - cameraFrameSize[axis] * Math.min(1, easeInQuad(progress / 0.3));
-    const size = progress < 0.7 ? cameraFrameSize[axis] : cameraFrameSize[axis] * Math.max(0, 1 - easeOutQuad((progress - 0.7) / 0.3));
+    const pos = cameraFrameSize.x - cameraFrameSize.x * Math.min(1, easeInQuad(progress / 0.3));
+    const size = progress < 0.7 ? (cameraFrameSize.x + 10) : cameraFrameSize.x * Math.max(0, 1 - easeOutQuad((progress - 0.7) / 0.3));
     ctx.fillStyle = '#000';
-    if(side === SIDE_T) {
-      ctx.fillRect(0, pos, cameraFrameSize.x, size)
-    } else {
-      ctx.fillRect(pos, 0, size, cameraFrameSize.y)
-    }
+    ctx.fillRect(pos, 0, size, cameraFrameSize.y)
   });
 })
 
