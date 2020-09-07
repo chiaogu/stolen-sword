@@ -12,7 +12,7 @@ import {
   G,
 } from '../constants';
 import { easeInOutQuad, easeOutCirc, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint } from '../easing';
-import { chain, enemy, invincible, shell, untouchable } from '../helper/enemy';
+import { chain, enemy, invincible, shell, untouchable, bug } from '../helper/enemy';
 import { gradient, graphic, staticMountain, ripple } from '../helper/graphic';
 import {
   boundary,
@@ -38,6 +38,7 @@ import {
   transform,
   effects,
   $g,
+  createLinearGradient,
 } from '../state';
 import {
   alternateProgress,
@@ -126,22 +127,27 @@ const randomMovement = () => ({
     ),
   ],
 });
+const _randomMovement = () => [
+  circularMovement(
+    Math.random() * 1000 + 2000,
+    Math.random() * 10,
+    Math.random() * 10
+  ),
+];
 export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = '#D8DBE6';
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = [
-      100,
-      340,
+    $reflectionGradient.$ = createLinearGradient(100, 340,
       [
+        [0.295, 'rgba(0,0,0,0)'],
         [0.3, 'rgb(117,137,160, 0.9)'],
         [1, '#2b435b'],
       ]
-    ];
+    );
     player.p.x = -250;
     player.p.y = 400;
     $g.$ = 0;
-    console.log($g.$)
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.max(
@@ -226,10 +232,12 @@ export default {
         invincible(49, 5444, randomMovement()),
         invincible(27, 5611, randomMovement()),
         invincible(-76, 5740, randomMovement()),
-        enemy(143, 750, 30, 30, randomMovement()),
         invincible(-141, 1596, randomMovement()),
-        untouchable(80, 1509, randomMovement()),
         invincible(-119, 2127, randomMovement()),
+        shell('卍', -179, 3409, [circularMovement(3000, 20, 5)]),
+        bug('Q', 143, 750, _randomMovement()),
+        bug('Q', 80, 1509, _randomMovement(), 1),
+        bug('Q', -160, 3790, [circularMovement(2500, 40, 5)], 1),
         ...chain(
           untouchable(-300, 2767, {
             [KEY_OBJECT_ON_UPDATE]: [
@@ -247,10 +255,6 @@ export default {
           8,
           (i, head) => (i === 7 ? untouchable : untouchable)(head.p.x, head.p.y)
         ),
-        shell('當', -179, 3409, [circularMovement(3000, 20, 5)]),
-        untouchable(-160, 3790, {
-          [KEY_OBJECT_ON_UPDATE]: [circularMovement(2500, 40, 5)],
-        })
       );
     },
   ],

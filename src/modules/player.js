@@ -17,7 +17,6 @@ import {
   $timeRatio,
   draw,
   getReflection,
-  getWaterMask,
   isAbleToDash,
   isPlayerInvincibleAfterDamage,
   isReleaseVelocityEnough,
@@ -88,11 +87,11 @@ function drawPlayer(player) {
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
 
-    const waterMask = getWaterMask(ctx, player);
-    if (waterMask) {
-      ctx.fillStyle = waterMask.g;
-      ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
-    }
+    // const waterMask = getWaterMask(player);
+    // if (waterMask) {
+    //   ctx.fillStyle = waterMask.g;
+    //   ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
+    // }
 
     const reflection = getReflection(player);
     if (reflection) {

@@ -249,7 +249,6 @@ export const flow = (x, y, w, h, v, z) => ({
         const platformBoundary = getObjectBoundary(platform);
         const progress = 1 - getActionProgress(platform[KEY_OBJECT_FRAME], 300);
         ctx.fillStyle = platform.s.x > platform.s.y ? `rgba(255,255,255,0.6)` : createLinearGradient(
-          ctx,
           platform.p.y + platform.s.y / 2 + progress * platform.s.y / 10 ,
           platform.s.y,
           Array(20).fill().map((_, i) => [i * 0.05, `rgba(255,255,255,${i % 2 == 0 ? 0.8 : 0.6})`]),

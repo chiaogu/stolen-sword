@@ -7,9 +7,9 @@ import {
   $timeRatio,
   draw,
   getReflection,
-  getWaterMask,
   playerDamage,
   transform,
+  $reflectionGradient,
 } from '../state';
 import { getObjectBoundary, object, vector, vectorOp } from '../utils';
 import { checkRipple } from './graphic';
@@ -24,17 +24,20 @@ function handleCollision(projectile, projectileBoundary, collidedSide) {
 function drawProjectile(projectile) {
   draw(35, (ctx) => {
     ctx.fillStyle = '#ec5751';
-    const { l, t, b } = getObjectBoundary(projectile);
+    const { l, t } = getObjectBoundary(projectile);
     ctx.fillRect(
       ...transform(vector(l, t)),
       transform(projectile.s.x),
       transform(projectile.s.y)
     );
 
-    const waterMask = getWaterMask(ctx, projectile);
-    if (waterMask) {
-      ctx.fillStyle = waterMask.g;
-      ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
+    if ($reflectionGradient.$) {
+      ctx.fillStyle = $reflectionGradient.$;
+      ctx.fillRect(
+        ...transform(vector(l, t)),
+        transform(projectile.s.x),
+        transform(projectile.s.y)
+      );
     }
 
     const reflection = getReflection(projectile);
@@ -45,7 +48,7 @@ function drawProjectile(projectile) {
         reflection.x - transform(projectile.s.x) / 2,
         reflection.y,
         transform(projectile.s.x),
-        reflection.h
+        transform(projectile.s.y)
       );
       ctx.globalAlpha = 1;
     }

@@ -155,7 +155,7 @@ export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
 };
 
 export const gradient = (y, h, z, distance, colors, depth) => graphic(0, 0, () => draw(z, ctx => {
-  const grad = createLinearGradient(ctx, y, h, colors, distance, depth);
+  const grad = createLinearGradient(y, h, colors, distance, depth);
   ctx.fillStyle = grad;
   ctx.fillRect(
     0, transform(vector(0, y), distance)[1],
@@ -170,7 +170,7 @@ const getMountainColor = (bright, distance, a = 1) => `rgba(${bright * (0.64 + 0
 const drawMountain = (x, y, z, scale = 1, distance, fillGradient = true) => {
   let bright = 157 + 70 * (1 - distance / 0.4);
   draw(z, ctx => {
-    ctx.fillStyle = fillGradient ? createLinearGradient(ctx, y + 400 * (1 - distance / 0.4),  -mountainSprite.h, [
+    ctx.fillStyle = fillGradient ? createLinearGradient(y + 400 * (1 - distance / 0.4),  -mountainSprite.h, [
       [0, getMountainColor(bright * 0.9, distance)],
       [0.1, getMountainColor(bright, distance)]
     ], distance) : getMountainColor(bright, distance);
@@ -181,7 +181,7 @@ const drawMountain = (x, y, z, scale = 1, distance, fillGradient = true) => {
     ctx.fill();
     
     if($reflectionY.$ != undefined) {
-      ctx.fillStyle = createLinearGradient(ctx, y + 500 * (1 - distance / 0.35),  mountainSprite.h, [
+      ctx.fillStyle = createLinearGradient(y + 500 * (1 - distance / 0.35),  mountainSprite.h, [
         [0, getMountainColor(bright * 0.8, distance)],
         [0.1, getMountainColor(bright * 0.9, distance)],
         [1, getMountainColor(bright * 0.9, distance, 0.3)],

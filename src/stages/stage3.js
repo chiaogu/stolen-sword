@@ -45,6 +45,7 @@ import {
   platforms,
   player,
   effects,
+  createLinearGradient,
 } from '../state';
 import { alternateProgress, vector, object, objectAction } from '../utils';
 
@@ -56,14 +57,13 @@ export default {
     $maxReleaseVelocity.$ = 12;
     cameraCenter.y = player.p.y + 100;
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = [
-      100,
-      340,
+    $reflectionGradient.$ = createLinearGradient(100, 340,
       [
+        [0.29, 'rgba(117,137,160,0)'],
         [0.3, 'rgb(117,137,160, 0.9)'],
         [1, '#2b435b'],
       ]
-    ];
+    );
     $backgroundV.$ = 0.5;
     $backgroundColor.$ = '#D8DBE6';
     player.p.x = -DEFAULT_FRAME_WIDTH;

@@ -113,7 +113,7 @@ export default {
       ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
-    return enemies.length === 0 && player.p.y <= 0;
+    return enemies.length === 0 && Math.round(player.p.y) <= 0;
   },
   [KEY_STAGE_TRANSITION](progress) {
     const movementProgress = 1 - easeInOutQuad(alternateProgress(progress));

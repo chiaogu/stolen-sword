@@ -140,29 +140,9 @@ export const cameraFrameSize = vector(window.innerWidth, window.innerHeight);
 export const $cameraZoom = ref(1);
 
 export const getReflection = object => {
-  const { l, t, b } = getObjectBoundary(object);
   if($reflectionY.$ !== undefined && object.p.y > $reflectionY.$) {
-    const distance = t - $reflectionY.$;
-    const h = -transform(b > $reflectionY.$ ? object.s.y : distance);
     const [x, y] = reflect(object.p, $reflectionY.$);
-    return { x: x - Math.random() * 4 * $timeRatio.$, y, h }
-  }
-}
-
-export const getWaterMask = (ctx, object, color) => {
-  const { l, t, b } = getObjectBoundary(object);
-  if($reflectionGradient.$ && b <= $reflectionY.$) {
-    const reflectionH = Math.min(object.s.y, Math.max(0, $reflectionY.$ - b));
-    const [x, y] = transform(vector(l - 0.5, b - 0.5));
-    const colors = $reflectionGradient.$[2].slice();
-    if(color) colors.unshift([colors[0][0] - 0.01, color]);
-    return { 
-      x,
-      y,
-      w: transform(object.s.x + 1),
-      h: -transform(reflectionH + 1),
-      g: createLinearGradient(ctx, $reflectionGradient.$[0], $reflectionGradient.$[1], colors),
-    };
+    return { x: x - Math.random() * 4 * $timeRatio.$, y, d: Math.min(1, (object.p.y - $reflectionY.$) / object.s.y * 2) }
   }
 }
 
@@ -308,8 +288,9 @@ export const draw = (zIndex, callback) =>
 export const $reflectionY = ref();
 export const $reflectionGradient = ref();
 
-export const createLinearGradient = (ctx, y, h, colors, distance, depth) => {
-  const grad = ctx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h), depth ? distance : undefined));
+const offscreenCtx = document.createElement('canvas').getContext('2d');
+export const createLinearGradient = (y, h, colors, distance, depth) => {
+  const grad = offscreenCtx.createLinearGradient(...transform(vector(0, y), distance), ...transform(vector(0, y - h), depth ? distance : undefined));
   colors.forEach(color => grad.addColorStop(...color));
   return grad;
 }
