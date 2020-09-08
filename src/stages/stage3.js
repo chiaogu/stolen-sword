@@ -28,7 +28,7 @@ import {
   summonTheft,
   wipe,
 } from '../helper/graphic';
-import { boundarySet, followPlayerX, water } from '../helper/platform';
+import { boundarySet, water } from '../helper/platform';
 import {
   $backgroundColor,
   $backgroundV,
@@ -81,9 +81,7 @@ export default {
       ...movingMountain(-37, 60, 9, 0.15, 4)
     );
     platforms.push(
-      water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400, {
-        [KEY_OBJECT_ON_UPDATE]: [followPlayerX],
-      }),
+      water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400),
       ...boundarySet(-230)
     );
   },
