@@ -55,6 +55,7 @@ import {
 } from '../utils';
 import { checkRipple } from './graphic';
 
+// collision
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
 
@@ -96,6 +97,7 @@ function takeDamage(enemy, enemyBoundary, collidedSide) {
   }
 }
 
+// rendering
 const getEnemyColor = (enemy) => {
   if (
     enemy[KEY_OBJECT_IS_COLLIDED] &&
@@ -215,18 +217,8 @@ function drawEnemy(enemy) {
   });
 }
 
-const dead = objectEvent(
-  (enemy) => {
-    enemy[KEY_ENEMY_IS_DEAD] = true;
-  },
-  ENEMY_DEATH_ANIMATION_DURATION,
-  {
-    [KEY_OBJECT_EVENT_IS_REPEAT]: false,
-    [KEY_OBJECT_EVENT_GET_OFFSET]: (enemy) => enemy[KEY_ENEMY_DEAD_FRAME],
-  }
-);
-
-export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
+// class
+const _enemy = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
@@ -234,7 +226,6 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
   ...options,
   [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_UPDATE]: [
-    dead,
     ...(options[KEY_OBJECT_ON_UPDATE] || []),
     drawEnemy,
     (enemy) => {
@@ -245,6 +236,16 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
         enemy.p.y += enemy.v.y * $timeRatio.$;
       }
     },
+    objectEvent(
+      (enemy) => {
+        enemy[KEY_ENEMY_IS_DEAD] = true;
+      },
+      ENEMY_DEATH_ANIMATION_DURATION,
+      {
+        [KEY_OBJECT_EVENT_IS_REPEAT]: false,
+        [KEY_OBJECT_EVENT_GET_OFFSET]: (enemy) => enemy[KEY_ENEMY_DEAD_FRAME],
+      }
+    ),
     checkRipple(),
   ],
 });
@@ -261,6 +262,43 @@ export const compund = (core, ...children) => {
   return [core, ...children];
 };
 
+export const chain = (head, amount, interval, coreIndex, getEnemy) => {
+  let nodes = [
+    head,
+    ...chase(
+      head,
+      Array(amount)
+        .fill()
+        .map((_, i) => (i + 1) * interval)
+    ).map((doChase, i) => {
+      const enemy = getEnemy(i, head);
+      enemy[KEY_OBJECT_ON_UPDATE].push(doChase);
+      return enemy;
+    }),
+  ];
+  nodes = compund(...nodes.splice(coreIndex, 1), ...nodes);
+  nodes.splice(coreIndex, 0, nodes.splice(0, 1)[0]);
+  return nodes;
+};
+
+export const enemy = (appearance, x, y, actions, isUntouchable) =>
+  _enemy(x, y, 30, 30, {
+    [KEY_OBJECT_ON_UPDATE]: actions,
+    [KEY_ENEMY_APPEARANCE]: appearance,
+    [KEY_ENEMY_IS_UNTOUCHABLE]: isUntouchable
+  });
+
+export const shell = (appearance, x, y, actions) =>
+  _enemy(x, y, 40, 40, {
+    [KEY_OBJECT_ON_UPDATE]: [
+      enemy => (enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1),
+      ...actions
+    ],
+    [KEY_ENEMY_APPEARANCE]: appearance,
+    [KEY_ENEMY_HEALTH]: 3
+  });
+  
+// actions
 export const switchMode = (interval) =>
   objectEvent(
     (enemy) => {
@@ -329,55 +367,4 @@ export const recover = (interval, max) =>
     enemy[KEY_ENEMY_HEALTH] = Math.min(max, enemy[KEY_ENEMY_HEALTH] + 1);
   }, interval, {
     [KEY_OBJECT_EVENT_GET_OFFSET]: (enemy) => enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] || 0
-  });
-
-export const untouchable = (x, y, options = {}) =>
-  enemy(x, y, 30, 30, {
-    ...options,
-    [KEY_ENEMY_IS_UNTOUCHABLE]: true,
-  });
-
-export const invincible = (x, y, options = {}) =>
-  enemy(x, y, 30, 30, {
-    ...options,
-    [KEY_OBJECT_ON_UPDATE]: [
-      recover(FRAME_DURAITON, 2),
-      ...(options[KEY_OBJECT_ON_UPDATE] || []),
-    ],
-  });
-
-export const chain = (head, amount, interval, coreIndex, getEnemy) => {
-  let nodes = [
-    head,
-    ...chase(
-      head,
-      Array(amount)
-        .fill()
-        .map((_, i) => (i + 1) * interval)
-    ).map((doChase, i) => {
-      const enemy = getEnemy(i, head);
-      enemy[KEY_OBJECT_ON_UPDATE].push(doChase);
-      return enemy;
-    }),
-  ];
-  nodes = compund(...nodes.splice(coreIndex, 1), ...nodes);
-  nodes.splice(coreIndex, 0, nodes.splice(0, 1)[0]);
-  return nodes;
-};
-
-export const bug = (appearance, x, y, actions, isUntouchable) =>
-  enemy(x, y, 30, 30, {
-    [KEY_OBJECT_ON_UPDATE]: actions,
-    [KEY_ENEMY_APPEARANCE]: appearance,
-    [KEY_ENEMY_IS_UNTOUCHABLE]: isUntouchable
-  });
-
-export const shell = (appearance, x, y, actions) =>
-  enemy(x, y, 40, 40, {
-    [KEY_OBJECT_ON_UPDATE]: [
-      enemy => (enemy[KEY_ENEMY_IS_DEFENCING] = enemy[KEY_ENEMY_HEALTH] > 1),
-      ...actions
-    ],
-    [KEY_ENEMY_APPEARANCE]: appearance,
-    [KEY_ENEMY_HEALTH]: 3
   });

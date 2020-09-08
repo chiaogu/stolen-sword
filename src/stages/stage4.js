@@ -1,53 +1,44 @@
 import { circularMovement } from '../animation';
 import {
   DEFAULT_FRAME_WIDTH,
+  G,
   KEY_OBJECT_INITIAL_POS,
-  KEY_OBJECT_ON_UPDATE,
   KEY_STAGE_INITIATE,
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
   SIDE_L,
   SIDE_R,
-  G,
 } from '../constants';
-import { easeInOutQuad, easeOutCirc, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint } from '../easing';
-import { chain, enemy, invincible, shell, untouchable, bug, compund } from '../helper/enemy';
-import { gradient, graphic, staticMountain, ripple } from '../helper/graphic';
-import {
-  boundary,
-  flow,
-  followPlayerY,
-  platform,
-  water,
-  boundarySet,
-} from '../helper/platform';
+import { easeInOutQuad, easeInQuad, easeOutCirc } from '../easing';
+import { enemy, chain, compund, shell } from '../helper/enemy';
+import { gradient, graphic, ripple, staticMountain } from '../helper/graphic';
+import { boundarySet, flow, platform, water } from '../helper/platform';
 import {
   $backgroundColor,
   $cameraLoop,
+  $g,
   $reflectionGradient,
   $reflectionY,
   $stageWave,
   cameraCenter,
   collision,
+  createLinearGradient,
   draw,
-  enemies,
+  effects,
   graphics,
   platforms,
   player,
   transform,
-  effects,
-  $g,
-  createLinearGradient,
 } from '../state';
 import {
   alternateProgress,
   decompressPath,
   object,
   objectAction,
+  objectEvent,
   vector,
   vectorMagnitude,
-  objectEvent,
 } from '../utils';
 
 const cliffPaths = [
@@ -131,11 +122,10 @@ export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = '#D8DBE6';
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = createLinearGradient(-183, 50,
-      [
-        [0.29, 'rgba(117,137,160,0)'],
-        [0.3, 'rgb(117,137,160, 0.9)']
-      ]);
+    $reflectionGradient.$ = createLinearGradient(-183, 50, [
+      [0.29, 'rgba(117,137,160,0)'],
+      [0.3, 'rgb(117,137,160, 0.9)'],
+    ]);
     player.p.x = -250;
     player.p.y = 400;
     $g.$ = 0;
@@ -168,29 +158,60 @@ export default {
         [0.5, 'rgb(109,130,152, 0.9)'],
         [1, '#2b435b'],
       ]),
-      gradient(3000, 14000, 9, 0.03, [
-        [0, 'rgba(216,219,230,0)'],
-        [1, 'rgba(216,219,230,1)'],
-      ], 1),
-      gradient(1200, 6550, 1, 0.06, [
-        [0, 'rgba(216,219,230,1)'],
-        [1, 'rgba(43,67,91,0)'],
-      ], 1),
-      graphic(0, 0, () => draw(10, ctx => {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(...transform(vector(-232, 2)), transform(76), transform(140));
-      }), [
-        objectEvent(() => {
-          if(Math.random() > 0.5) effects.push(ripple(-190, 0, 300))
-        }, 1000)
-      ]),
-      graphic(0, 0, () => draw(10, ctx => {
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.beginPath();
-        ctx.moveTo(...transform(vector(-45, 2210)));
-        ctx.arc(...transform(vector(-45, 2210)), transform(30), Math.PI, -Math.PI / 2);
-        ctx.fill();
-      })),
+      gradient(
+        3000,
+        14000,
+        9,
+        0.03,
+        [
+          [0, 'rgba(216,219,230,0)'],
+          [1, 'rgba(216,219,230,1)'],
+        ],
+        1
+      ),
+      gradient(
+        1200,
+        6550,
+        1,
+        0.06,
+        [
+          [0, 'rgba(216,219,230,1)'],
+          [1, 'rgba(43,67,91,0)'],
+        ],
+        1
+      ),
+      graphic(
+        0,
+        0,
+        () =>
+          draw(10, (ctx) => {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(
+              ...transform(vector(-232, 2)),
+              transform(76),
+              transform(140)
+            );
+          }),
+        [
+          objectEvent(() => {
+            if (Math.random() > 0.5) effects.push(ripple(-190, 0, 300));
+          }, 1000),
+        ]
+      ),
+      graphic(0, 0, () =>
+        draw(10, (ctx) => {
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.beginPath();
+          ctx.moveTo(...transform(vector(-45, 2210)));
+          ctx.arc(
+            ...transform(vector(-45, 2210)),
+            transform(30),
+            Math.PI,
+            -Math.PI / 2
+          );
+          ctx.fill();
+        })
+      ),
       gradient(5421, 250, 51, 1.5, cloudGradient, 1),
       gradient(5421, 250, 51, 1.2, cloudGradient, 1),
       gradient(5421, 250, 10, 0.7, cloudGradient, 1),
@@ -211,31 +232,34 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    () => {
-      enemies.push(
-        ...compund(
-          bug('巾', -160, 3790, [circularMovement(2500, 40, 5)], 1),
-          ...[
-            ['亓', 0, 4340],
-            ['冂', -130, 4516],
-            ['兀', -61, 4694],
-            ['ㄢ', 4, 4850],
-            ['个', 40, 5032],
-            ['天', 124, 5194],
-            ['云', -49, 5319],
-            ['四', 49, 5444],
-            ['弓', 27, 5611],
-            ['六', -76, 5740],
-            ['廾', -141, 1596],
-            ['爪', -119, 2127],
-            ['孓', -173, 2927],
-          ].map(([appearance, x, y]) => bug(appearance, x, y, _randomMovement()))
-        ),
-        shell('卞', -179, 3409, [circularMovement(3000, 20, 5)]),
-        bug('卝', 143, 750, _randomMovement()),
-        bug('从', 80, 1509, _randomMovement(), 1),
-        ...chain(
-          bug('公', -300, 2767, [
+    () => [
+      ...compund(
+        enemy('巾', -160, 3790, [circularMovement(2500, 40, 5)], 1),
+        ...[
+          ['亓', 0, 4340],
+          ['冂', -130, 4516],
+          ['兀', -61, 4694],
+          ['ㄢ', 4, 4850],
+          ['只', 40, 5032],
+          ['天', 124, 5194],
+          ['云', -49, 5319],
+          ['皿', 49, 5444],
+          ['弓', 27, 5611],
+          ['六', -76, 5740],
+          ['廾', -141, 1596],
+          ['爪', -119, 2127],
+          ['孓', -173, 2927],
+        ].map(([appearance, x, y]) => enemy(appearance, x, y, _randomMovement()))
+      ),
+      shell('卞', -179, 3409, [circularMovement(3000, 20, 5)]),
+      enemy('卝', 143, 750, _randomMovement()),
+      enemy('从', 80, 1509, _randomMovement(), 1),
+      ...chain(
+        enemy(
+          '公',
+          -300,
+          2767,
+          [
             objectAction(5000, (enemy, progress) => {
               progress = easeInOutQuad(alternateProgress(progress));
               enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + 472 * progress;
@@ -243,14 +267,15 @@ export default {
                 enemy[KEY_OBJECT_INITIAL_POS].x +
                 400 * Math.sin((easeOutCirc(progress) * Math.PI) / 2);
             }),
-          ], 1),
-          10,
-          300,
-          8,
-          (i, head) => (i === 7 ? shell : bug)('ㄙ', head.p.x, head.p.y, [], 1)
+          ],
+          1
         ),
-      );
-    },
+        10,
+        300,
+        8,
+        (i, head) => (i === 7 ? shell : enemy)('ㄙ', head.p.x, head.p.y, [], 1)
+      ),
+    ],
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(-131, 6226, 200, 80);
@@ -263,8 +288,7 @@ export default {
   [KEY_STAGE_TRANSITION](progress) {
     $g.$ = G;
     player.v.y = 0;
-    player.p.y =
-      (1 - easeInQuad((progress))) * 400;
+    player.p.y = (1 - easeInQuad(progress)) * 400;
     player.p.x = -1600 * easeInQuad(1 - progress);
   },
 };

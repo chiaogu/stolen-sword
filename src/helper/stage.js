@@ -1,45 +1,45 @@
-import { vectorOp, object, objectEvent, getActionProgress } from '../utils';
 import {
-  player,
-  enemies,
-  platforms,
-  projectiles,
-  cameraCenter,
-  $stage,
-  $stageWave,
-  $stageIndex,
-  revive,
-  $stageNextWave,
-  $g,
-  $maxReleaseVelocity,
-  waitForClick,
-  graphics,
-  $reflectionY,
-  $backgroundV,
-  $backgroundColor,
-  $reflectionGradient
-} from '../state';
-import {
-  KEY_STAGE_INITIATE,
-  KEY_OBJECT_ON_UPDATE,
-  KEY_OBJECT_FRAME,
-  KEY_OBJECT_EVENT_GET_OFFSET,
-  KEY_STAGE_TRANSITION_FRAME,
-  KEY_STAGE_WAVES,
-  KEY_STAGE_IS_WAVE_CLEAN,
-  KEY_STAGE_TRANSITION,
-  STAGE_TRANSITION_DURAION,
+  FRAME_DURAITON,
   G,
-  MAX_RELEASE_VELOCITY,
+  KEY_OBJECT_EVENT_GET_OFFSET,
+  KEY_OBJECT_FRAME,
+  KEY_OBJECT_ON_UPDATE,
+  KEY_PLAYER_DEATH_FRAME,
   KEY_STAGE_ENDING_CUT_SCENE,
   KEY_STAGE_ENDING_CUT_SCENE_FRAME,
   KEY_STAGE_ENDING_CUT_SCENE_INDEX,
-  FRAME_DURAITON,
   KEY_STAGE_ENDING_CUT_SCENE_KEY,
+  KEY_STAGE_INITIATE,
+  KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_START_KEY,
-  KEY_PLAYER_DEATH_FRAME
+  KEY_STAGE_TRANSITION,
+  KEY_STAGE_TRANSITION_FRAME,
+  KEY_STAGE_WAVES,
+  MAX_RELEASE_VELOCITY,
+  STAGE_TRANSITION_DURAION,
 } from '../constants';
 import stages from '../stages/index';
+import {
+  $backgroundColor,
+  $backgroundV,
+  $g,
+  $maxReleaseVelocity,
+  $reflectionGradient,
+  $reflectionY,
+  $stage,
+  $stageIndex,
+  $stageNextWave,
+  $stageWave,
+  cameraCenter,
+  enemies,
+  graphics,
+  platforms,
+  player,
+  projectiles,
+  revive,
+  waitForClick,
+} from '../state';
+import { getActionProgress, object, objectEvent, vectorOp } from '../utils';
 
 const creatStage = (config) => ({
   ...object(),
@@ -47,7 +47,10 @@ const creatStage = (config) => ({
   [KEY_OBJECT_ON_UPDATE]: [update, checkTransition],
   [KEY_STAGE_ENDING_CUT_SCENE_INDEX]: 0,
   [KEY_STAGE_ENDING_CUT_SCENE_FRAME]: 0,
-  [KEY_STAGE_ENDING_CUT_SCENE]: [[() => {}, 0], ...(config[KEY_STAGE_ENDING_CUT_SCENE] || [])]
+  [KEY_STAGE_ENDING_CUT_SCENE]: [
+    [() => {}, 0],
+    ...(config[KEY_STAGE_ENDING_CUT_SCENE] || []),
+  ],
 });
 
 function setWave(wave) {
@@ -60,7 +63,8 @@ function _setWave(wave) {
   delete $stage.$[KEY_STAGE_TRANSITION_FRAME];
   enemies.splice(0, enemies.length);
   $stageWave.$ = wave;
-  if($stage.$[KEY_STAGE_WAVES][wave]) $stage.$[KEY_STAGE_WAVES][wave]();
+  if ($stage.$[KEY_STAGE_WAVES][wave])
+    enemies.push(...$stage.$[KEY_STAGE_WAVES][wave]());
 }
 
 export function setStage(stageIndex, wave) {
@@ -89,26 +93,31 @@ export function setStage(stageIndex, wave) {
 }
 
 function update(stage) {
-  if($stageWave.$ === -1 && $stageNextWave.$ !== 0) {
-    waitForClick(
-      `${KEY_STAGE_START_KEY}${$stageIndex.$}`,
-      () => setWave(0)
-    );
-  } else if($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
-    const [callback, duration = FRAME_DURAITON, wait] = stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
-    const frameDiff = stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
-    if(frameDiff >= Math.round(duration / FRAME_DURAITON)) {
+  if ($stageWave.$ === -1 && $stageNextWave.$ !== 0) {
+    waitForClick(`${KEY_STAGE_START_KEY}${$stageIndex.$}`, () => setWave(0));
+  } else if ($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
+    const [callback, duration = FRAME_DURAITON, wait] = stage[
+      KEY_STAGE_ENDING_CUT_SCENE
+    ][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
+    const frameDiff =
+      stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
+    if (frameDiff >= Math.round(duration / FRAME_DURAITON)) {
       stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
       const nextAnimation = () => {
-        if(stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] < stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1) {
+        if (
+          stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] <
+          stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1
+        ) {
           stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
           stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
-          stage[KEY_STAGE_ENDING_CUT_SCENE][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]][0](0);
+          stage[KEY_STAGE_ENDING_CUT_SCENE][
+            stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]
+          ][0](0);
         } else {
           setStage($stageIndex.$ + 1);
         }
       };
-      if(wait) {
+      if (wait) {
         waitForClick(
           `${KEY_STAGE_ENDING_CUT_SCENE_KEY}${$stageIndex.$}${stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]}`,
           nextAnimation
@@ -127,8 +136,14 @@ function update(stage) {
     );
     if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](progress);
   } else {
-    if (!player[KEY_PLAYER_DEATH_FRAME] && stage[KEY_STAGE_IS_WAVE_CLEAN] && stage[KEY_STAGE_IS_WAVE_CLEAN]()) {
-      ($stageWave.$ === stage[KEY_STAGE_WAVES].length - 1 ? _setWave : setWave)($stageWave.$ + 1);
+    if (
+      !player[KEY_PLAYER_DEATH_FRAME] &&
+      stage[KEY_STAGE_IS_WAVE_CLEAN] &&
+      stage[KEY_STAGE_IS_WAVE_CLEAN]()
+    ) {
+      ($stageWave.$ === stage[KEY_STAGE_WAVES].length - 1 ? _setWave : setWave)(
+        $stageWave.$ + 1
+      );
     }
   }
 }

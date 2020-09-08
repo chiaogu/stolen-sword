@@ -1,8 +1,5 @@
 import { circularMovement, slideIn } from '../animation';
 import {
-  DEFAULT_FRAME_WIDTH,
-  KEY_OBJECT_ON_UPDATE,
-  KEY_OBJECT_Z_INDEX,
   KEY_STAGE_ENDING_CUT_SCENE,
   KEY_STAGE_INITIATE,
   KEY_STAGE_IS_WAVE_CLEAN,
@@ -10,22 +7,29 @@ import {
   KEY_STAGE_WAVES,
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
-import { bug, compund, enemy, fire } from '../helper/enemy';
-import { gradient, movingBamboo, wipe, letterBox, drawCaption, graphic, theft, summonTheft, moveTheft } from '../helper/graphic';
-import { boundary, followPlayerY, platform, boundarySet } from '../helper/platform';
+import { enemy, compund, fire } from '../helper/enemy';
+import {
+  drawCaption,
+  gradient,
+  letterBox,
+  moveTheft,
+  movingBamboo,
+  summonTheft,
+  wipe,
+} from '../helper/graphic';
+import { boundarySet } from '../helper/platform';
 import {
   $backgroundColor,
   $backgroundV,
   $cameraLoop,
   $cameraZoom,
+  $tempPlayerPos,
   cameraCenter,
   effects,
   enemies,
   graphics,
   platforms,
   player,
-  $theft,
-  $tempPlayerPos,
 } from '../state';
 import { alternateProgress, vector } from '../utils';
 
@@ -55,60 +59,53 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
+    () => [
+      enemy('大', 50, 150, [
+        slideIn(2000, 250, 200),
+        circularMovement(3000, 10, 5, 2000),
+      ]),
+    ],
+    () => [
+      enemy('不', -100, 300, [
+        slideIn(2000, 250, 350),
+        circularMovement(5000, 10, 5, 2000),
+      ]),
+      enemy('木', 75, 350, [
+        slideIn(2000, 250, 450),
+        circularMovement(3000, 10, 5, 2000),
+      ]),
+    ],
     () =>
-      enemies.push(
-        bug('大', 50, 150, [
-          slideIn(2000, 250, 200),
-          circularMovement(3000, 10, 5, 2000),
-        ])
-      ),
-    () =>
-      enemies.push(
-        bug('不', -100, 300, [
-          slideIn(2000, 250, 350),
-          circularMovement(5000, 10, 5, 2000),
+      compund(
+        enemy('父', 0, 450, [
+          slideIn(2000, 250, 330),
+          circularMovement(5000, 10, 0, 2000),
         ]),
-        bug('木', 75, 350, [
-          slideIn(2000, 250, 450),
-          circularMovement(3000, 10, 5, 2000),
+        enemy('人', 0, 300, [
+          slideIn(1000, 250, 300),
+          circularMovement(6000, 100, 50, 1000),
         ])
       ),
+    () => [
+      enemy('火', 0, 350, [
+        slideIn(1000, 250, 400),
+        fire(3000, 500),
+        circularMovement(10000, 100, 10, 1000),
+      ]),
+    ],
     () =>
-      enemies.push(
-        ...compund(
-          bug('父', 0, 450, [
-            slideIn(2000, 250, 330),
-            circularMovement(5000, 10, 0, 2000),
-          ]),
-          bug('人', 0, 300, [
-            slideIn(1000, 250, 300),
-            circularMovement(6000, 100, 50, 1000),
-          ])
-        )
-      ),
-    () =>
-      enemies.push(
-        bug('火', 0, 350, [
-          slideIn(1000, 250, 400),
+      compund(
+        enemy('上', 0, 300, [
           fire(3000, 500),
-          circularMovement(10000, 100, 10, 1000),
-        ])
-      ),
-    () =>
-      enemies.push(
-        ...compund(
-          bug('上', 0, 300, [
-            fire(3000, 500),
-            slideIn(2000, 250, 300),
-            circularMovement(6000, 150, 10, 2000),
-          ]),
-          bug(
-            '下',
-            0,
-            220,
-            [slideIn(1000, 250, 220), circularMovement(5000, 100, 10, 1000)],
-            true
-          )
+          slideIn(2000, 250, 300),
+          circularMovement(6000, 150, 10, 2000),
+        ]),
+        enemy(
+          '下',
+          0,
+          220,
+          [slideIn(1000, 250, 220), circularMovement(5000, 100, 10, 1000)],
+          true
         )
       ),
   ],
@@ -123,46 +120,53 @@ export default {
     else player.p.x = $tempPlayerPos.$.x * easeInOutQuad(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
-    [() => {
-      $tempPlayerPos.$ = vector(player.p.x, player.p.y);
-      graphics.push(...letterBox());
-    }],
+    [
+      () => {
+        $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+        graphics.push(...letterBox());
+      },
+    ],
     [
       (progress) => {
         $backgroundV.$ = 1 + easeOutQuad(progress) * 2;
         player.p.x =
-          $tempPlayerPos.$.x + (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
+          $tempPlayerPos.$.x +
+          (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
       },
       2000,
     ],
     [() => drawCaption("Can't find the theft."), 500, true],
     [summonTheft(-250, 100, 9)],
     [
-      (progress) => moveTheft(
-        -250 + 200 * progress,
-        200 * easeOutQuad(1 - alternateProgress(progress * 0.8))
-      ),
+      (progress) =>
+        moveTheft(
+          -250 + 200 * progress,
+          200 * easeOutQuad(1 - alternateProgress(progress * 0.8))
+        ),
       1000,
     ],
     [
-      (progress) => moveTheft(
-        -50 + 100 * progress,
-        160 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8))
-      ),
+      (progress) =>
+        moveTheft(
+          -50 + 100 * progress,
+          160 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8))
+        ),
       500,
     ],
     [
-      (progress) => moveTheft(
-        50 + 140 * progress,
-        240 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8))
-      ),
+      (progress) =>
+        moveTheft(
+          50 + 140 * progress,
+          240 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8))
+        ),
       500,
     ],
     [
-      (progress) => moveTheft(
-        190 + 120 * progress,
-        320 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8))
-      ),
+      (progress) =>
+        moveTheft(
+          190 + 120 * progress,
+          320 + 300 * easeOutQuad(1 - alternateProgress(progress * 0.8))
+        ),
       1000,
     ],
     [

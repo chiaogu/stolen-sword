@@ -8,28 +8,27 @@ import {
   DEFAULT_FRAME_WIDTH,
   KEY_ENEMY_DEAD_FRAME,
   KEY_ENEMY_IS_DEAD,
-  KEY_ENEMY_IS_UNTOUCHABLE,
-  KEY_STAGE_ENDING_CUT_SCENE,
+  KEY_OBJECT_EVENT_GET_OFFSET,
+  KEY_OBJECT_FRAME,
   KEY_OBJECT_ON_UPDATE,
+  KEY_STAGE_ENDING_CUT_SCENE,
   KEY_STAGE_INITIATE,
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
-  KEY_OBJECT_Z_INDEX,
-  KEY_OBJECT_FRAME,
-  KEY_OBJECT_EVENT_GET_OFFSET,
 } from '../constants';
-import { easeInOutQuad, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint, easeInCirc, easeOutCirc } from '../easing';
-import { chain, enemy, fire, firework, recover, shell, bug } from '../helper/enemy';
-import { gradient, movingMountain, letterBox, drawCaption, wipe, theft, summonTheft, moveTheft } from '../helper/graphic';
+import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
+import { enemy, chain, fire, firework, recover, shell } from '../helper/enemy';
 import {
-  boundary,
-  followPlayerX,
-  followPlayerY,
-  platform,
-  water,
-  boundarySet,
-} from '../helper/platform';
+  drawCaption,
+  gradient,
+  letterBox,
+  moveTheft,
+  movingMountain,
+  summonTheft,
+  wipe,
+} from '../helper/graphic';
+import { boundarySet, followPlayerX, water } from '../helper/platform';
 import {
   $backgroundColor,
   $backgroundV,
@@ -39,17 +38,16 @@ import {
   $maxReleaseVelocity,
   $reflectionGradient,
   $reflectionY,
+  $tempPlayerPos,
   cameraCenter,
+  createLinearGradient,
+  effects,
   enemies,
   graphics,
   platforms,
   player,
-  effects,
-  createLinearGradient,
-  $theft,
-  $tempPlayerPos,
 } from '../state';
-import { alternateProgress, vector, object, objectAction } from '../utils';
+import { alternateProgress, objectAction, vector } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -57,13 +55,11 @@ export default {
     $maxReleaseVelocity.$ = 12;
     cameraCenter.y = player.p.y + 100;
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = createLinearGradient(100, 340,
-      [
-        [0.29, 'rgba(117,137,160,0)'],
-        [0.3, 'rgb(117,137,160, 0.9)'],
-        [1, '#2b435b'],
-      ]
-    );
+    $reflectionGradient.$ = createLinearGradient(100, 340, [
+      [0.29, 'rgba(117,137,160,0)'],
+      [0.3, 'rgb(117,137,160, 0.9)'],
+      [1, '#2b435b'],
+    ]);
     $backgroundV.$ = 0.5;
     $backgroundColor.$ = '#D8DBE6';
     player.p.x = -DEFAULT_FRAME_WIDTH;
@@ -92,45 +88,55 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    () =>
-      enemies.push(
-        shell('亞', 75, 50, [
-          slideIn(2000, 270, -40),
-          circularMovement(7000, 0, 90, 2000)
-        ])
-      ),
-    () =>
-      enemies.push(
-        bug('工', 10, 300, [
-          fire(6000, 3000),
-          slideIn(3500, 0, 550),
-          circularMovement(8000, 100, 30, 3500),
-        ]),
-        shell('干', -120, 100, [
-          slideIn(2500, -150, -250),
-          recover(3000, 3),
-          circularMovement(5000, 10, 15, 2500),
-        ]),
-        shell('士', 120, 150, [
-          recover(3000, 3),
-          slideIn(3500, 150, -250),
-          circularMovement(6000, 10, 15, 3500),
-        ])
-      ),
+    () => [
+      shell('亞', 75, 50, [
+        slideIn(2000, 270, -40),
+        circularMovement(7000, 0, 90, 2000),
+      ]),
+    ],
+    () => [
+      enemy('工', 10, 300, [
+        fire(6000, 3000),
+        slideIn(3500, 0, 550),
+        circularMovement(8000, 100, 30, 3500),
+      ]),
+      shell('干', -120, 100, [
+        slideIn(2500, -150, -250),
+        recover(3000, 3),
+        circularMovement(5000, 10, 15, 2500),
+      ]),
+      shell('士', 120, 150, [
+        recover(3000, 3),
+        slideIn(3500, 150, -250),
+        circularMovement(6000, 10, 15, 3500),
+      ]),
+    ],
     () => {
-      const core = bug('十', 0, 300, [
-        slideIn(2300, 0, 550),
-        circularMovement(10000, 160, 288, 2300, progress => easeInOutQuad(alternateProgress(progress)) / -2),
-        enemy => {
-          if (
-            !enemy[KEY_ENEMY_DEAD_FRAME] &&
-            children.filter((child) => child[KEY_ENEMY_IS_DEAD]).length ===
-              children.length
-          ) {
-            enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
-          }
-        },
-      ], true);
+      const core = enemy(
+        '十',
+        0,
+        300,
+        [
+          slideIn(2300, 0, 550),
+          circularMovement(
+            10000,
+            160,
+            288,
+            2300,
+            (progress) => easeInOutQuad(alternateProgress(progress)) / -2
+          ),
+          (enemy) => {
+            if (
+              !enemy[KEY_ENEMY_DEAD_FRAME] &&
+              children.filter((child) => child[KEY_ENEMY_IS_DEAD]).length ===
+                children.length
+            ) {
+              enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+            }
+          },
+        ],
+        true
+      );
 
       const children = [
         ['巛', vector(-50, 0)],
@@ -144,46 +150,50 @@ export default {
             250 * (index > 1 ? 1 : -1),
             index % 2 === 1 ? 400 : 550
           ),
-          follow(core, offset, 2290),
+          follow(core, offset, 2300),
         ])
       );
-      
-      enemies.push(core, ...children)
+
+      return [core, ...children];
     },
-    () => {
-      enemies.push(
-        ...chain(
-          shell('十', 0, 300, [
-            recover(3000, 3),
-            slideIn(4000, 250, 450),
-            firework(10, 6000, 1000),
-            lemniscateMovement(12000, 500, 3000),
-          ]),
-          9,
-          250,
+    () =>
+      chain(
+        shell('十', 0, 300, [
+          recover(3000, 3),
+          slideIn(4000, 250, 450),
+          firework(10, 6000, 1000),
+          lemniscateMovement(12000, 500, 3000),
+        ]),
+        9,
+        250,
+        0,
+        (i) => enemy(i === 0 ? '米' : '乂', 250, 450, [], i === 0)
+      ),
+    () =>
+      chain(
+        enemy(
+          '回',
           0,
-          (i) => bug(i === 0 ? '米' : '乂', 250, 450, [], i === 0)
-        )
-      );
-    },
-    () => {
-      enemies.push(
-        ...chain(
-          bug('回', 0, 200, [
+          200,
+          [
             slideIn(5000, 270, -200),
             firework(10, 6000, 2000),
             circularMovement(10000, 200, 210, 5000),
-          ], true),
-          9,
-          250,
-          1,
-          (i) =>
-            (i === 0 ? shell : bug)(i === 0 ? '由' : i % 2 == 1 ? '口' : '回', 270, -200, [
-              ...(i === 0 ? [recover(2500, 3)] : [])
-            ], i === 8)
-        )
-      );
-    },
+          ],
+          true
+        ),
+        9,
+        250,
+        1,
+        (i) =>
+          (i === 0 ? shell : enemy)(
+            i === 0 ? '由' : i % 2 == 1 ? '口' : '回',
+            270,
+            -200,
+            [...(i === 0 ? [recover(2500, 3)] : [])],
+            i === 8
+          )
+      ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0 && player.p.y <= player.s.y / 2;
@@ -199,21 +209,31 @@ export default {
     else player.p.x = $tempPlayerPos.$.x * easeInOutQuad(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
-    [() => {
-      $g.$ = 0;
-      player.v.y = 0;
-      graphics.push(...letterBox());
-      $tempPlayerPos.$ = vector(player.p.x, player.p.y);
-      const offset = player[KEY_OBJECT_FRAME];
-      player[KEY_OBJECT_ON_UPDATE].push(objectAction(2000, (player, progress) => {
-        player.p.y = 200 * easeOutQuad(1 - alternateProgress(progress));
-        player.p.x =
-          $tempPlayerPos.$.x + (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
-          if(Math.round(player.p.x) === -100) $tempPlayerPos.$ = vector(player.p.x, player.p.y);
-      }, {
-        [KEY_OBJECT_EVENT_GET_OFFSET]: () => offset
-      }));
-    }],
+    [
+      () => {
+        $g.$ = 0;
+        player.v.y = 0;
+        graphics.push(...letterBox());
+        $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+        const offset = player[KEY_OBJECT_FRAME];
+        player[KEY_OBJECT_ON_UPDATE].push(
+          objectAction(
+            2000,
+            (player, progress) => {
+              player.p.y = 200 * easeOutQuad(1 - alternateProgress(progress));
+              player.p.x =
+                $tempPlayerPos.$.x +
+                (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
+              if (Math.round(player.p.x) === -100)
+                $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+            },
+            {
+              [KEY_OBJECT_EVENT_GET_OFFSET]: () => offset,
+            }
+          )
+        );
+      },
+    ],
     [
       (progress) => {
         $backgroundV.$ = 1 + easeOutQuad(progress) * 2;
@@ -223,43 +243,50 @@ export default {
     [() => drawCaption("Can't find the theft."), 500, true],
     [summonTheft(-300, 0, 11)],
     [
-      (progress) => moveTheft(
-        -300 + 100 * progress,
-        200 - 200 * easeInQuad(progress)
-      ),
-      1000
+      (progress) =>
+        moveTheft(-300 + 100 * progress, 200 - 200 * easeInQuad(progress)),
+      1000,
     ],
     [
-      (progress) => moveTheft(
-        -200 + 100 * progress,
-        100 * easeOutQuad(1 - alternateProgress(progress))
-      ),
+      (progress) =>
+        moveTheft(
+          -200 + 100 * progress,
+          100 * easeOutQuad(1 - alternateProgress(progress))
+        ),
       800,
     ],
     [
-      (progress) => moveTheft(
-        -100 + 200 * progress,
-        100 * easeOutQuad(1 - alternateProgress(progress))
-      ),
+      (progress) =>
+        moveTheft(
+          -100 + 200 * progress,
+          100 * easeOutQuad(1 - alternateProgress(progress))
+        ),
       800,
     ],
     [
-      (progress) => moveTheft(
-        100 + 300 * progress,
-        300 * easeOutQuad(1 - alternateProgress(progress))
-      ),
+      (progress) =>
+        moveTheft(
+          100 + 300 * progress,
+          300 * easeOutQuad(1 - alternateProgress(progress))
+        ),
       1200,
     ],
-    [() => {
-      player[KEY_OBJECT_ON_UPDATE].pop();
-      $tempPlayerPos.$ = vector(player.p.x, player.p.y);
-    }],
-    [progress => {
-      player.p.y = 
-        $tempPlayerPos.$.y + 100 * easeOutQuad(1 - alternateProgress(progress * 2));
+    [
+      () => {
+        player[KEY_OBJECT_ON_UPDATE].pop();
+        $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+      },
+    ],
+    [
+      (progress) => {
+        player.p.y =
+          $tempPlayerPos.$.y +
+          100 * easeOutQuad(1 - alternateProgress(progress * 2));
         player.p.x = -100 + 500 * easeOutQuad(progress);
         $backgroundV.$ = 4 + easeOutQuad(progress) * 5;
-    }, 1800],
+      },
+      1800,
+    ],
     [() => effects.push(wipe())],
     [() => {}, 1000],
   ],
