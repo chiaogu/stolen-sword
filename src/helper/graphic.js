@@ -43,10 +43,10 @@ export const wipe = () => effect(0, 0, 2400, (progress) => {
   });
 })
 
-export const ripple = (x, y, maxR, scale = 0.1) => effect(x, y, 3000, (progress, graphic) => {
+export const ripple = (x, y, maxR) => effect(x, y, 3000, (progress, graphic) => {
   graphic.p.x -= $backgroundV.$ * $timeRatio.$;
   const r = transform(maxR) * progress;
-  const color = (a = 0) => `rgba(80,100,120,${a})`;
+  const color = (a = 0) => `rgba(70,90,110,${a})`;
   const drawRipple = (ctx, colors, ...args) => {
     const grad = ctx.createRadialGradient(
       ...transform(graphic.p),

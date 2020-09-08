@@ -107,14 +107,14 @@ export default {
           circularMovement(8000, 100, 30, 3500),
         ]),
         shell('干', -120, 100, [
-          slideIn(2500, -150, -150),
+          slideIn(2500, -150, -250),
           recover(3000, 3),
           circularMovement(5000, 10, 15, 2500),
         ]),
         shell('士', 120, 150, [
           recover(3000, 3),
-          slideIn(3000, 150, -150),
-          circularMovement(6000, 10, 15, 3000),
+          slideIn(3500, 150, -250),
+          circularMovement(6000, 10, 15, 3500),
         ])
       ),
     () => {

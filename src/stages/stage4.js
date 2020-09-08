@@ -131,13 +131,11 @@ export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = '#D8DBE6';
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = createLinearGradient(100, 340,
+    $reflectionGradient.$ = createLinearGradient(-183, 50,
       [
-        [0.295, 'rgba(0,0,0,0)'],
-        [0.3, 'rgb(117,137,160, 0.9)'],
-        [1, '#2b435b'],
-      ]
-    );
+        [0.29, 'rgba(117,137,160,0)'],
+        [0.3, 'rgb(117,137,160, 0.9)']
+      ]);
     player.p.x = -250;
     player.p.y = 400;
     $g.$ = 0;

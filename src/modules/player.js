@@ -24,6 +24,7 @@ import {
   playerTrajectory,
   transform,
   $cameraLoop,
+  $reflectionGradient,
 } from '../state';
 import {
   getActionProgress,
@@ -87,20 +88,19 @@ function drawPlayer(player) {
     }
     ctx.fillRect(...transform(vector(l, t)), transform(player.s.x), height);
 
-    // const waterMask = getWaterMask(player);
-    // if (waterMask) {
-    //   ctx.fillStyle = waterMask.g;
-    //   ctx.fillRect(waterMask.x, waterMask.y, waterMask.w, waterMask.h);
-    // }
+    if ($reflectionGradient.$) {
+      ctx.fillStyle = $reflectionGradient.$;
+      ctx.fillRect(...transform(vector(l - 1, t + 1)), transform(player.s.x + 2), height + 2);
+    }
 
     const reflection = getReflection(player);
     if (reflection) {
-      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.fillStyle = `rgba(255,255,255,${0.1 * reflection.d})`;
       ctx.fillRect(
-        reflection.x,
+        reflection.x - transform(player.s.x / 2),
         reflection.y,
         transform(player.s.x),
-        reflection.h
+        transform(player.s.y)
       );
     }
   });
