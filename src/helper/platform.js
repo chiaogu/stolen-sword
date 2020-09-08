@@ -158,15 +158,13 @@ export const verticalBamboo = (x, y, h) =>
         const { t, b } = getObjectBoundary(platform);
         const startY = b - h;
         const endY = t + h / 2;
-        const grad = ctx.createLinearGradient(
-          ...transform(vector(0, startY)),
-          ...transform(vector(0, endY))
-        );
-        grad.addColorStop(0, 'rgba(221,234,240, 0)');
-        grad.addColorStop(0.2, '#B6D8D2');
-        grad.addColorStop(0.4, '#B6D8D2');
-        grad.addColorStop(0.6, '#4E8F80');
-        grad.addColorStop(0.8, '#B6D8D2');
+        const grad = createLinearGradient(startY, startY - endY, [
+          [0, 'rgba(221,234,240, 0)'],
+          [0.2, '#B6D8D2'],
+          [0.4, '#B6D8D2'],
+          [0.6, '#4E8F80'],
+          [0.8, '#B6D8D2'],
+        ]);
         ctx.strokeStyle = grad;
         ctx.lineWidth = transform(7);
         ctx.setLineDash([transform(80), transform(1)]);

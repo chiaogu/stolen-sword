@@ -321,11 +321,7 @@ export const fire = (interval, startTime = 0) =>
         ]);
         const vm = vectorMagnitude(v);
         vectorOp((v) => (v / vm) * 2, [v], v);
-        projectiles.push(
-          projectile(enemy.p, vector(10, 10), v, {
-            [KEY_PROJECTILE_SORUCE]: enemy,
-          })
-        );
+        projectiles.push(projectile(enemy, v));
       }
     },
     interval,
@@ -342,16 +338,7 @@ export const firework = (amount, interval, startTime = 0) =>
         const v = 2;
         for (let i = 0; i < amount; i++) {
           const theta = (i / amount) * 2 * Math.PI;
-          projectiles.push(
-            projectile(
-              enemy.p,
-              vector(10, 10),
-              vector(v * Math.cos(theta), v * Math.sin(theta)),
-              {
-                [KEY_PROJECTILE_SORUCE]: enemy,
-              }
-            )
-          );
+          projectiles.push(projectile(enemy, vector(v * Math.cos(theta), v * Math.sin(theta))));
         }
       }
     },

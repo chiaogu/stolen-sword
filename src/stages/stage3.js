@@ -88,13 +88,13 @@ export default {
   [KEY_STAGE_WAVES]: [
     () => [
       shell('亞', 75, 50, [
-        slideIn(2000, 270, -40),
-        circularMovement(7000, 0, 90, 2000),
+        slideIn(2500, 270, -40),
+        circularMovement(7000, 0, 90, 2500),
       ]),
     ],
     () => [
       enemy('工', 10, 300, [
-        fire(6000, 3000),
+        fire(6000, 1500),
         slideIn(3500, 0, 550),
         circularMovement(8000, 100, 30, 3500),
       ]),
