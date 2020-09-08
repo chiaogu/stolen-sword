@@ -14,7 +14,9 @@ import {
   $reflectionY,
   effects,
   createLinearGradient,
-  $backgroundColor
+  $backgroundColor,
+  graphics,
+  $theft
 } from '../state';
 import { object, vector, getActionProgress, vectorMagnitude, decompressPath } from '../utils';
 import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
@@ -203,7 +205,7 @@ export const letterBox = () => {
   const height = transform(83);
   const drawLetterbox = graphic => draw(61, ctx => {
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, graphic.p.y, cameraFrameSize.x, height);
+    ctx.fillRect(0, graphic.p.y, cameraFrameSize.x + 5, height);
   });
   return [
     graphic(0, 0, drawLetterbox, [slideIn(3000, 0, -height)]),
@@ -222,3 +224,13 @@ export const drawCaption = text => draw(62, ctx => {
   ctx.fillText(...args);
   ctx.strokeText(...args);
 });
+
+export const summonTheft = (x, y, z) => () => graphics.push($theft.$ = graphic(x, y, graphic => draw(z, ctx => {
+  ctx.fillStyle = '#f00';
+  ctx.fillRect(...transform(graphic.p), transform(20), transform(20));
+}), [checkRipple()]));
+
+export const moveTheft = (x, y) => {
+  $theft.$.p.x = x;
+  $theft.$.p.y = y;
+}

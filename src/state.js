@@ -294,3 +294,6 @@ export const createLinearGradient = (y, h, colors, distance, depth) => {
   colors.forEach(color => grad.addColorStop(...color));
   return grad;
 }
+
+export const $theft = ref();
+export const $tempPlayerPos = ref();

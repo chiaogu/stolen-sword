@@ -14,7 +14,7 @@ import {
 } from '../constants';
 import { easeInQuint, easeInOutQuint, easeInOutQuad, easeOutQuint, easeOutQuad, easeInQuad } from '../easing';
 import {  bug, enemy } from '../helper/enemy';
-import { staticBamboo, wipe, gradient, letterBox, drawCaption } from '../helper/graphic';
+import { staticBamboo, wipe, gradient, letterBox, drawCaption, theft, summonTheft, moveTheft } from '../helper/graphic';
 import {
   boundary,
   followPlayerY,
@@ -38,12 +38,12 @@ import {
   projectiles,
   draw,
   $g,
+  $theft,
+  $tempPlayerPos,
 } from '../state';
 import { object, vectorMagnitude, vector, alternateProgress } from '../utils';
 
 let tempCamCenter;
-let tempPlayerPos;
-
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -116,47 +116,39 @@ export default {
     [() => {
       $cameraLoop.$ = undefined;
       tempCamCenter = vector(cameraCenter.x, cameraCenter.y);
-      tempPlayerPos = vector(player.p.x, player.p.y);
+      $tempPlayerPos.$ = vector(player.p.x, player.p.y);
       graphics.push(...letterBox());
     }],
     [progress => {
       player.p.x =
-        tempPlayerPos.x + (-100 - tempPlayerPos.x) * easeInOutQuad(progress);
+        $tempPlayerPos.$.x + (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
     }, 1000],
     [() => drawCaption('Still not found the theft.'), 500, true],
     [progress => {
       cameraCenter.y = tempCamCenter.y + (player.p.y - tempCamCenter.y - 120) * easeInOutQuad(progress)
     }, 2000],
+    [summonTheft(-56, 2504, 3)],
     [
-      () =>
-        enemies.push(
-          enemy(-56, 2504, 20, 20, {
-            [KEY_OBJECT_Z_INDEX]: 3,
-          })
-        ),
-    ],
-    [
-      (progress) => {
-        enemies[0].p.x = -56 + 135 * progress;
-        enemies[0].p.y =
-        2504 + 96 * easeOutQuad(progress);
-      },
+      (progress) => moveTheft(
+        -56 + 135 * progress,
+        2504 + 96 * easeOutQuad(progress)
+      ),
       500,
     ],
     [
-      (progress) => {
-        enemies[0].p.x = 79 - 141 * progress;
-        enemies[0].p.y =
-        2600 + 100 * easeOutQuad(progress);
-      },
+      (progress) => moveTheft(
+        79 - 141 * progress,
+        2600 + 100 * easeOutQuad(progress)
+      ),
       500,
     ],
     [
       (progress) => {
         progress *= 1.4;
-        enemies[0].p.x = -62 + 248 * progress;
-        enemies[0].p.y =
-          2700 + 100 * easeOutQuad(1 - alternateProgress(progress));
+        moveTheft(
+          -62 + 248 * progress,
+          2700 + 100 * easeOutQuad(1 - alternateProgress(progress))
+        )
       },
       1600,
     ],

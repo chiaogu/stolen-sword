@@ -21,7 +21,7 @@ import {
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad, easeInQuint, easeOutQuint, easeInCirc, easeOutCirc } from '../easing';
 import { chain, enemy, fire, firework, recover, shell, bug } from '../helper/enemy';
-import { gradient, movingMountain, letterBox, drawCaption, wipe } from '../helper/graphic';
+import { gradient, movingMountain, letterBox, drawCaption, wipe, theft, summonTheft, moveTheft } from '../helper/graphic';
 import {
   boundary,
   followPlayerX,
@@ -46,10 +46,10 @@ import {
   player,
   effects,
   createLinearGradient,
+  $theft,
+  $tempPlayerPos,
 } from '../state';
 import { alternateProgress, vector, object, objectAction } from '../utils';
-
-let tempPlayerPos;
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -195,21 +195,21 @@ export default {
     player.v.y = 0;
     player.p.y =
       (1 - easeInQuad(alternateProgress(progress))) * 200 + player.s.y / 2;
-    if (progress == 0) tempPlayerPos = vector(player.p.x, player.p.y);
-    else player.p.x = tempPlayerPos.x * easeInOutQuad(1 - progress);
+    if (progress == 0) $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+    else player.p.x = $tempPlayerPos.$.x * easeInOutQuad(1 - progress);
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
     [() => {
       $g.$ = 0;
       player.v.y = 0;
       graphics.push(...letterBox());
-      tempPlayerPos = vector(player.p.x, player.p.y);
+      $tempPlayerPos.$ = vector(player.p.x, player.p.y);
       const offset = player[KEY_OBJECT_FRAME];
       player[KEY_OBJECT_ON_UPDATE].push(objectAction(2000, (player, progress) => {
         player.p.y = 200 * easeOutQuad(1 - alternateProgress(progress));
         player.p.x =
-          tempPlayerPos.x + (-100 - tempPlayerPos.x) * easeInOutQuad(progress);
-          if(Math.round(player.p.x) === -100) tempPlayerPos = vector(player.p.x, player.p.y);
+          $tempPlayerPos.$.x + (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
+          if(Math.round(player.p.x) === -100) $tempPlayerPos.$ = vector(player.p.x, player.p.y);
       }, {
         [KEY_OBJECT_EVENT_GET_OFFSET]: () => offset
       }));
@@ -221,52 +221,42 @@ export default {
       2000,
     ],
     [() => drawCaption("Can't find the theft."), 500, true],
+    [summonTheft(-300, 0, 11)],
     [
-      () =>
-        enemies.push(
-          enemy(-300, 0, 20, 20, {
-            [KEY_OBJECT_Z_INDEX]: 11,
-          })
-        ),
-    ],
-    [
-      (progress) => {
-        enemies[0].p.x = -300 + 100 * progress;
-        enemies[0].p.y = 200 - 200 * easeInQuad(progress);
-      },
+      (progress) => moveTheft(
+        -300 + 100 * progress,
+        200 - 200 * easeInQuad(progress)
+      ),
       1000
     ],
     [
-      (progress) => {
-        enemies[0].p.x = -200 + 100 * progress;
-        enemies[0].p.y =
-          100 * easeOutQuad(1 - alternateProgress(progress));
-      },
+      (progress) => moveTheft(
+        -200 + 100 * progress,
+        100 * easeOutQuad(1 - alternateProgress(progress))
+      ),
       800,
     ],
     [
-      (progress) => {
-        enemies[0].p.x = -100 + 200 * progress;
-        enemies[0].p.y =
-          100 * easeOutQuad(1 - alternateProgress(progress));
-      },
+      (progress) => moveTheft(
+        -100 + 200 * progress,
+        100 * easeOutQuad(1 - alternateProgress(progress))
+      ),
       800,
     ],
     [
-      (progress) => {
-        enemies[0].p.x = 100 + 300 * progress;
-        enemies[0].p.y =
-          300 * easeOutQuad(1 - alternateProgress(progress));
-      },
+      (progress) => moveTheft(
+        100 + 300 * progress,
+        300 * easeOutQuad(1 - alternateProgress(progress))
+      ),
       1200,
     ],
     [() => {
       player[KEY_OBJECT_ON_UPDATE].pop();
-      tempPlayerPos = vector(player.p.x, player.p.y);
+      $tempPlayerPos.$ = vector(player.p.x, player.p.y);
     }],
     [progress => {
       player.p.y = 
-        tempPlayerPos.y + 100 * easeOutQuad(1 - alternateProgress(progress * 2));
+        $tempPlayerPos.$.y + 100 * easeOutQuad(1 - alternateProgress(progress * 2));
         player.p.x = -100 + 500 * easeOutQuad(progress);
         $backgroundV.$ = 4 + easeOutQuad(progress) * 5;
     }, 1800],

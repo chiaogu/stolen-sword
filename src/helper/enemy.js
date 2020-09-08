@@ -231,7 +231,6 @@ export const enemy = (x, y, w = 30, h = 30, options = {}) => ({
   [KEY_OBJECT_ON_COLLIDED]: handleCollision,
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
   [KEY_OBJECT_Z_INDEX]: 15,
-  [KEY_ENEMY_APPEARANCE]: '勿',
   ...options,
   [KEY_ENEMY_HEALTH]: options[KEY_ENEMY_HEALTH] || 1,
   [KEY_OBJECT_ON_UPDATE]: [
