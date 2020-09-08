@@ -216,10 +216,10 @@ export const letterBox = () => {
 export const drawCaption = text => draw(62, ctx => {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
-  ctx.lineWidth = transform(0.3);
+  ctx.lineWidth = transform(0.5);
   ctx.fillStyle = '#eec918';
   ctx.strokeStyle = '#000';
-  ctx.font = `${transform(20)}px serif`;
+  ctx.font = `${transform(24)}px serif`;
   const args = [text, cameraFrameSize.x / 2, cameraFrameSize.y - transform(120)];
   ctx.fillText(...args);
   ctx.strokeText(...args);

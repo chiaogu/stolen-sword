@@ -88,9 +88,9 @@ export default {
       ),
     () => [
       enemy('火', 0, 350, [
-        slideIn(1000, 250, 400),
+        slideIn(1500, 250, 400),
         fire(3000, 500),
-        circularMovement(10000, 100, 10, 1000),
+        circularMovement(10000, 100, 10, 1500),
       ]),
     ],
     () =>

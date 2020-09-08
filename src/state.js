@@ -297,3 +297,4 @@ export const createLinearGradient = (y, h, colors, distance, depth) => {
 
 export const $theft = ref();
 export const $tempPlayerPos = ref();
+export const $canvasLeftOffset = ref(0);

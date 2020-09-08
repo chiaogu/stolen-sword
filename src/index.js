@@ -1,5 +1,5 @@
 import modules from './modules/index';
-import { $debug } from './state';
+import { $debug, $canvasLeftOffset } from './state';
 import { ASPECT_RATIO, FRAME_DURAITON } from './constants';
 
 const canvas = document.querySelector("canvas");
@@ -19,6 +19,7 @@ function resize() {
   canvas.width = Math.floor(vw * scale);
   canvas.height = Math.floor(vh * scale);
   ctx.scale(scale, scale);
+  $canvasLeftOffset.$ = canvas.getBoundingClientRect().left;
 }
 
 window.addEventListener('resize', () => setTimeout(resize, FRAME_DURAITON));
