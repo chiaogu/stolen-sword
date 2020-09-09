@@ -34,16 +34,8 @@ import {
   vector,
   vectorOp,
   decompressPath,
+  vectorDistance,
 } from '../utils';
-
-function drawPath(ctx, img, color, offset, scale) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  img.p.forEach(p => {
-    ctx.lineTo(...transform(vector(p.x * scale + offset.x, p.y * scale + offset.y)));
-  })
-  ctx.fill();
-}
 
 const rotate = (center, pos, angle) => {
   const cos = Math.cos(angle * 2 * Math.PI);
@@ -59,58 +51,72 @@ const rotate = (center, pos, angle) => {
 //   if(key === '2') i = (i + 1) % parts.length;
 // });
 // setInterval(() => {
-//   draw(0, () => {
-//     if (pressingKeys.has('i')) parts[i][2][parts[i][2].length - 1].y += 0.1;
-//     if (pressingKeys.has('j')) parts[i][2][parts[i][2].length - 1].x += -0.1;
-//     if (pressingKeys.has('k')) parts[i][2][parts[i][2].length - 1].y += -0.1;
-//     if (pressingKeys.has('l')) parts[i][2][parts[i][2].length - 1].x += 0.1;
-//     if (pressingKeys.has('u')) parts[i][3] += 0.001;
-//     if (pressingKeys.has('o')) parts[i][3] -= 0.001;
-//     console.log(i, parts[i][2][parts[i][2].length - 1], parts[i][3])
+//   draw(0, ctx => {
+//     if (pressingKeys.has('i')) parts[i][2][parts[i][2].length - 1][0].y += 0.1;
+//     if (pressingKeys.has('j')) parts[i][2][parts[i][2].length - 1][0].x += -0.1;
+//     if (pressingKeys.has('k')) parts[i][2][parts[i][2].length - 1][0].y += -0.1;
+//     if (pressingKeys.has('l')) parts[i][2][parts[i][2].length - 1][0].x += 0.1;
+//     if (pressingKeys.has('u')) parts[i][2][parts[i][2].length - 1][1] += 0.001;
+//     if (pressingKeys.has('o')) parts[i][2][parts[i][2].length - 1][1] -= 0.001;
+//     console.log(i, parts[i][2][parts[i][2].length - 1])
 //   })
 // }, 16);
 
-const hatImg = decompressPath(`4#+};K1BLild`);
-const faceImg = decompressPath(`F[is'4N`);
-const bodyImg = decompressPath(`ge_G?>GOE4/'~`);
-const rightThigh = decompressPath(`reks&<?;GGK`);
-const rightCalf = decompressPath(`lWHG??GDMG'"ve`);
-const leftThigh = decompressPath(`,te{%=DODOEJ`);
-const leftCalf = decompressPath(`+;Lcgk}r+5G;MGO`);
-const leftHand = decompressPath(` )nN/`);
-const leftUpperArm = decompressPath(`WLjKl&G>=`);
-const rightHand = decompressPath(`,.+Eek"`);
-const rightUpperArm = decompressPath('+??=OO`Od#');
-const sword = decompressPath(`aAeA%B!%''''cggggc`);
+const hatImg = decompressPath(`4#+};K1BLild`, -105, -35);
+const faceImg = decompressPath(`F[is'4N`, -43, -30);
+const bodyImg = decompressPath(`ge_G?>GOE4/'~`, -35, -170);
+const rightThigh = decompressPath(`reks&<?;GGK`, -20, 70);
+const rightCalf = decompressPath(`p'>GDJGG;OJge~`, -50, -115);
+const leftThigh = decompressPath(`,te{%=DODOEJ`, -63, 55);
+const leftCalf = decompressPath(`+;Lcgk}r+5G;MGO`, -57, 60);
+const leftHand = decompressPath(` )nN/`, -15, -20);
+const leftUpperArm = decompressPath(`WLjKl&G>=`, -27, 13);
+const rightHand = decompressPath(`,.+Eek"`, -70, -45);
+const rightUpperArm = decompressPath('+??=OO`Od#', -37, -90);
+const sword = decompressPath(`aAeA%B!%''''cggggc`, -113, 10);
 
-const body = vector(3, 28);
-const head = vector(2.8, -1.6);
-const rightLeg = vector(-5, -31);
-const leftLeg = vector(4, -29.5);
-const rightArm = vector(-5.2, -5.1);
-const leftArm = vector(4.3, -16.6);
+const body = [vector(0, 11.9), 0];
+const head = [vector(0, 12.7), 0];
+const rightLeg = [vector(-2.3, -6.7), 0];
+const leftLeg = [vector(1.9, -7), 0];
+const rightArm = [vector(-5.2, 5.1), 0];
+const leftArm = [vector(5.6, 5.8), 0];
 
 const parts = [
-  [sword, '#111', [body, rightArm, vector(37, -26.4)], 0.216],
+  [sword, '#111', [body, leftArm, [vector(3.9, -14), -1.124]], 0.216],
   [leftUpperArm, '#666', [body, leftArm], 0.108],
-  [leftHand, '#c4c4c4', [body, leftArm, vector(1.4, -10.2)], 0.102],
+  [leftHand, '#c4c4c4', [body, leftArm, [vector(3,-13.7), 0, leftArm]], 0.102],
   [bodyImg, '#333', [body], 0.109],
   [faceImg, '#c4c4c4', [body, head], 0.141],
-  [hatImg, '#333', [body, head, vector(5.5, 2.8)], 0.108],
-  [leftCalf, '#333', [body, leftLeg, vector(2.4, -11.7)], 0.1],
+  [hatImg, '#333', [body, head, [vector(0.2, 3), 0, head]], 0.108],
+  [leftCalf, '#333', [body, leftLeg, [vector(2.9, -12), 0]], 0.1],
   [leftThigh, '#333', [body, leftLeg], 0.1],
-  [rightCalf, '#333', [body, rightLeg, vector(0.3, 6.8)], 0.1],
+  [rightCalf, '#333', [body, rightLeg, [vector(-0.8, -11.9), 0]], 0.1],
   [rightThigh, '#333', [body, rightLeg], 0.108],
   [rightUpperArm, '#888', [body, rightArm], 0.103],
-  [rightHand, '#c4c4c4', [body, rightArm, vector(4.8, -20.5)], 0.1145]
+  [rightHand, '#c4c4c4', [body, rightArm, [vector(0.4, -16.3), 0, rightArm]], 0.1145]
 ];
 
+function drawPath(ctx, img, color, offset, scale, angle) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  img.p.forEach(p => {
+    ctx.lineTo(...transform(rotate(offset, vector(p.x * scale + offset.x, p.y * scale + offset.y), angle)));
+  })
+  ctx.fill();
+}
+
 const drawParts = (ctx, player) => parts.forEach(([img, color, joints, scale]) => {
-  const offset = vectorOp(
-    (playerPos, ...offsets) => playerPos + offsets.reduce((sum, v) => sum + v, 0),
-    [player.p, ...joints]
-  );
-  drawPath(ctx, img, color, offset, scale); 
+  let pos = vector(player.p.x, player.p.y);
+  
+  joints.forEach(([offset], index) => {
+    const prevPos = vector(pos.x, pos.y);
+    pos.x += offset.x;
+    pos.y += offset.y;
+    if(index > 0) pos = rotate(prevPos, pos, joints[index - 1][1]);
+  })
+  const angle = joints[joints.length - 1][2] ? joints[joints.length - 1][2][1] : joints[joints.length - 1][1];
+  drawPath(ctx, img, color, pos, scale, angle); 
 });
 
 function drawCharacter(ctx, player) {
@@ -124,9 +130,9 @@ function drawCharacter(ctx, player) {
   // } else {
   //   ctx.fillStyle = '#000';
   // }
-  // ctx.strokeStyle = '#000';
-  // const { l, t } = getObjectBoundary(player);
-  // ctx.strokeRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
+  ctx.strokeStyle = '#000';
+  const { l, t } = getObjectBoundary(player);
+  ctx.strokeRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
   
   drawParts(ctx, player);
 }
