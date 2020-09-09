@@ -46,8 +46,7 @@ window.addEventListener('touchmove', ({ touches }) => onPressMove(touches[0]));
 window.addEventListener('touchend', ({ touches }) => onPressUp(touches[0]));
 
 export default (ctx) => {
-  // const leftOffset = canvas.getBoundingClientRect().left;
-  // let x = cursorPos.x - leftOffset;
+  // let x = cursorPos.x;
   // let y = cursorPos.y - 10;
   // if (x > cameraFrameSize.x - 40) x -= 40;
   // if (y < 40) y += 60;
@@ -55,11 +54,11 @@ export default (ctx) => {
   // ctx.font = `10px sans-serif`;
   // ctx.fillStyle = '#fff';
   // ctx.fillText(
-  //   `${(cursorPos.x - leftOffset).toFixed()}, ${cursorPos.y.toFixed()}`,
+  //   `${(cursorPos.x).toFixed()}, ${cursorPos.y.toFixed()}`,
   //   x,
   //   y
   // );
-  // const worldPos = detransform(vector(cursorPos.x - leftOffset, cursorPos.y));
+  // const worldPos = detransform(vector(cursorPos.x, cursorPos.y));
   // ctx.fillText(`${worldPos.x.toFixed()}, ${worldPos.y.toFixed()}`, x, y - 15);
 
   if ($isPressing.$) {

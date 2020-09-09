@@ -45,7 +45,7 @@ const ref = (defaultValue) =>
   );
 
 // Player
-export const player = object(0, 0, 20, 20);
+export const player = object(0, 0, 20, 50);
 export const $health = ref(DEFAULT_HEALTH);
 export const $dash = ref(DEFAULT_DASH);
 export const $trajectoryLineOpacity = ref(0);

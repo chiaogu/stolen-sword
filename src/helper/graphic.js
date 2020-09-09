@@ -161,31 +161,31 @@ export const gradient = (y, h, z, distance, colors, depth) => graphic(0, 0, () =
   );
 }));
 
-const mountainSprite = decompressPath(`	qaK^LWZMGGOWGOGGO`);
-mountainSprite.p[0].y = mountainSprite.p[mountainSprite.p.length - 1].y;
+const mountainImg = decompressPath(`	qaK^LWZMGGOWGOGGO`);
+mountainImg.p[0].y = mountainImg.p[mountainImg.p.length - 1].y;
 const getMountainColor = (bright, distance, a = 1) => `rgba(${bright * (0.64 + 0.3 * (1 - distance / 0.3))}, ${bright * (0.8 + 0.1 * (1 - distance / 0.3))}, ${bright}, ${a})`;
 const drawMountain = (x, y, z, scale = 1, distance, fillGradient = true) => {
   let bright = 157 + 70 * (1 - distance / 0.4);
   draw(z, ctx => {
-    ctx.fillStyle = fillGradient ? createLinearGradient(y + 400 * (1 - distance / 0.4),  -mountainSprite.h, [
+    ctx.fillStyle = fillGradient ? createLinearGradient(y + 400 * (1 - distance / 0.4),  -mountainImg.h, [
       [0, getMountainColor(bright * 0.9, distance)],
       [0.1, getMountainColor(bright, distance)]
     ], distance) : getMountainColor(bright, distance);
     ctx.beginPath();
-    mountainSprite.p.forEach(p => {
-      ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainSprite.h / 2) * scale), distance));
+    mountainImg.p.forEach(p => {
+      ctx.lineTo(...transform(vector((x + p.x) * scale, (y + p.y + mountainImg.h / 2) * scale), distance));
     })
     ctx.fill();
     
     if($reflectionY.$ != undefined) {
-      ctx.fillStyle = createLinearGradient(y + 500 * (1 - distance / 0.35),  mountainSprite.h, [
+      ctx.fillStyle = createLinearGradient(y + 500 * (1 - distance / 0.35),  mountainImg.h, [
         [0, getMountainColor(bright * 0.8, distance)],
         [0.1, getMountainColor(bright * 0.9, distance)],
         [1, getMountainColor(bright * 0.9, distance, 0.3)],
       ], distance);
       ctx.beginPath();
-      mountainSprite.p.forEach(p => {
-        ctx.lineTo(...transform(vector((x + p.x) * scale, (y - p.y - mountainSprite.h / 2 + 56) * scale), distance));
+      mountainImg.p.forEach(p => {
+        ctx.lineTo(...transform(vector((x + p.x) * scale, (y - p.y - mountainImg.h / 2 + 56) * scale), distance));
       })
       ctx.fill();
     }
