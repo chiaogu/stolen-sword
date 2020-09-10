@@ -98,7 +98,7 @@ export function playerDamage() {
 }
 export function revive() {
   $health.$ = DEFAULT_HEALTH;
-  delete player[KEY_PLAYER_DEATH_FRAME];
+  player[KEY_PLAYER_DEATH_FRAME] = undefined;
 }
 
 export function resetDash() {
@@ -233,7 +233,7 @@ export function stepTo(callback, shouldStop) {
   return () => removeAnimation(id);
 }
 
-export function slowDown(duration = SLOW_DOWN_DURATION) {
+export function slowDown() {
   if (!cancelTimeRatioAnimation) {
     cancelTimeRatioAnimation = animateTo(
       (ratio) => {
@@ -241,7 +241,7 @@ export function slowDown(duration = SLOW_DOWN_DURATION) {
           NORAML_TIME_RATIO -
           (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * easeOutQuint(ratio);
       },
-      duration,
+      SLOW_DOWN_DURATION,
       easeOutQuint
     );
   }

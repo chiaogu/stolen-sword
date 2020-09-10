@@ -8,9 +8,11 @@ import {
   SIDE_R,
   SIDE_L,
   KEY_PLAYER_ATTACK_FRAME,
-  KEY_PLAYER_STOP_FRAME
+  KEY_PLAYER_STOP_FRAME,
+  KEY_PLAYER_DAMAGE_FRAME,
+  KEY_PLAYER_CHARGE_FRAME
 } from '../constants';
-import { checkRipple } from '../helper/graphic';
+import { checkRipple, wipe } from '../helper/graphic';
 import { setStage } from '../helper/stage';
 import {
   $dash,
@@ -34,6 +36,8 @@ import {
   $backgroundV,
   getReleaseVelocity,
   $playerCollisionSide,
+  slowDown,
+  effects,
 } from '../state';
 import {
   getActionProgress,
@@ -58,6 +62,17 @@ const rotate = (center, pos, angle) => {
   )
 }
 
+// const name = [
+//   'body',
+//   'head',
+//   'rightLeg',
+//   'leftLeg',
+//   'rightArm',
+//   'leftArm',
+//   'leftKnee',
+//   'rightKnee',
+//   'swordJoint',
+// ]
 // let i = 0;
 // window.addEventListener('keydown', ({ key }) => {
 //   if(key === 'c') i = (i + 1) % joints.length;
@@ -69,7 +84,7 @@ const rotate = (center, pos, angle) => {
 // setInterval(() => {
 //   if (pressingKeys.has('z')) joints[i][1] += 0.001;
 //   if (pressingKeys.has('x')) joints[i][1] -= 0.001;
-//   // console.log(name[i], joints.map(([_, angle]) => +angle.toFixed(3)));
+//   console.log(name[i], joints.map(([_, angle]) => +angle.toFixed(3)));
 // }, 16);
 
 const hatImg = decompressPath(`4#+};K1BLild`, -105, -35, 0.108);
@@ -144,23 +159,11 @@ function setAngle(index, angle) {
   joints[index][1] = angle;
 }
 
-// const name = [
-//   'body',
-//   'head',
-//   'rightLeg',
-//   'leftLeg',
-//   'rightArm',
-//   'leftArm',
-//   'leftKnee',
-//   'rightKnee',
-//   'swordJoint',
-// ]
-
-function animateToPose(frameKey, duration, from, to, timing) {
+function animateToPose(frameKey, duration, from, to, timing, removeKey = 1) {
   const progress = getActionProgress(player[KEY_OBJECT_FRAME] - player[frameKey], duration, false);
   if(progress > 1 || !player[frameKey]) {
     setPose(to);
-    player[frameKey] = undefined;
+    if(removeKey) player[frameKey] = undefined;
   } else {
     setPose(from.map((angle, index) => lerp(angle, to[index], timing(progress))));
   }
@@ -196,12 +199,18 @@ function stop() {
   setPose(stoppinAngle);
 }
 
+function die() {
+  animateToPose(KEY_PLAYER_DEATH_FRAME, 1000, damageing, deadAngle, easeOutQuint, false);
+}
+
 const runAngles = [0.109, 0.021, 0.08, -0.13, 0.119, 0.051, 0, 0.148, -0.968];
 const chargingAngle = [0.08, 0, -0.056, -0.068, -0.073, -0.002, 0.231, 0.091, 0.078];
 const idleAngle = [0,0,0,0,0,0,0,0,-1.025];
 const stoppinAngle =  [0.025, 0, -0.109, -0.085, 0.027, -0.027, 0.107, -0.073, -1.062];
 const attacking = [0.069, 0.025, 0.068, -0.235, -0.172, -0.514, 0.066, 0.089, 0.424];
-setPose(attacking);
+const damageing = [-0.072, -0.089, -0.138, -0.148, -0.225, -0.144, -0.054, 0.043, -1.186];
+const deadAngle = [-0.234, -0.275, -0.237, -0.235, -0.218, -0.18, -0.154, -0.183, -1.462];
+// setPose(damageing);
 
 function drawCharacter(ctx, player) {
   // if (isPlayerInvincibleAfterDamage()) {
@@ -219,18 +228,27 @@ function drawCharacter(ctx, player) {
   // const { l, t } = getObjectBoundary(player);
   // ctx.strokeRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
   
-  if($playerCollisionSide.$[SIDE_R]) {
+  
+  if(isPlayerInvincibleAfterDamage())
+    ctx.globalAlpha = Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3 ? 0.1 : 1;
+  
+  const vFacing = player.v.x / Math.abs(player.v.x) || 1;
+  if($isPressing.$) {
+    const { x } = getReleaseVelocity();
+    facing = x / Math.abs(x) || 1;
+  } else if(player[KEY_PLAYER_DEATH_FRAME] || player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME]) {
+    facing = -vFacing;
+  } else if($playerCollisionSide.$[SIDE_R]) {
     facing = 1;
   } else if($playerCollisionSide.$[SIDE_L]) {
     facing = -1;
-  } else if($isPressing.$) {
-    const { x } = getReleaseVelocity();
-    facing = x / Math.abs(x) || 1;
   } else {
-    facing = player.v.x / Math.abs(player.v.x) || 1;
+    facing = vFacing;
   }
 
-  if($playerCollisionSide.$[SIDE_T]) {
+  if(player[KEY_PLAYER_DEATH_FRAME]) {
+    die();
+  } else if($playerCollisionSide.$[SIDE_T]) {
     if(vectorMagnitude(player.v) <= 0.6) {
       if($backgroundV.$ > 0) {
         run();
@@ -241,12 +259,15 @@ function drawCharacter(ctx, player) {
     } else {
       stop();
     }
+  } else if(player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME]) {
+    setPose(damageing);
   } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
     attack();
-  }  else {
+  } else {
     setPose(chargingAngle);
   }
   drawParts(ctx, player);
+  ctx.globalAlpha = 1;
 }
 
 function drawPlayer(player) {
@@ -301,15 +322,10 @@ function drawTrajectory(ctx, player) {
   }
 } 
 
-const getPlayerDeathProgress = player => Math.min(1, getActionProgress(
-  player[KEY_OBJECT_FRAME] - player[KEY_PLAYER_DEATH_FRAME],
-  PLAYER_DEATH_ANIMATION_DURATION,
-  false
-)) || 0;
-
 function update(player) {
   if (!player[KEY_PLAYER_DEATH_FRAME] && $health.$ === 0) {
     player[KEY_PLAYER_DEATH_FRAME] = player[KEY_OBJECT_FRAME];
+    effects.push(wipe());
   }
 
   // gravity pulling

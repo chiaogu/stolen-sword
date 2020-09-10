@@ -11,8 +11,10 @@ import {
   backToNormal,
   isAbleToDash,
   $canvasLeftOffset,
+  player,
 } from '../state';
 import { vector } from '../utils';
+import { KEY_PLAYER_CHARGE_FRAME, KEY_OBJECT_FRAME } from '../constants';
 
 window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
 window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
@@ -30,6 +32,7 @@ function onPressDown({ clientX, clientY }) {
   $isPressing.$ = true;
   resolveClick();
   if(isAbleToDash()) slowDown();
+  player[KEY_PLAYER_CHARGE_FRAME] = player[KEY_OBJECT_FRAME];
 }
 
 function onPressUp() {

@@ -37,6 +37,7 @@ export const KEY_PLAYER_DAMAGE_FRAME = key();
 export const KEY_PLAYER_DEATH_FRAME = key();
 export const KEY_PLAYER_ATTACK_FRAME = key();
 export const KEY_PLAYER_STOP_FRAME = key();
+export const KEY_PLAYER_CHARGE_FRAME = key();
 
 export const KEY_PROJECTILE_IS_COMSUMED = key();
 export const KEY_PROJECTILE_SORUCE = key();
@@ -69,7 +70,7 @@ export const DEFAULT_HEALTH = 2;
 
 export const ENEMY_DEATH_ANIMATION_DURATION = 1000;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
-export const PLAYER_DEATH_ANIMATION_DURATION = 2000;
+export const PLAYER_DEATH_ANIMATION_DURATION = 1000;
 export const STAGE_TRANSITION_DURAION = 100;
 // export const STAGE_TRANSITION_DURAION = 2000;
 
