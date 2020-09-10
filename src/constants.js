@@ -71,8 +71,17 @@ export const DEFAULT_HEALTH = 2;
 export const ENEMY_DEATH_ANIMATION_DURATION = 1000;
 export const PLAYER_DAMAGE_INVINCIBLE_DURAION = 1000;
 export const PLAYER_DEATH_ANIMATION_DURATION = 1000;
-export const STAGE_TRANSITION_DURAION = 100;
-// export const STAGE_TRANSITION_DURAION = 2000;
+// export const STAGE_TRANSITION_DURAION = 100;
+export const STAGE_TRANSITION_DURAION = 2000;
+
+export const POSE_RUN = [0.109, 0.021, 0.08, -0.13, 0.119, 0.051, 0, 0.148, -0.968];
+export const POSE_CHARGE = [0.08, 0, -0.056, -0.068, -0.073, -0.002, 0.231, 0.091, 0.078];
+export const POSE_IDLE = [0,0,0,0,0,0,0,0,-1.025];
+export const POSE_STOP =  [0.025, 0, -0.109, -0.085, 0.027, -0.027, 0.107, -0.073, -1.062];
+export const POSE_ATTACK = [0.069, 0.025, 0.068, -0.235, -0.172, -0.514, 0.066, 0.089, 0.424];
+export const POSE_DAMAGED = [-0.072, -0.089, -0.138, -0.148, -0.225, -0.144, -0.054, 0.043, -1.186];
+export const POSE_DIE = [-0.234, -0.275, -0.237, -0.235, -0.218, -0.18, -0.154, -0.183, -1.462];
+export const POSE_SWIM = [0.107, 0.01, 0.114, 0.119, -0.26, -0.247, 0.104, 0.215, -0.057];
 
 /**
  *  zIndex

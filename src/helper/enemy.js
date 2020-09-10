@@ -60,10 +60,10 @@ import { checkRipple } from './graphic';
 function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
   
-  player[KEY_PLAYER_ATTACK_FRAME] = player[KEY_OBJECT_FRAME];
   if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
     playerDamage();
   } else {
+    player[KEY_PLAYER_ATTACK_FRAME] = player[KEY_OBJECT_FRAME];
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       bounceBack(enemy, enemyBoundary, collidedSide);
     }

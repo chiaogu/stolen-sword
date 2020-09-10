@@ -18,7 +18,7 @@ import {
   graphics,
   $theft
 } from '../state';
-import { object, vector, getActionProgress, vectorMagnitude, decompressPath } from '../utils';
+import { object, vector, getActionProgress, vectorMagnitude, decompressPath, rotate } from '../utils';
 import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
 import { circular, slideIn } from '../animation';
 
@@ -233,4 +233,71 @@ export const summonTheft = (x, y, z) => () => graphics.push($theft.$ = graphic(x
 export const moveTheft = (x, y) => {
   $theft.$.p.x = x;
   $theft.$.p.y = y;
+}
+
+export function drawPath(ctx, img, color, offset, angle, facing, flip) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  img.p.forEach(p => {
+    ctx.lineTo(...transform(rotate(offset, vector(p.x * facing + offset.x, p.y * flip + offset.y), angle)));
+  })
+  ctx.fill();
+}
+
+const hatImg = decompressPath(`4#+};K1BLild`, -105, -35, 0.108);
+const faceImg = decompressPath(`F[is'4N`, -43, -30, 0.141);
+const bodyImg = decompressPath(`ge_G?>GOE4/'~`, -35, -170, 0.109);
+const rightThigh = decompressPath(`reks&<?;GGK`, -20, 70, 0.108);
+const rightCalf = decompressPath(`p'>GDJGG;OJge~`, -50, -115, 0.1);
+const leftThigh = decompressPath(`,te{%=DODOEJ`, -63, 55, 0.1);
+const leftCalf = decompressPath(`+;Lcgk}r+5G;MGO`, -57, 60, 0.1);
+const leftHand = decompressPath(` )nN/`, -15, -20, 0.102);
+const leftUpperArm = decompressPath(`WLjKl&G>=`, -27, 13, 0.108);
+const rightHand = decompressPath(`,.+Eek"`, -70, -45, 0.1145);
+const rightUpperArm = decompressPath('+??=OO`Od#', -37, -90, 0.103);
+const sword = decompressPath(`aAeA%B!%''''cggggc`, -113, 10, 0.216);
+
+export function createSkeletion() {
+  const body = [vector(0, 11.9), 0];
+  const head = [vector(0, 12.7), 0];
+  const rightLeg = [vector(-2.3, -6.7), 0];
+  const leftLeg = [vector(1.9, -7), 0];
+  const rightArm = [vector(-5.2, 5.1), 0];
+  const leftArm = [vector(5.6, 5.8), 0];
+  const leftKnee = [vector(2.9, -12), 0];
+  const rightKnee = [vector(-0.8, -11.9), 0];
+  const swordJoint = [vector(3.9, -14), -1.124];
+  
+  const j = [body, head, rightLeg, leftLeg, rightArm, leftArm, leftKnee, rightKnee, swordJoint];
+  
+  const p = [
+    [leftUpperArm, 0, [j[0], j[5]]],
+    [sword, 1, [j[0], j[5], j[8]]],
+    [leftHand, 2, [j[0], j[5], [vector(3,-13.7), 0, j[5]]]],
+    [bodyImg, 3, [j[0]]],
+    [faceImg, 2, [j[0], j[1]]],
+    [hatImg, 3, [j[0], j[1], [vector(0.2, 3), 0, j[1]]]],
+    [leftCalf, 3, [j[0], j[3], j[6]]],
+    [leftThigh, 3, [j[0], j[3]]],
+    [rightCalf, 3, [j[0], j[2], j[7]]],
+    [rightThigh, 3, [j[0], j[2]]],
+    [rightUpperArm, 4, [j[0], j[4]]],
+    [rightHand, 2, [j[0], j[4], [vector(0.4, -16.3), 0, j[4]]]]
+  ];
+  
+  return {
+    j,
+    d: (ctx, center, colors, facing = 1, flip = 1) => p.forEach(([img, colorIndex, joints]) => {
+      let pos = vector(center.x, center.y);
+      joints.forEach(([offset], index) => {
+        const prevPos = vector(pos.x, pos.y);
+        pos.x += offset.x * facing;
+        pos.y += offset.y * flip;
+        if(index > 0) pos = rotate(prevPos, pos, joints[index - 1][1] * facing * flip);
+      })
+      const angle = joints[joints.length - 1][2] ? joints[joints.length - 1][2][1] : joints[joints.length - 1][1];
+      drawPath(ctx, img, colors[colorIndex], pos, angle * facing * flip, facing, flip); 
+    }),
+    p: angles => angles.forEach((angle, index) => j[index][1] = angle)
+  };
 }

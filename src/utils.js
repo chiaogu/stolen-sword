@@ -184,3 +184,14 @@ export function decompressPath(str, offsetX = 0, offsetY = 0, scale = 1) {
     h: yMax - yMin
   }
 }
+
+export const lerp = (a, b, p) => a + (b - a) * p;
+
+export const rotate = (center, pos, angle) => {
+  const cos = Math.cos(angle * 2 * Math.PI);
+  const sin = Math.sin(angle * 2 * Math.PI);
+  return vector(
+    (cos * (pos.x - center.x)) + (sin * (pos.y - center.y)) + center.x,
+    (cos * (pos.y - center.y)) - (sin * (pos.x - center.x)) + center.y
+  )
+}
