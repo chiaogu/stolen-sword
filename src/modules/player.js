@@ -39,6 +39,7 @@ import {
   slowDown,
   effects,
   $reflectionY,
+  isUnderWater,
 } from '../state';
 import {
   getActionProgress,
@@ -231,9 +232,7 @@ function drawPlayer(player) {
     ctx.globalAlpha = 1;
 
     // water mask
-    if (
-      $reflectionGradient.$ &&
-      getObjectBoundary(player).b <= $reflectionY.$) {
+    if (isUnderWater(player)) {
       drawCharacter(ctx, player.p, defaultColor.map(() => $reflectionGradient.$));
     }
 

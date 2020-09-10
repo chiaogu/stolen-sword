@@ -147,6 +147,8 @@ export const getReflection = object => {
   }
 }
 
+export const isUnderWater = object => $reflectionGradient.$ && getObjectBoundary(object).b <= $reflectionY.$;
+
 export function reflect(value, y, ratio = 1) {
   const scale = cameraFrameSize.y / DEFAULT_FRAME_HEIGHT;
   return [

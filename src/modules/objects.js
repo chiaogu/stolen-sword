@@ -22,6 +22,7 @@ import {
   KEY_PROJECTILE_SORUCE,
   KEY_GRAPHIC_IS_ANIMATION_FINISH
 } from '../constants';
+import { projectile } from '../helper/projectile';
 
 function objectLoop(object, ctx) {
   let collidedSide;
@@ -57,7 +58,8 @@ export default (ctx) => {
     if (
       isOutOfScreen(projectiles[i]) ||
       isSourceDead(projectiles[i]) ||
-      projectiles[i][KEY_PROJECTILE_IS_COMSUMED]
+      projectiles[i][KEY_PROJECTILE_IS_COMSUMED] ||
+      projectiles[i].p.y <= - projectiles[i].s.y
     )
       projectiles.splice(i, 1);
     else objectLoop(projectiles[i], ctx);

@@ -42,6 +42,7 @@ import {
   $reflectionY,
   enemies,
   $reflectionGradient,
+  isUnderWater,
 } from '../state';
 import {
   getActionProgress,
@@ -193,10 +194,7 @@ function drawEnemy(enemy) {
     );
     ctx.fill();
 
-    if (
-      $reflectionGradient.$ &&
-      getObjectBoundary(enemy).b <= $reflectionY.$
-    ) {
+    if (isUnderWater(enemy)) {
       ctx.globalAlpha = 1;
       ctx.fillStyle = $reflectionGradient.$;
       ctx.strokeStyle = $reflectionGradient.$;

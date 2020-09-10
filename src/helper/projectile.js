@@ -11,6 +11,7 @@ import {
   playerDamage,
   transform,
   $reflectionGradient,
+  isUnderWater,
 } from '../state';
 import { getObjectBoundary, object, vector, vectorOp } from '../utils';
 import { checkRipple } from './graphic';
@@ -40,7 +41,7 @@ export const projectile = (enemy, v) => ({
           transform(projectile.s.y)
         );
     
-        if ($reflectionGradient.$) {
+        if (isUnderWater(projectile)) {
           ctx.fillStyle = $reflectionGradient.$;
           ctx.fillRect(
             ...transform(vector(l, t)),
