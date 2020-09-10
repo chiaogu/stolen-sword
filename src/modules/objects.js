@@ -9,7 +9,8 @@ import {
   $stage,
   graphics,
   effects,
-  collision
+  collision,
+  $playerCollisionSide
 } from '../state';
 import {
   KEY_OBJECT_IS_COLLIDED,
@@ -23,16 +24,18 @@ import {
 } from '../constants';
 
 function objectLoop(object, ctx) {
-  // collision
+  let collidedSide;
   if (object[KEY_OBJECT_ON_COLLIDED]) {
     const objBoundary = getObjectBoundary(object);
-    const collidedSide = collision(player, object);
+    collidedSide = collision(player, object);
+    
     object[KEY_OBJECT_IS_COLLIDED] = !!collidedSide;
     object[KEY_OBJECT_ON_COLLIDED](object, objBoundary, collidedSide);
   }
   if (object[KEY_OBJECT_ON_UPDATE])
     object[KEY_OBJECT_ON_UPDATE].forEach((onUpdate) => onUpdate(object, ctx));
   object[KEY_OBJECT_FRAME] += 1 * $timeRatio.$;
+  return collidedSide;
 }
 
 function isSourceDead(projectile) {
@@ -45,8 +48,10 @@ export default (ctx) => {
     if (enemies[i][KEY_ENEMY_IS_DEAD]) enemies.splice(i, 1);
     else objectLoop(enemies[i], ctx);
   }
+  $playerCollisionSide.$ = {};
   for (let i = platforms.length - 1; i >= 0; i--) {
-    objectLoop(platforms[i], ctx);
+    const collsionSide = objectLoop(platforms[i], ctx);
+    if(collsionSide) $playerCollisionSide.$[collsionSide] = 1;
   }
   for (let i = projectiles.length - 1; i >= 0; i--) {
     if (

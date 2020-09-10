@@ -151,7 +151,7 @@ export const objectEvent = (callback, interval, options = {}) => {
   };
 };
 
-export function decompressPath(str, offsetX = 0, offsetY = 0) {
+export function decompressPath(str, offsetX = 0, offsetY = 0, scale = 1) {
   let z = 'charCodeAt';
   let x = 0;
   let y = 0;
@@ -175,6 +175,8 @@ export function decompressPath(str, offsetX = 0, offsetY = 0) {
   result.forEach(p => {
     p.x -= (xMax - xMin) / 2 + offsetX;
     p.y -= (yMax - yMin) / 2 + offsetY;
+    p.x *= scale;
+    p.y *= scale;
   })
   return {
     p: result.splice(1, result.length),

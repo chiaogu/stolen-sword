@@ -25,9 +25,13 @@ function resize() {
 window.addEventListener('resize', () => setTimeout(resize, FRAME_DURAITON));
 resize();
 
+let lastTimeTick;
 function tick() { 
   if(devicePixelRatio != window.devicePixelRatio) resize();
-  modules.map(render => render(ctx));
+  if(!lastTimeTick || (Date.now() - lastTimeTick) >= FRAME_DURAITON / 2) {
+    modules.map(render => render(ctx));
+    lastTimeTick = Date.now();
+  }
   if(!$debug.$) requestAnimationFrame(tick);
 };
 tick();
