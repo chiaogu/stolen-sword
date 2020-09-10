@@ -6,7 +6,9 @@ import {
   PLAYER_DEATH_ANIMATION_DURATION,
   SIDE_T,
   SIDE_R,
-  SIDE_L
+  SIDE_L,
+  KEY_PLAYER_ATTACK_FRAME,
+  KEY_PLAYER_STOP_FRAME
 } from '../constants';
 import { checkRipple } from '../helper/graphic';
 import { setStage } from '../helper/stage';
@@ -45,7 +47,7 @@ import {
   vectorMagnitude,
 } from '../utils';
 import { enemy } from '../helper/enemy';
-import { easeInOutQuint, easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
+import { easeInOutQuint, easeInOutQuad, easeInQuad, easeOutQuad, easeOutQuint, easeInQuint } from '../easing';
 
 const rotate = (center, pos, angle) => {
   const cos = Math.cos(angle * 2 * Math.PI);
@@ -142,11 +144,6 @@ function setAngle(index, angle) {
   joints[index][1] = angle;
 }
 
-function idle() {
-  body[0].y = 11.9;
-  setPose(idleAngle);
-}
-
 // const name = [
 //   'body',
 //   'head',
@@ -159,23 +156,52 @@ function idle() {
 //   'swordJoint',
 // ]
 
+function animateToPose(frameKey, duration, from, to, timing) {
+  const progress = getActionProgress(player[KEY_OBJECT_FRAME] - player[frameKey], duration, false);
+  if(progress > 1 || !player[frameKey]) {
+    setPose(to);
+    player[frameKey] = undefined;
+  } else {
+    setPose(from.map((angle, index) => lerp(angle, to[index], timing(progress))));
+  }
+}
+
+function idle() {
+  body[0].y = 11.9;
+  animateToPose(KEY_PLAYER_STOP_FRAME, 200, stoppinAngle, idleAngle, easeOutQuint);
+}
+
 function run() {
-  if($isPressing.$) setPose(chargingAngle);
-  else setPose(runAngles);
-  const progress = getActionProgress(player[KEY_OBJECT_FRAME], 600);
-  const p = easeInOutQuad(alternateProgress(progress));
-  body[0].y = 4 + 2 * alternateProgress(p);
-  setAngle(2, lerp(runAngles[2], -0.16, p));
-  setAngle(3, lerp(runAngles[3], 0.172, p));
-  setAngle(6, lerp(runAngles[6], 0.2, alternateProgress(easeInQuad(progress))));
-  setAngle(7, lerp(0.2, 0, alternateProgress(easeInQuad(progress))));
+  if(player[KEY_PLAYER_STOP_FRAME]) {
+    animateToPose(KEY_PLAYER_STOP_FRAME, 200, stoppinAngle, runAngles, easeInQuint);
+  } else {
+    if($isPressing.$) setPose(chargingAngle);
+    else setPose(runAngles);
+    const progress = getActionProgress(player[KEY_OBJECT_FRAME], 600);
+    const p = easeInOutQuad(alternateProgress(progress));
+    body[0].y = 4 + 2 * alternateProgress(p);
+    setAngle(2, lerp(runAngles[2], -0.16, p));
+    setAngle(3, lerp(runAngles[3], 0.172, p));
+    setAngle(6, lerp(runAngles[6], 0.2, alternateProgress(easeInQuad(progress))));
+    setAngle(7, lerp(0.2, 0, alternateProgress(easeInQuad(progress))));
+  }
+}
+
+function attack() {
+  animateToPose(KEY_PLAYER_ATTACK_FRAME, 300, attacking, chargingAngle, easeInQuint);
+}
+
+function stop() {
+  player[KEY_PLAYER_STOP_FRAME] = player[KEY_OBJECT_FRAME];
+  setPose(stoppinAngle);
 }
 
 const runAngles = [0.109, 0.021, 0.08, -0.13, 0.119, 0.051, 0, 0.148, -0.968];
-const chargingAngle = [0.08, 0, -0.056, -0.068, -0.073, -0.002, 0.231, 0.091, -0.922];
+const chargingAngle = [0.08, 0, -0.056, -0.068, -0.073, -0.002, 0.231, 0.091, 0.078];
 const idleAngle = [0,0,0,0,0,0,0,0,-1.025];
 const stoppinAngle =  [0.025, 0, -0.109, -0.085, 0.027, -0.027, 0.107, -0.073, -1.062];
-// setPose(stoppinAngle);
+const attacking = [0.069, 0.025, 0.068, -0.235, -0.172, -0.514, 0.066, 0.089, 0.424];
+setPose(attacking);
 
 function drawCharacter(ctx, player) {
   // if (isPlayerInvincibleAfterDamage()) {
@@ -213,9 +239,11 @@ function drawCharacter(ctx, player) {
         idle();
       }
     } else {
-      setPose(stoppinAngle);
+      stop();
     }
-  } else {
+  } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
+    attack();
+  }  else {
     setPose(chargingAngle);
   }
   drawParts(ctx, player);

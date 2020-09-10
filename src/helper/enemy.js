@@ -18,7 +18,7 @@ import {
   KEY_OBJECT_ON_COLLIDED,
   KEY_OBJECT_ON_UPDATE,
   KEY_OBJECT_Z_INDEX,
-  KEY_PROJECTILE_SORUCE,
+  KEY_PLAYER_ATTACK_FRAME,
   SIDE_B,
   SIDE_L,
   SIDE_R,
@@ -62,6 +62,7 @@ function handleCollision(enemy, enemyBoundary, collidedSide) {
   if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
     playerDamage();
   } else {
+    player[KEY_PLAYER_ATTACK_FRAME] = player[KEY_OBJECT_FRAME];
     if (enemy[KEY_ENEMY_IS_DEFENCING]) {
       bounceBack(enemy, enemyBoundary, collidedSide);
     }

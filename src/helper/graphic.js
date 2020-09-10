@@ -147,8 +147,8 @@ export const staticBamboo = (x, y, h, amount, distance, zIndex) => {
 export const movingBamboo = (x, y, h, amount, distance, zIndex = 10) => {
   const drawBamboo = Array(3).fill().map(() => bamboo(x, y, h, amount, distance, zIndex, 100));
   return background((offset, index) => {
-    drawBamboo[index](offset);
-  }, 2 * distance);
+    if(distance < 1 || index !== 1) drawBamboo[index](offset);
+  }, (distance > 1 ? 3 : 2) * distance);
 };
 
 export const gradient = (y, h, z, distance, colors, depth) => graphic(0, 0, () => draw(z, ctx => {
