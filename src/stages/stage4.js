@@ -122,15 +122,16 @@ export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = '#D8DBE6';
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = createLinearGradient(-183, 50, [
-      [0.29, 'rgba(117,137,160,0)'],
-      [0.3, 'rgb(117,137,160, 0.9)'],
-    ]);
     player.p.x = -250;
     player.p.y = 400;
     $g.$ = 0;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
+      $reflectionGradient.$ = createLinearGradient(0, 300, [
+        [0, 'rgba(0,0,0,0)'],
+        [0.01, 'rgb(117,137,160, 0.9)'],
+        [0.9, '#2b435b'],
+      ]);
       cameraCenter.y = Math.max(
         player.p.y - player.s.y / 2,
         Math.min(200, cameraCenter.y)

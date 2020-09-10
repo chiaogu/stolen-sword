@@ -38,6 +38,7 @@ import {
   $playerCollisionSide,
   slowDown,
   effects,
+  $reflectionY,
 } from '../state';
 import {
   getActionProgress,
@@ -110,19 +111,21 @@ const leftKnee = [vector(2.9, -12), 0];
 const rightKnee = [vector(-0.8, -11.9), 0];
 const swordJoint = [vector(3.9, -14), -1.124];
 
+const defaultColor = ['#666', '#111', '#c4c4c4', '#333', '#888'];
+
 const parts = [
-  [leftUpperArm, '#666', [body, leftArm]],
-  [sword, '#111', [body, leftArm, swordJoint]],
-  [leftHand, '#c4c4c4', [body, leftArm, [vector(3,-13.7), 0, leftArm]]],
-  [bodyImg, '#333', [body]],
-  [faceImg, '#c4c4c4', [body, head]],
-  [hatImg, '#333', [body, head, [vector(0.2, 3), 0, head]]],
-  [leftCalf, '#333', [body, leftLeg, leftKnee]],
-  [leftThigh, '#333', [body, leftLeg]],
-  [rightCalf, '#333', [body, rightLeg, rightKnee]],
-  [rightThigh, '#333', [body, rightLeg]],
-  [rightUpperArm, '#888', [body, rightArm]],
-  [rightHand, '#c4c4c4', [body, rightArm, [vector(0.4, -16.3), 0, rightArm]]]
+  [leftUpperArm, 0, [body, leftArm]],
+  [sword, 1, [body, leftArm, swordJoint]],
+  [leftHand, 2, [body, leftArm, [vector(3,-13.7), 0, leftArm]]],
+  [bodyImg, 3, [body]],
+  [faceImg, 2, [body, head]],
+  [hatImg, 3, [body, head, [vector(0.2, 3), 0, head]]],
+  [leftCalf, 3, [body, leftLeg, leftKnee]],
+  [leftThigh, 3, [body, leftLeg]],
+  [rightCalf, 3, [body, rightLeg, rightKnee]],
+  [rightThigh, 3, [body, rightLeg]],
+  [rightUpperArm, 4, [body, rightArm]],
+  [rightHand, 2, [body, rightArm, [vector(0.4, -16.3), 0, rightArm]]]
 ];
 const joints = [body, head, rightLeg, leftLeg, rightArm, leftArm, leftKnee, rightKnee, swordJoint];
 
@@ -130,25 +133,25 @@ const lerp = (a, b, p) => a + (b - a) * p;
 
 let facing = 1;
 
-function drawPath(ctx, img, color, offset, angle) {
+function drawPath(ctx, img, color, offset, angle, flip) {
   ctx.fillStyle = color;
   ctx.beginPath();
   img.p.forEach(p => {
-    ctx.lineTo(...transform(rotate(offset, vector(p.x * facing + offset.x, p.y + offset.y), angle)));
+    ctx.lineTo(...transform(rotate(offset, vector(p.x * facing + offset.x, p.y * flip + offset.y), angle)));
   })
   ctx.fill();
 }
 
-const drawParts = (ctx, player) => parts.forEach(([img, color, joints]) => {
-  let pos = vector(player.p.x, player.p.y);
+const drawCharacter = (ctx, center, colors, flip = 1) => parts.forEach(([img, colorIndex, joints]) => {
+  let pos = vector(center.x, center.y);
   joints.forEach(([offset], index) => {
     const prevPos = vector(pos.x, pos.y);
     pos.x += offset.x * facing;
-    pos.y += offset.y;
-    if(index > 0) pos = rotate(prevPos, pos, joints[index - 1][1] * facing);
+    pos.y += offset.y * flip;
+    if(index > 0) pos = rotate(prevPos, pos, joints[index - 1][1] * facing * flip);
   })
   const angle = joints[joints.length - 1][2] ? joints[joints.length - 1][2][1] : joints[joints.length - 1][1];
-  drawPath(ctx, img, color, pos, angle * facing); 
+  drawPath(ctx, img, colors[colorIndex], pos, angle * facing * flip, flip); 
 });
 
 function setPose(angles) {
@@ -210,90 +213,39 @@ const stoppinAngle =  [0.025, 0, -0.109, -0.085, 0.027, -0.027, 0.107, -0.073, 
 const attacking = [0.069, 0.025, 0.068, -0.235, -0.172, -0.514, 0.066, 0.089, 0.424];
 const damageing = [-0.072, -0.089, -0.138, -0.148, -0.225, -0.144, -0.054, 0.043, -1.186];
 const deadAngle = [-0.234, -0.275, -0.237, -0.235, -0.218, -0.18, -0.154, -0.183, -1.462];
-// setPose(damageing);
-
-function drawCharacter(ctx, player) {
-  // if (isPlayerInvincibleAfterDamage()) {
-  //   ctx.fillStyle =
-  //     Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3
-  //       ? 'rgba(255,255,255, 0.1)'
-  //       : '#000';
-  // } else if ($dash.$ === 0) {
-  //   ctx.fillStyle = '#444';
-  // } else {
-  //   ctx.fillStyle = '#000';
-  // }
-  // ctx.lineWidth = 1;
-  // ctx.strokeStyle = '#000';
-  // const { l, t } = getObjectBoundary(player);
-  // ctx.strokeRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
-  
-  
-  if(isPlayerInvincibleAfterDamage())
-    ctx.globalAlpha = Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3 ? 0.1 : 1;
-  
-  const vFacing = player.v.x / Math.abs(player.v.x) || 1;
-  if($isPressing.$) {
-    const { x } = getReleaseVelocity();
-    facing = x / Math.abs(x) || 1;
-  } else if(player[KEY_PLAYER_DEATH_FRAME] || player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME]) {
-    facing = -vFacing;
-  } else if($playerCollisionSide.$[SIDE_R]) {
-    facing = 1;
-  } else if($playerCollisionSide.$[SIDE_L]) {
-    facing = -1;
-  } else {
-    facing = vFacing;
-  }
-
-  if(player[KEY_PLAYER_DEATH_FRAME]) {
-    die();
-  } else if($playerCollisionSide.$[SIDE_T]) {
-    if(vectorMagnitude(player.v) <= 0.6) {
-      if($backgroundV.$ > 0) {
-        run();
-        facing = 1;
-      } else {
-        idle();
-      }
-    } else {
-      stop();
-    }
-  } else if(player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME]) {
-    setPose(damageing);
-  } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
-    attack();
-  } else {
-    setPose(chargingAngle);
-  }
-  drawParts(ctx, player);
-  ctx.globalAlpha = 1;
-}
+setPose(attacking);
 
 function drawPlayer(player) {
   draw(26, (ctx) => drawTrajectory(ctx, player));
   draw(25, (ctx) => {
-    
     // draw character
-    drawCharacter(ctx, player);
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = '#000';
+    // const { l, t } = getObjectBoundary(player);
+    // ctx.strokeRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
+  
+    if(isPlayerInvincibleAfterDamage()) {
+      ctx.globalAlpha = Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3 ? 0.1 : 1;
+    }
+    drawCharacter(ctx, player.p, defaultColor);
+    ctx.globalAlpha = 1;
 
     // water mask
-    // if ($reflectionGradient.$) {
-    //   ctx.fillStyle = $reflectionGradient.$;
-    //   ctx.fillRect(...transform(vector(l - 1, t + 1)), transform(player.s.x + 2), height + 2);
-    // }
+    if (
+      $reflectionGradient.$ &&
+      getObjectBoundary(player).b <= $reflectionY.$) {
+      drawCharacter(ctx, player.p, defaultColor.map(() => $reflectionGradient.$));
+    }
 
     // reflection
-    // const reflection = getReflection(player);
-    // if (reflection) {
-    //   ctx.fillStyle = `rgba(255,255,255,${0.1 * reflection.d})`;
-    //   ctx.fillRect(
-    //     reflection.x - transform(player.s.x / 2),
-    //     reflection.y,
-    //     transform(player.s.x),
-    //     transform(player.s.y)
-    //   );
-    // }
+    if ($reflectionY.$ !== undefined) {
+      ctx.globalAlpha = 0.3 * easeInQuad(Math.max(0, Math.min(1, player.p.y / player.s.y * 2)));
+      drawCharacter(ctx, vector(
+        player.p.x,
+        -player.p.y
+      ), defaultColor, -1);
+      ctx.globalAlpha = 1;
+    }
   });
 }
 
@@ -323,6 +275,7 @@ function drawTrajectory(ctx, player) {
 } 
 
 function update(player) {
+  // check death
   if (!player[KEY_PLAYER_DEATH_FRAME] && $health.$ === 0) {
     player[KEY_PLAYER_DEATH_FRAME] = player[KEY_OBJECT_FRAME];
     effects.push(wipe());
@@ -334,6 +287,43 @@ function update(player) {
   // update position
   vectorOp((pos, v) => pos + v * $timeRatio.$, [player.p, player.v], player.p);
   if($cameraLoop.$) $cameraLoop.$();
+  
+  // update facing
+  const vFacing = player.v.x / Math.abs(player.v.x) || 1;
+  if($isPressing.$) {
+    const { x } = getReleaseVelocity();
+    facing = x / Math.abs(x) || 1;
+  } else if(player[KEY_PLAYER_DEATH_FRAME] || player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME]) {
+    facing = -vFacing;
+  } else if($playerCollisionSide.$[SIDE_R]) {
+    facing = 1;
+  } else if($playerCollisionSide.$[SIDE_L]) {
+    facing = -1;
+  } else {
+    facing = vFacing;
+  }
+
+  // update pose
+  if(player[KEY_PLAYER_DEATH_FRAME]) {
+    die();
+  } else if($playerCollisionSide.$[SIDE_T]) {
+    if(vectorMagnitude(player.v) <= 0.6) {
+      if($backgroundV.$ > 0) {
+        run();
+        facing = 1;
+      } else {
+        idle();
+      }
+    } else {
+      stop();
+    }
+  } else if(player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME] && isPlayerInvincibleAfterDamage()) {
+    setPose(damageing);
+  } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
+    attack();
+  } else {
+    setPose(chargingAngle);
+  }
 }
 
 const death = objectEvent(

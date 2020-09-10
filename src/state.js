@@ -30,7 +30,7 @@ import {
   isGoingThrough,
   getClosetSide,
 } from './utils';
-import { easeOutQuint } from './easing';
+import { easeOutQuint, easeOutQuad, easeInQuad } from './easing';
 
 const ref = (defaultValue) =>
   new Proxy(
@@ -143,7 +143,7 @@ export const $cameraZoom = ref(1);
 export const getReflection = object => {
   if($reflectionY.$ !== undefined && object.p.y > $reflectionY.$) {
     const [x, y] = reflect(object.p, $reflectionY.$);
-    return { x: x - Math.random() * 4 * $timeRatio.$, y, d: Math.min(1, (object.p.y - $reflectionY.$) / object.s.y * 2) }
+    return { x: x - Math.random() * 4 * $timeRatio.$, y, d: easeInQuad(Math.min(1, (object.p.y - $reflectionY.$) / object.s.y * 2)) }
   }
 }
 

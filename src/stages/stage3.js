@@ -55,11 +55,6 @@ export default {
     $maxReleaseVelocity.$ = 12;
     cameraCenter.y = player.p.y + 100;
     $reflectionY.$ = 0;
-    $reflectionGradient.$ = createLinearGradient(100, 340, [
-      [0.29, 'rgba(117,137,160,0)'],
-      [0.3, 'rgb(117,137,160, 0.9)'],
-      [1, '#2b435b'],
-    ]);
     $backgroundV.$ = 0.5;
     $backgroundColor.$ = '#D8DBE6';
     player.p.x = -DEFAULT_FRAME_WIDTH;
@@ -68,6 +63,11 @@ export default {
         player.p.y - player.s.y / 2 - 100,
         Math.min(100, cameraCenter.y)
       );
+      $reflectionGradient.$ = createLinearGradient(0, 300, [
+        [0, 'rgba(0,0,0,0)'],
+        [0.01, 'rgb(117,137,160, 0.9)'],
+        [0.9, '#2b435b'],
+      ]);
     };
     graphics.push(
       gradient(1100, 1350, 10, 0.1, [
