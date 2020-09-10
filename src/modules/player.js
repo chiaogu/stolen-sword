@@ -207,6 +207,16 @@ function die() {
   animateToPose(KEY_PLAYER_DEATH_FRAME, 1000, damageing, deadAngle, easeOutQuint, false);
 }
 
+function swim() {
+  setPose(swimAngle2);
+  const progress = getActionProgress(player[KEY_OBJECT_FRAME], 600);
+  const p = easeInOutQuad(alternateProgress(progress));
+  setAngle(2, lerp(swimAngle2[2], 0.032, p));
+  setAngle(3, lerp(swimAngle2[3], 0.2, p));
+  setAngle(6, lerp(swimAngle2[6], 0.246, alternateProgress(easeInQuad(progress))));
+  setAngle(7, lerp(swimAngle2[7], 0.134, alternateProgress(easeInQuad(progress))));
+}
+
 const runAngles = [0.109, 0.021, 0.08, -0.13, 0.119, 0.051, 0, 0.148, -0.968];
 const chargingAngle = [0.08, 0, -0.056, -0.068, -0.073, -0.002, 0.231, 0.091, 0.078];
 const idleAngle = [0,0,0,0,0,0,0,0,-1.025];
@@ -214,7 +224,7 @@ const stoppinAngle =  [0.025, 0, -0.109, -0.085, 0.027, -0.027, 0.107, -0.073, 
 const attacking = [0.069, 0.025, 0.068, -0.235, -0.172, -0.514, 0.066, 0.089, 0.424];
 const damageing = [-0.072, -0.089, -0.138, -0.148, -0.225, -0.144, -0.054, 0.043, -1.186];
 const deadAngle = [-0.234, -0.275, -0.237, -0.235, -0.218, -0.18, -0.154, -0.183, -1.462];
-setPose(attacking);
+const swimAngle2 = [0.107, 0.01, 0.114, 0.119, -0.26, -0.247, 0.104, 0.215, -0.057];
 
 function drawPlayer(player) {
   draw(26, (ctx) => drawTrajectory(ctx, player));
@@ -240,7 +250,7 @@ function drawPlayer(player) {
     if ($reflectionY.$ !== undefined) {
       ctx.globalAlpha = 0.3 * easeInQuad(Math.max(0, Math.min(1, player.p.y / player.s.y * 2)));
       drawCharacter(ctx, vector(
-        player.p.x,
+        player.p.x - Math.random() * 4 * $timeRatio.$,
         -player.p.y
       ), defaultColor, -1);
       ctx.globalAlpha = 1;
@@ -305,6 +315,10 @@ function update(player) {
   // update pose
   if(player[KEY_PLAYER_DEATH_FRAME]) {
     die();
+  } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
+    attack();
+  } else if(player.p.y < $reflectionY.$) {
+    swim();
   } else if($playerCollisionSide.$[SIDE_T]) {
     if(vectorMagnitude(player.v) <= 0.6) {
       if($backgroundV.$ > 0) {
@@ -318,11 +332,11 @@ function update(player) {
     }
   } else if(player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME] && isPlayerInvincibleAfterDamage()) {
     setPose(damageing);
-  } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
-    attack();
   } else {
     setPose(chargingAngle);
   }
+  
+  defaultColor[2] = ($health.$ == 2 ? '#c4c4c4' : '#ec5751');
 }
 
 const death = objectEvent(
