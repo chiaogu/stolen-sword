@@ -52,6 +52,7 @@ import {
 import { alternateProgress, vector, getActionProgress, lerp } from '../utils';
 
 let tempStateFrame;
+const getAliveEnemies = () => enemies.filter(enemy => !enemy[KEY_ENEMY_DEAD_FRAME]);
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -91,7 +92,7 @@ export default {
               0.5 * easeOutQuad(progress)
             )
           }
-          if(enemies.length === 0) graphics.pop();
+          if(getAliveEnemies().length === 0) graphics.pop();
         })));
       }
       return [
@@ -104,20 +105,27 @@ export default {
     () => {
       if(needTutorial) {
         let flag = false;
+        let prevEnemyCount;
         graphics.push(graphic(0,0, () => draw(61, () => {
+          const aliveEnemies = getAliveEnemies();
+          if(aliveEnemies.length === 0) return graphics.pop();
           if(flag) {
             const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - tempStateFrame, 1500 * $timeRatio.$);
             drawDragTrack(
-              ...transform(vector(123, 16)),
+              ...transform(vector(120, -5)),
               ...transform(vector(
-                lerp(120, 120 + (player.p.x - enemies[0].p.x) / 3, easeInOutQuint(progress)),
-                lerp(-5, -154 + (player.p.y - enemies[0].p.y) / 3, easeInOutQuint(progress))
+                lerp(120, 120 + (player.p.x - aliveEnemies[0].p.x) / 3, easeInOutQuint(progress)),
+                lerp(-5, -154 + (player.p.y - aliveEnemies[0].p.y) / 3, easeInOutQuint(progress))
               )),
               0.5 * easeOutQuad(progress)
             )
             if(player.p.y <= 120) {
               flag = false;
-              backToNormal();
+              if(!$isPressing.$) backToNormal();
+            }
+            if(prevEnemyCount != aliveEnemies.length && aliveEnemies.length == 1) {
+              slowDown(0.01);
+              prevEnemyCount = aliveEnemies.length;
             }
           } else {
             if(player.p.y > 160 && Math.abs(player.v.y) < 1) {
@@ -126,7 +134,6 @@ export default {
               tempStateFrame = $stage.$[KEY_OBJECT_FRAME];
             }
           }
-          if(enemies.length === 0) graphics.pop();
         })));
       }
       return [

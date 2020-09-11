@@ -128,6 +128,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
     // update pose
     if(player[KEY_PLAYER_DEATH_FRAME]) {
       // die
+      skeleton.j[0][0].y = -25;
       animateToPose(KEY_PLAYER_DEATH_FRAME, 1000, POSE_DAMAGED, POSE_DIE, easeOutQuint, false);
     } else if(player[KEY_PLAYER_ATTACK_FRAME]) {
       // attack

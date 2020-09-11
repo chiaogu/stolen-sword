@@ -157,7 +157,7 @@ const checkTransition = objectEvent(
         stage[KEY_STAGE_TRANSITION_FRAME] === undefined
           ? KEY_OBJECT_FRAME
           : KEY_STAGE_TRANSITION_FRAME
-      ] - 1,
+      ],
   }
 );
 

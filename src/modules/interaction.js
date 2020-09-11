@@ -19,8 +19,8 @@ import { vector } from '../utils';
 import { KEY_PLAYER_CHARGE_FRAME, KEY_OBJECT_FRAME } from '../constants';
 import { drawDragTrack } from '../helper/graphic';
 
-window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
-window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
+// window.addEventListener('keydown', ({ key }) => pressingKeys.add(key));
+// window.addEventListener('keyup', ({ key }) => pressingKeys.delete(key));
 
 function onPressMove({ clientX, clientY }) {
   cursorPos.x = clientX - $canvasLeftOffset.$;

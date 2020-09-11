@@ -156,16 +156,13 @@ function drawEnemy(enemy) {
       (!enemy[KEY_ENEMY_IS_UNTOUCHABLE] && enemy[KEY_ENEMY_COMPUND_PARENT]
         ? 0.3
         : 1);
-    ctx.shadowBlur = 3;
-    ctx.shadowColor = color;
     ctx.fillStyle = color;
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.font = `bold ${transform(36)}px sans-serif`;
     ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
     drawEnemyShell(ctx, enemy, 4);
-    ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
     
     const angle = vectorAngle(enemy.p, player.p) / Math.PI / 2;
