@@ -220,12 +220,10 @@ export const letterBox = () => {
 }
 
 export const drawCaption = text => draw(62, ctx => {
-  ctx.textBaseline = 'middle';
-  ctx.textAlign = 'center';
-  ctx.lineWidth = transform(0.5);
+  ctx.lineWidth = transform(0.7);
   ctx.fillStyle = '#eec918';
-  ctx.strokeStyle = '#000';
-  ctx.font = `${transform(24)}px serif`;
+  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+  ctx.font = `${transform(22)}px serif`;
   const args = [text, cameraFrameSize.x / 2, cameraFrameSize.y - transform(120)];
   ctx.fillText(...args);
   ctx.strokeText(...args);

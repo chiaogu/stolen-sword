@@ -110,15 +110,17 @@ export default {
           const aliveEnemies = getAliveEnemies();
           if(aliveEnemies.length === 0) return graphics.pop();
           if(flag) {
-            const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - tempStateFrame, 1500 * $timeRatio.$);
-            drawDragTrack(
-              ...transform(vector(120, -5)),
-              ...transform(vector(
-                lerp(120, 120 + (player.p.x - aliveEnemies[0].p.x) / 3, easeInOutQuint(progress)),
-                lerp(-5, -154 + (player.p.y - aliveEnemies[0].p.y) / 3, easeInOutQuint(progress))
-              )),
-              0.5 * easeOutQuad(progress)
-            )
+            if(!$isPressing.$) {
+              const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - tempStateFrame, 1500 * $timeRatio.$);
+              drawDragTrack(
+                ...transform(vector(120, -5)),
+                ...transform(vector(
+                  lerp(120, 120 + (player.p.x - aliveEnemies[0].p.x) / 3, easeInOutQuint(progress)),
+                  lerp(-5, -154 + (player.p.y - aliveEnemies[0].p.y) / 3, easeInOutQuint(progress))
+                )),
+                0.5 * easeOutQuad(progress)
+              )
+            }
             if(player.p.y <= 120) {
               flag = false;
               if(!$isPressing.$) backToNormal();
@@ -207,7 +209,7 @@ export default {
       },
       2000,
     ],
-    [() => drawCaption("Can't find the theft."), 500, true],
+    [() => drawCaption("Can't find the theft. I think I lost him."), 500, true],
     [summonTheft(-260, 100, 9)],
     [
       (progress) =>

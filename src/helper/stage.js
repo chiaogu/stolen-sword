@@ -17,6 +17,10 @@ import {
   KEY_STAGE_WAVES,
   MAX_RELEASE_VELOCITY,
   STAGE_TRANSITION_DURAION,
+  KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER,
+  KEY_GAME_START_KEY,
+  KEY_SAVE_STAGE,
+  KEY_SAVE_WAVE
 } from '../constants';
 import stages from '../stages/index';
 import {
@@ -38,13 +42,90 @@ import {
   projectiles,
   revive,
   waitForClick,
+  $isGameStarted,
+  draw,
+  $timeRatio,
+  load,
+  save,
 } from '../state';
 import { getActionProgress, object, objectEvent, vectorOp } from '../utils';
+import { graphic } from './graphic';
+
+const initialWave = +load(KEY_SAVE_WAVE) || 0;
 
 const creatStage = (config) => ({
   ...object(),
   ...config,
-  [KEY_OBJECT_ON_UPDATE]: [update, checkTransition],
+  [KEY_OBJECT_ON_UPDATE]: [
+    stage => {
+      if ($stageWave.$ === -1 && $stageNextWave.$ !== initialWave) {
+        if($isGameStarted.$) setWave(initialWave);
+      } else if ($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
+        const [callback, duration = FRAME_DURAITON, wait] = stage[
+          KEY_STAGE_ENDING_CUT_SCENE
+        ][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
+        const frameDiff =
+          stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
+        if (frameDiff >= Math.round(duration / FRAME_DURAITON)) {
+          stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
+          const nextAnimation = () => {
+            if (
+              stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] <
+              stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1
+            ) {
+              stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
+              stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
+              stage[KEY_STAGE_ENDING_CUT_SCENE][
+                stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]
+              ][0](0);
+            } else {
+              setStage($stageIndex.$ + 1);
+            }
+          };
+          if (wait) {
+            waitForClick(
+              `${KEY_STAGE_ENDING_CUT_SCENE_KEY}${$stageIndex.$}${stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]}`,
+              nextAnimation
+            );
+          } else {
+            nextAnimation();
+          }
+        } else {
+          callback(getActionProgress(frameDiff, duration));
+        }
+      } else if (stage[KEY_STAGE_TRANSITION_FRAME] !== undefined) {
+        const progress = getActionProgress(
+          stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_TRANSITION_FRAME],
+          STAGE_TRANSITION_DURAION,
+          false
+        );
+        if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](Math.max(0, Math.min(1, progress)));
+      } else {
+        if (
+          !player[KEY_PLAYER_DEATH_FRAME] &&
+          stage[KEY_STAGE_IS_WAVE_CLEAN] &&
+          stage[KEY_STAGE_IS_WAVE_CLEAN]()
+        ) {
+          ($stageWave.$ === stage[KEY_STAGE_WAVES].length - 1 ? _setWave : setWave)(
+            $stageWave.$ + 1
+          );
+        }
+      }
+    },
+    objectEvent(
+      () => _setWave($stageNextWave.$),
+      STAGE_TRANSITION_DURAION,
+      {
+        [KEY_OBJECT_EVENT_GET_OFFSET]: (stage) =>
+          stage[
+            stage[KEY_STAGE_TRANSITION_FRAME] === undefined
+              ? KEY_OBJECT_FRAME
+              : KEY_STAGE_TRANSITION_FRAME
+          ] - 1,
+        [KEY_OBJECT_EVENT_FIRST_FRAME_TRIGGER]: true
+      }
+    )
+  ],
   [KEY_STAGE_ENDING_CUT_SCENE_INDEX]: 0,
   [KEY_STAGE_ENDING_CUT_SCENE_FRAME]: 0,
   [KEY_STAGE_ENDING_CUT_SCENE]: [
@@ -63,6 +144,8 @@ function _setWave(wave) {
   delete $stage.$[KEY_STAGE_TRANSITION_FRAME];
   enemies.splice(0, enemies.length);
   $stageWave.$ = wave;
+  save(KEY_SAVE_WAVE, wave);
+  console.log(wave)
   if ($stage.$[KEY_STAGE_WAVES][wave])
     enemies.push(...$stage.$[KEY_STAGE_WAVES][wave]());
 }
@@ -89,79 +172,32 @@ export function setStage(stageIndex, wave) {
     if (wave) setWave(wave);
     else $stageWave.$ = -1;
     $stage.$[KEY_STAGE_INITIATE]();
+    save(KEY_SAVE_STAGE, stageIndex);
   }
-}
-
-function update(stage) {
-  if ($stageWave.$ === -1 && $stageNextWave.$ !== 0) {
-    waitForClick(`${KEY_STAGE_START_KEY}${$stageIndex.$}`, () => setWave(0));
-  } else if ($stageWave.$ === stage[KEY_STAGE_WAVES].length) {
-    const [callback, duration = FRAME_DURAITON, wait] = stage[
-      KEY_STAGE_ENDING_CUT_SCENE
-    ][stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]];
-    const frameDiff =
-      stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME];
-    if (frameDiff >= Math.round(duration / FRAME_DURAITON)) {
-      stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
-      const nextAnimation = () => {
-        if (
-          stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX] <
-          stage[KEY_STAGE_ENDING_CUT_SCENE].length - 1
-        ) {
-          stage[KEY_STAGE_ENDING_CUT_SCENE_FRAME] = stage[KEY_OBJECT_FRAME];
-          stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]++;
-          stage[KEY_STAGE_ENDING_CUT_SCENE][
-            stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]
-          ][0](0);
-        } else {
-          setStage($stageIndex.$ + 1);
-        }
-      };
-      if (wait) {
-        waitForClick(
-          `${KEY_STAGE_ENDING_CUT_SCENE_KEY}${$stageIndex.$}${stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]}`,
-          nextAnimation
-        );
+  if(!$isGameStarted.$) {
+    let startFrame;
+    const title = graphic(0,0,() => draw(61, ctx => {
+      if(startFrame != undefined) {
+        const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - startFrame, 1000, false);
+        if(progress >= 1) return graphics.splice(graphics.indexOf(title), 1);
+        ctx.fillStyle = `rgba(0,0,0,${1 - progress})`;
       } else {
-        nextAnimation();
+        const progress = Math.min(1, getActionProgress($stage.$[KEY_OBJECT_FRAME], 2000, false));
+        if(progress >= 1) {
+          waitForClick(KEY_GAME_START_KEY, () => {
+            $isGameStarted.$ = true;
+            startFrame = $stage.$[KEY_OBJECT_FRAME];
+          })
+        }
+        ctx.fillStyle = `rgba(0,0,0,${progress})`;
       }
-    } else {
-      callback(getActionProgress(frameDiff, duration));
-    }
-  } else if (stage[KEY_STAGE_TRANSITION_FRAME] !== undefined) {
-    const progress = getActionProgress(
-      stage[KEY_OBJECT_FRAME] - stage[KEY_STAGE_TRANSITION_FRAME],
-      STAGE_TRANSITION_DURAION,
-      false
-    );
-    if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](Math.max(0, Math.min(1, progress)));
-  } else {
-    if (
-      !player[KEY_PLAYER_DEATH_FRAME] &&
-      stage[KEY_STAGE_IS_WAVE_CLEAN] &&
-      stage[KEY_STAGE_IS_WAVE_CLEAN]()
-    ) {
-      ($stageWave.$ === stage[KEY_STAGE_WAVES].length - 1 ? _setWave : setWave)(
-        $stageWave.$ + 1
-      );
-    }
+      ctx.fillRect(100, 100, 100, 100);
+    }));
+    graphics.push(title);
   }
 }
 
-const checkTransition = objectEvent(
-  () => _setWave($stageNextWave.$),
-  STAGE_TRANSITION_DURAION,
-  {
-    [KEY_OBJECT_EVENT_GET_OFFSET]: (stage) =>
-      stage[
-        stage[KEY_STAGE_TRANSITION_FRAME] === undefined
-          ? KEY_OBJECT_FRAME
-          : KEY_STAGE_TRANSITION_FRAME
-      ],
-  }
-);
-
-setStage(0);
+setStage(+load(KEY_SAVE_STAGE) || 0);
 
 window.addEventListener('keydown', ({ key }) => {
   if (key === 'Shift') setStage(($stageIndex.$ + 1) % stages.length);

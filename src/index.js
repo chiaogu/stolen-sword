@@ -18,6 +18,8 @@ function resize() {
   canvas.style.height = Math.floor(vh);
   canvas.width = Math.floor(vw * scale);
   canvas.height = Math.floor(vh * scale);
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
   ctx.scale(scale, scale);
   $canvasLeftOffset.$ = canvas.getBoundingClientRect().left;
 }

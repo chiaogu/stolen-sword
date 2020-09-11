@@ -116,6 +116,7 @@ export function isAbleToDash() {
     $dash.$ > 0 &&
     !player[KEY_PLAYER_DEATH_FRAME] &&
     $stage.$ &&
+    $stageWave.$ !== -1 &&
     !$stage.$[KEY_STAGE_TRANSITION_FRAME] &&
     !isInTranisition()
   );
@@ -261,6 +262,7 @@ export function backToNormal() {
 }
 
 // Stage
+export const $isGameStarted = ref(false);
 export const enemies = [];
 export const projectiles = [];
 export const platforms = [];

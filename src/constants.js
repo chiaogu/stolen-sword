@@ -20,6 +20,7 @@ export const KEY_STAGE_ENDING_CUT_SCENE_FRAME = key();
 export const KEY_STAGE_ENDING_CUT_SCENE_INDEX = key();
 export const KEY_STAGE_ENDING_CUT_SCENE_KEY = key();
 export const KEY_STAGE_START_KEY = key();
+export const KEY_GAME_START_KEY = key();
 
 export const KEY_OBJECT_ON_UPDATE = key();
 export const KEY_OBJECT_FRAME = key();
@@ -45,6 +46,8 @@ export const KEY_PROJECTILE_SORUCE = key();
 export const KEY_GRAPHIC_IS_ANIMATION_FINISH = key();
 
 export const KEY_SAVE_NEED_TUTORIAL = key();
+export const KEY_SAVE_STAGE = key();
+export const KEY_SAVE_WAVE = key();
 
 export const SIDE_T = 't';
 export const SIDE_R = 'r';

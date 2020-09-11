@@ -158,8 +158,6 @@ function drawEnemy(enemy) {
         : 1);
     ctx.fillStyle = color;
     ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
     ctx.font = `bold ${transform(36)}px sans-serif`;
     ctx.fillText(enemy[KEY_ENEMY_APPEARANCE], ...transform(enemy.p));
     drawEnemyShell(ctx, enemy, 4);

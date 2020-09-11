@@ -126,6 +126,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
     }
   
     // update pose
+    skeleton.j[0][0].y = 11.9;
     if(player[KEY_PLAYER_DEATH_FRAME]) {
       // die
       skeleton.j[0][0].y = -25;
@@ -162,7 +163,6 @@ player[KEY_OBJECT_ON_UPDATE] = [
           facing = 1;
         } else {
           // idle
-          skeleton.j[0][0].y = 11.9;
           animateToPose(KEY_PLAYER_STOP_FRAME, 200, POSE_STOP, POSE_IDLE, easeOutQuint);
         }
       } else {

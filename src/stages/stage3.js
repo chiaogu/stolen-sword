@@ -243,7 +243,7 @@ export default {
       },
       2000,
     ],
-    [() => drawCaption("Can't find the theft."), 500, true],
+    [() => drawCaption('Still not found the theft. Where did he go?'), 500, true],
     [summonTheft(-300, 0, 11)],
     [
       (progress) =>
