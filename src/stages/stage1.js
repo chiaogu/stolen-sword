@@ -5,6 +5,7 @@ import {
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
+  POSE_RUN,
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
 import { enemy, compund, fire } from '../helper/enemy';
@@ -36,7 +37,7 @@ import { alternateProgress, vector } from '../utils';
 export default {
   [KEY_STAGE_INITIATE]() {
     $backgroundColor.$ = '#ddeaf0';
-    player.p.x = -240;
+    player.p.x = -260;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(
@@ -136,7 +137,7 @@ export default {
       2000,
     ],
     [() => drawCaption("Can't find the theft."), 500, true],
-    [summonTheft(-250, 100, 9)],
+    [summonTheft(-260, 100, 9)],
     [
       (progress) =>
         moveTheft(
@@ -150,7 +151,7 @@ export default {
         moveTheft(
           -50 + 100 * progress,
           160 + 100 * easeOutQuad(1 - alternateProgress(progress * 0.8))
-        ),
+        ,1, POSE_RUN),
       500,
     ],
     [

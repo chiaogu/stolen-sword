@@ -16,6 +16,9 @@ import {
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
+  POSE_RUN,
+  POSE_STOP,
+  POSE_CHARGE,
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
 import { enemy, chain, fire, firework, recover, shell } from '../helper/enemy';
@@ -218,7 +221,7 @@ export default {
           objectAction(
             2000,
             (player, progress) => {
-              player.p.y = 200 * easeOutQuad(1 - alternateProgress(progress));
+              player.p.y = player.s.y / 4 + 140 * easeOutQuad(1 - alternateProgress(progress));
               player.p.x =
                 $tempPlayerPos.$.x +
                 (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
@@ -242,7 +245,7 @@ export default {
     [summonTheft(-300, 0, 11)],
     [
       (progress) =>
-        moveTheft(-300 + 100 * progress, 200 - 200 * easeInQuad(progress)),
+        moveTheft(-300 + 100 * progress, 200 - 200 * easeInQuad(progress), 1, POSE_STOP),
       1000,
     ],
     [
@@ -257,7 +260,8 @@ export default {
       (progress) =>
         moveTheft(
           -100 + 200 * progress,
-          100 * easeOutQuad(1 - alternateProgress(progress))
+          100 * easeOutQuad(1 - alternateProgress(progress)),
+          1, progress > 0.5 ? POSE_STOP : POSE_CHARGE
         ),
       800,
     ],

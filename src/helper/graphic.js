@@ -4,6 +4,7 @@ import {
   KEY_GRAPHIC_IS_ANIMATION_FINISH,
   SIDE_T,
   DEFAULT_FRAME_WIDTH,
+  POSE_CHARGE,
 } from '../constants';
 import {
   transform,
@@ -225,14 +226,21 @@ export const drawCaption = text => draw(62, ctx => {
   ctx.strokeText(...args);
 });
 
-export const summonTheft = (x, y, z) => () => graphics.push($theft.$ = graphic(x, y, graphic => draw(z, ctx => {
-  ctx.fillStyle = '#f00';
-  ctx.fillRect(...transform(graphic.p), transform(20), transform(20));
-}), [checkRipple()]));
+export const summonTheft = (x, y, z) => () => {
+  const skeleton = createSkeletion();
+  $theft.$ = [graphic(x, y, graphic => draw(z, ctx => {
+    skeleton.p($theft.$[2]);
+    skeleton.d(ctx, graphic.p, ['#8a302c', '#00959e', '#e8e8e8', '#a4413d', '#c57777'], $theft.$[1], 1);
+    ['33', '66', '88', 'c4', '00', '11']
+  }), [checkRipple()]), 1, POSE_CHARGE]
+  graphics.push($theft.$[0]);
+};
 
-export const moveTheft = (x, y) => {
-  $theft.$.p.x = x;
-  $theft.$.p.y = y;
+export const moveTheft = (x, y, facing = 1, pose = POSE_CHARGE) => {
+  $theft.$[0].p.x = x;
+  $theft.$[0].p.y = y;;
+  $theft.$[1] = facing;
+  $theft.$[2] = pose;
 }
 
 export function drawPath(ctx, img, color, offset, angle, facing, flip) {

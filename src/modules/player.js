@@ -48,6 +48,8 @@ import {
   effects,
   $reflectionY,
   isUnderWater,
+  $isForceStopping,
+  $forceFacing,
 } from '../state';
 import {
   getActionProgress,
@@ -108,7 +110,9 @@ player[KEY_OBJECT_ON_UPDATE] = [
     
     // update facing
     const vFacing = player.v.x / Math.abs(player.v.x) || 1;
-    if($isPressing.$) {
+    if($forceFacing.$) {
+      facing = $forceFacing.$;
+    } else if($isPressing.$) {
       const { x } = getReleaseVelocity();
       facing = x / Math.abs(x) || 1;
     } else if(player[KEY_PLAYER_DEATH_FRAME] || player[KEY_PLAYER_CHARGE_FRAME] < player[KEY_PLAYER_DAMAGE_FRAME]) {
@@ -138,7 +142,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
       setAngle(6, lerp(POSE_SWIM[6], 0.246, alternateProgress(easeInQuad(progress))));
       setAngle(7, lerp(POSE_SWIM[7], 0.134, alternateProgress(easeInQuad(progress))));
     } else if($playerCollisionSide.$[SIDE_T]) {
-      if(vectorMagnitude(player.v) <= 0.6) {
+      if(vectorMagnitude(player.v) <= 0.6 && !$isForceStopping.$) {
         if($backgroundV.$ > 0) {
           // run
           if(player[KEY_PLAYER_STOP_FRAME]) {

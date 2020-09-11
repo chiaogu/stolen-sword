@@ -52,6 +52,8 @@ export const $trajectoryLineOpacity = ref(0);
 export const $g = ref(G);
 export const $maxReleaseVelocity = ref(MAX_RELEASE_VELOCITY);
 export const $playerCollisionSide = ref({});
+export const $isForceStopping = ref();
+export const $forceFacing = ref();
 
 export function getReleaseVelocity() {
   const v = vector(

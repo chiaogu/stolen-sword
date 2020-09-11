@@ -5,8 +5,11 @@ import {
   KEY_STAGE_IS_WAVE_CLEAN,
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
+  POSE_RUN,
+  POSE_STOP,
+  POSE_CHARGE,
 } from '../constants';
-import { easeInOutQuad, easeInQuint, easeOutQuad } from '../easing';
+import { easeInOutQuad, easeInQuint, easeOutQuad, easeInCirc } from '../easing';
 import { enemy } from '../helper/enemy';
 import {
   drawCaption,
@@ -34,14 +37,16 @@ import {
   graphics,
   platforms,
   player,
+  $isForceStopping,
+  $forceFacing,
 } from '../state';
-import { alternateProgress, object, vector, vectorMagnitude } from '../utils';
+import { alternateProgress, object, vector, vectorMagnitude, lerp } from '../utils';
 
 let tempCamCenter;
 
 export default {
   [KEY_STAGE_INITIATE]() {
-    player.p.x = -240;
+    player.p.x = -260;
     cameraCenter.y = player.p.y + 200;
     $cameraLoop.$ = () => {
       cameraCenter.y = Math.min(
@@ -92,14 +97,17 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    () => [
-      enemy('卡', 25, 790, [circularMovement(3000, 50, 5)], true),
-      enemy('ㄚ', -20, 1150, [circularMovement(6000, 5, 10)], true),
-      enemy('中', 150, 1580, [circularMovement(3000, 50, 5)], true),
-      enemy('串', 75, 1800, [circularMovement(4000, 5, 50)], true),
-      enemy('申', -120, 2220, [circularMovement(6000, 80, 80)], true),
-      enemy('屮', -120, 2800, [circularMovement(6000, 5, 20)]),
-    ],
+    () => {
+      $isForceStopping.$ = false;
+      return [
+        enemy('卡', 25, 790, [circularMovement(3000, 50, 5)], true),
+        enemy('ㄚ', -20, 1150, [circularMovement(6000, 5, 10)], true),
+        enemy('中', 150, 1580, [circularMovement(3000, 50, 5)], true),
+        enemy('串', 75, 1800, [circularMovement(4000, 5, 50)], true),
+        enemy('申', -120, 2220, [circularMovement(6000, 80, 80)], true),
+        enemy('屮', -120, 2800, [circularMovement(6000, 5, 20)]),
+      ]
+    },
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     const goalArea = object(-136, 2900, 200, 30);
@@ -110,7 +118,8 @@ export default {
     );
   },
   [KEY_STAGE_TRANSITION](progress) {
-    player.p.x = -500 * easeInQuint(1 - progress);
+    player.p.x = -260 * easeInCirc(1 - progress);
+    $isForceStopping.$ = true;
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
     [
@@ -119,22 +128,13 @@ export default {
         tempCamCenter = vector(cameraCenter.x, cameraCenter.y);
         $tempPlayerPos.$ = vector(player.p.x, player.p.y);
         graphics.push(...letterBox());
+        $forceFacing.$ = 1;
       },
-    ],
-    [
-      (progress) => {
-        player.p.x =
-          $tempPlayerPos.$.x +
-          (-100 - $tempPlayerPos.$.x) * easeInOutQuad(progress);
-      },
-      1000,
     ],
     [() => drawCaption('Still not found the theft.'), 500, true],
     [
       (progress) => {
-        cameraCenter.y =
-          tempCamCenter.y +
-          (player.p.y - tempCamCenter.y - 120) * easeInOutQuad(progress);
+        cameraCenter.y = lerp(tempCamCenter.y, player.p.y - 120, easeInOutQuad(progress));
       },
       2000,
     ],
@@ -146,7 +146,7 @@ export default {
     ],
     [
       (progress) =>
-        moveTheft(79 - 141 * progress, 2600 + 100 * easeOutQuad(progress)),
+        moveTheft(79 - 141 * progress, 2600 + 100 * easeOutQuad(progress), -1, POSE_RUN),
       500,
     ],
     [
@@ -154,7 +154,8 @@ export default {
         progress *= 1.4;
         moveTheft(
           -62 + 248 * progress,
-          2700 + 100 * easeOutQuad(1 - alternateProgress(progress))
+          2700 + 100 * easeOutQuad(1 - alternateProgress(progress)),
+          1, progress > 0.5 ? POSE_STOP : POSE_CHARGE
         );
       },
       1600,
@@ -163,12 +164,15 @@ export default {
       (progress) => {
         $g.$ = 0;
         progress *= 1.6;
-        player.p.x = -100 + 240 * progress;
-        player.p.y = 2913 + 50 * easeOutQuad(1 - alternateProgress(progress));
+        player.p.x = lerp($tempPlayerPos.$.x, 180, progress);
+        player.p.y = $tempPlayerPos.$.y + 50 * easeOutQuad(1 - alternateProgress(progress));
       },
       1000,
     ],
-    [() => effects.push(wipe())],
+    [() => {
+      effects.push(wipe());
+      $forceFacing.$ = undefined;
+    }],
     [() => {}, 1000],
   ],
 };
