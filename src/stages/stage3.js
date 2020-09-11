@@ -49,6 +49,7 @@ import {
   graphics,
   platforms,
   player,
+  $forceFacing,
 } from '../state';
 import { alternateProgress, objectAction, vector } from '../utils';
 
@@ -216,6 +217,7 @@ export default {
         player.v.y = 0;
         graphics.push(...letterBox());
         $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+        $forceFacing.$ = 1;
         const offset = player[KEY_OBJECT_FRAME];
         player[KEY_OBJECT_ON_UPDATE].push(
           objectAction(
@@ -289,7 +291,10 @@ export default {
       },
       1800,
     ],
-    [() => effects.push(wipe())],
+    [() => {
+      effects.push(wipe());
+      $forceFacing.$ = undefined;
+    }],
     [() => {}, 1000],
   ],
 };

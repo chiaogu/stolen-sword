@@ -200,6 +200,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
           ctx.stroke();
         }
         ctx.lineCap = 'butt';
+        ctx.setLineDash([]);
       }
       
       // draw character

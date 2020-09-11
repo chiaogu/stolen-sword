@@ -6,8 +6,13 @@ import {
   KEY_STAGE_TRANSITION,
   KEY_STAGE_WAVES,
   POSE_RUN,
+  KEY_SAVE_NEED_TUTORIAL,
+  KEY_OBJECT_FRAME,
+  KEY_OBJECT_ON_UPDATE,
+  KEY_ENEMY_DEAD_FRAME,
+  FRAME_DURAITON,
 } from '../constants';
-import { easeInOutQuad, easeInQuad, easeOutQuad } from '../easing';
+import { easeInOutQuad, easeInQuad, easeOutQuad, easeInOutQuint, easeInQuint, easeOutQuint } from '../easing';
 import { enemy, compund, fire } from '../helper/enemy';
 import {
   drawCaption,
@@ -17,6 +22,8 @@ import {
   movingBamboo,
   summonTheft,
   wipe,
+  graphic,
+  drawDragTrack,
 } from '../helper/graphic';
 import { boundarySet } from '../helper/platform';
 import {
@@ -31,8 +38,20 @@ import {
   graphics,
   platforms,
   player,
+  save,
+  needTutorial,
+  draw,
+  $stage,
+  $isPressing,
+  slowDown,
+  transform,
+  $timeRatio,
+  $playerCollisionSide,
+  backToNormal,
 } from '../state';
-import { alternateProgress, vector } from '../utils';
+import { alternateProgress, vector, getActionProgress, lerp } from '../utils';
+
+let tempStateFrame;
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -60,22 +79,67 @@ export default {
     );
   },
   [KEY_STAGE_WAVES]: [
-    () => [
-      enemy('大', 50, 150, [
-        slideIn(2000, 250, 200),
-        circularMovement(3000, 10, 5, 2000),
-      ]),
-    ],
-    () => [
-      enemy('不', -100, 300, [
-        slideIn(2000, 250, 350),
-        circularMovement(5000, 10, 5, 2000),
-      ]),
-      enemy('木', 75, 350, [
-        slideIn(2000, 250, 450),
-        circularMovement(3000, 10, 5, 2000),
-      ]),
-    ],
+    () => {
+      if(needTutorial) {
+        tempStateFrame = $stage.$[KEY_OBJECT_FRAME];
+        graphics.push(graphic(0,0, () => draw(61, () => {
+          if(!$isPressing.$) {
+            const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - tempStateFrame, 1500 * $timeRatio.$);
+            drawDragTrack(
+              ...transform(vector(123, 16)),
+              ...transform(vector(lerp(120, 99, easeInOutQuint(progress)), lerp(-5, -154, easeInOutQuint(progress)))),
+              0.5 * easeOutQuad(progress)
+            )
+          }
+          if(enemies.length === 0) graphics.pop();
+        })));
+      }
+      return [
+        enemy('大', 50, 150, [
+          slideIn(2000, 250, 200),
+          circularMovement(3000, 10, 5, 2000),
+        ])
+      ];
+    },
+    () => {
+      if(needTutorial) {
+        let flag = false;
+        graphics.push(graphic(0,0, () => draw(61, () => {
+          if(flag) {
+            const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - tempStateFrame, 1500 * $timeRatio.$);
+            drawDragTrack(
+              ...transform(vector(123, 16)),
+              ...transform(vector(
+                lerp(120, 120 + (player.p.x - enemies[0].p.x) / 3, easeInOutQuint(progress)),
+                lerp(-5, -154 + (player.p.y - enemies[0].p.y) / 3, easeInOutQuint(progress))
+              )),
+              0.5 * easeOutQuad(progress)
+            )
+            if(player.p.y <= 120) {
+              flag = false;
+              backToNormal();
+            }
+          } else {
+            if(player.p.y > 160 && Math.abs(player.v.y) < 1) {
+              flag = true;
+              slowDown(0.01);
+              tempStateFrame = $stage.$[KEY_OBJECT_FRAME];
+            }
+          }
+          if(enemies.length === 0) graphics.pop();
+        })));
+      }
+      return [
+        enemy('不', -100, 300, [
+          slideIn(2000, 250, 350),
+          circularMovement(5000, 10, 5, 2000),
+        ]),
+        enemy('木', 75, 350, [
+          slideIn(2000, 250, 450),
+          circularMovement(3000, 10, 5, 2000),
+        ]),
+      ];
+    },
     () =>
       compund(
         enemy('父', 0, 450, [
@@ -177,7 +241,10 @@ export default {
       },
       1000,
     ],
-    [() => effects.push(wipe())],
+    [() => {
+      effects.push(wipe());
+      save(KEY_SAVE_NEED_TUTORIAL, 1);
+    }],
     [() => {}, 1000],
   ],
 };

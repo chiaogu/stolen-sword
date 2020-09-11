@@ -17,10 +17,15 @@ import {
   createLinearGradient,
   $backgroundColor,
   graphics,
-  $theft
+  $theft,
+  pressDownPos,
+  needTutorial,
+  $stage,
+  $isPressing,
+  enemies
 } from '../state';
-import { object, vector, getActionProgress, vectorMagnitude, decompressPath, rotate } from '../utils';
-import { easeInQuint, easeInQuad, easeOutQuad } from '../easing';
+import { object, vector, getActionProgress, vectorMagnitude, decompressPath, rotate, lerp } from '../utils';
+import { easeInQuint, easeInQuad, easeOutQuad, easeInOutQuint } from '../easing';
 import { circular, slideIn } from '../animation';
 
 export const graphic = (x, y, draw, animations = []) => ({
@@ -308,4 +313,21 @@ export function createSkeletion() {
     }),
     p: angles => angles.forEach((angle, index) => j[index][1] = angle)
   };
+}
+
+export function drawDragTrack(fromX, fromY, toX, toY, opacity = 0.2) {
+  draw(61, ctx => {
+    // visualize drag track
+    const grad = ctx.createLinearGradient(fromX, fromY, toX, toY);
+    grad.addColorStop(0, `rgba(255,255,255,${opacity})`);
+    grad.addColorStop(0.75, `rgba(255,255,255,0)`);
+    ctx.strokeStyle = grad;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 30;
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+  });
 }

@@ -44,6 +44,8 @@ export const KEY_PROJECTILE_SORUCE = key();
 
 export const KEY_GRAPHIC_IS_ANIMATION_FINISH = key();
 
+export const KEY_SAVE_NEED_TUTORIAL = key();
+
 export const SIDE_T = 't';
 export const SIDE_R = 'r';
 export const SIDE_B = 'b';
@@ -82,6 +84,7 @@ export const POSE_ATTACK = [0.069, 0.025, 0.068, -0.235, -0.172, -0.514, 0.066, 
 export const POSE_DAMAGED = [-0.072, -0.089, -0.138, -0.148, -0.225, -0.144, -0.054, 0.043, -1.186];
 export const POSE_DIE = [-0.234, -0.275, -0.237, -0.235, -0.218, -0.18, -0.154, -0.183, -1.462];
 export const POSE_SWIM = [0.107, 0.01, 0.114, 0.119, -0.26, -0.247, 0.104, 0.215, -0.057];
+
 
 /**
  *  zIndex

@@ -18,6 +18,7 @@ import {
   KEY_STAGE_WAVES,
   G,
   KEY_OBJECT_FORCE_CHECK_COLLISION,
+  KEY_SAVE_NEED_TUTORIAL,
 } from './constants';
 import {
   vector,
@@ -237,13 +238,13 @@ export function stepTo(callback, shouldStop) {
   return () => removeAnimation(id);
 }
 
-export function slowDown() {
+export function slowDown(ratio = SLOW_MOTION_TIME_RATIO) {
   if (!cancelTimeRatioAnimation) {
     cancelTimeRatioAnimation = animateTo(
-      (ratio) => {
+      (progress) => {
         $timeRatio.$ =
           NORAML_TIME_RATIO -
-          (NORAML_TIME_RATIO - SLOW_MOTION_TIME_RATIO) * easeOutQuint(ratio);
+          (NORAML_TIME_RATIO - ratio) * easeOutQuint(progress);
       },
       SLOW_DOWN_DURATION,
       easeOutQuint
@@ -303,3 +304,8 @@ export const createLinearGradient = (y, h, colors, distance, depth) => {
 export const $theft = ref();
 export const $tempPlayerPos = ref();
 export const $canvasLeftOffset = ref(0);
+
+export const save = (...args) => window.localStorage.setItem(...args);
+export const load = (...args) => window.localStorage.getItem(...args);
+
+export const needTutorial = load(KEY_SAVE_NEED_TUTORIAL) != 1;
