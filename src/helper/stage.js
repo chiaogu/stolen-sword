@@ -134,7 +134,7 @@ function update(stage) {
       STAGE_TRANSITION_DURAION,
       false
     );
-    if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](progress);
+    if (stage[KEY_STAGE_TRANSITION]) stage[KEY_STAGE_TRANSITION](Math.max(0, Math.min(1, progress)));
   } else {
     if (
       !player[KEY_PLAYER_DEATH_FRAME] &&

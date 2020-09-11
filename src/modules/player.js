@@ -178,37 +178,31 @@ player[KEY_OBJECT_ON_UPDATE] = [
   }, 
   // rendering
   () => {
-    draw(26, ctx => {
-      // visualize velocity
-      ctx.strokeStyle = '#f0f';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.moveTo(...transform(player.p));
-      ctx.lineTo(
-        ...transform(vectorOp((pos, v) => pos + v * 5, [player.p, player.v]))
-      );
-      ctx.stroke();
-    
-      if ($isPressing.$ && isAbleToDash()) {
-        ctx.strokeStyle = `rgba(0,255,0,${isReleaseVelocityEnough() ? 1 : 0})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(...transform(player.p));
-        playerTrajectory().forEach((pos) => {
-          ctx.lineTo(...transform(vector(pos.x, pos.y)));
-          // ctx.strokeRect(...transform(vector(pos.x - player.s.x / 2, pos.y + player.s.y / 2)), transform(player.s.x), transform(player.s.y));
-        });
-        ctx.stroke();
-      }
-    } );
     draw(25, ctx => {
+      // draw trajectory
+      if ($isPressing.$ && isAbleToDash()) {
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = `rgba(0,0,0,${isReleaseVelocityEnough() ? 0.1 : 0})`;
+        const line = 10;
+        for(let i = 0; i < line; i++) {
+          ctx.lineWidth = transform(Math.random() * 3 + 1);
+          ctx.beginPath();
+          ctx.moveTo(...transform(player.p));
+          const path = playerTrajectory();
+          for(let j = 0; j < Math.random() * path.length / 2 + path.length / 2; j++) {
+            const dashLength = transform(50);
+            ctx.setLineDash([Math.random() * dashLength * 2 + dashLength, Math.random() * dashLength])
+            ctx.lineTo(...transform(vector(
+              path[j].x + i / 1 * Math.cos(i / line * 2 * Math.PI),
+              path[j].y + i / 1 * Math.sin(i / line * 2 * Math.PI + 10)
+            )));
+          }
+          ctx.stroke();
+        }
+        ctx.lineCap = 'butt';
+      }
+      
       // draw character
-      // ctx.lineWidth = 1;
-      // ctx.strokeStyle = '#000';
-      // const { l, t } = getObjectBoundary(player);
-      // ctx.strokeRect(...transform(vector(l, t)), transform(player.s.x), transform(player.s.y));
-    
       if(isPlayerInvincibleAfterDamage()) {
         ctx.globalAlpha = Math.round(player[KEY_OBJECT_FRAME]) % 8 > 3 ? 0.1 : 1;
       }
