@@ -9,10 +9,13 @@ import {
   KEY_STAGE_WAVES,
   SIDE_L,
   SIDE_R,
+  KEY_STAGE_ENDING_CUT_SCENE,
+  POSE_IDLE,
+  POSE_CHARGE
 } from '../constants';
-import { easeInOutQuad, easeInQuad, easeOutCirc } from '../easing';
+import { easeInOutQuad, easeInQuad, easeOutCirc, easeOutQuint } from '../easing';
 import { enemy, chain, compund, shell } from '../helper/enemy';
-import { gradient, graphic, ripple, staticMountain } from '../helper/graphic';
+import { gradient, graphic, ripple, staticMountain, letterBox, drawCaption, summonTheft, moveTheft, wipe } from '../helper/graphic';
 import { boundarySet, flow, platform, water } from '../helper/platform';
 import {
   $backgroundColor,
@@ -31,6 +34,8 @@ import {
   player,
   transform,
   $titleY,
+  $tempPlayerPos,
+  $forceFacing,
 } from '../state';
 import {
   alternateProgress,
@@ -40,6 +45,7 @@ import {
   objectEvent,
   vector,
   vectorMagnitude,
+  lerp,
 } from '../utils';
 
 const cliffPaths = [
@@ -118,6 +124,9 @@ const _randomMovement = () => [
     Math.random() * 10
   ),
 ];
+
+let tempCamCenter;
+const fakeMountain = staticMountain(230, 1130, 7, 0.4, 4);
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -294,4 +303,54 @@ export default {
     player.p.y = (1 - easeInQuad(progress)) * 400;
     player.p.x = -1600 * easeInQuad(1 - progress);
   },
+  [KEY_STAGE_ENDING_CUT_SCENE]: [
+    [
+      () => {
+        $forceFacing.$ = 1;
+        $cameraLoop.$ = undefined;
+        $tempPlayerPos.$ = vector(player.p.x, player.p.y);
+        tempCamCenter = vector(cameraCenter.x, cameraCenter.y);
+        graphics.push(
+          ...letterBox(),
+          fakeMountain
+        );
+      }
+    ],
+    [
+      (progress) => {
+        cameraCenter.y = lerp(tempCamCenter.y, player.p.y - 80, easeInOutQuad(progress));
+      },
+      1000,
+    ],
+    [summonTheft(250, 0, 11)],
+    [() => drawCaption("Lost him again. Still can't find the theft."), 500, true],
+    [
+      (progress) => {
+        cameraCenter.x = lerp(tempCamCenter.x, -30, easeInOutQuad(progress));
+        fakeMountain.p.x = lerp(230, 110, easeInOutQuad(progress));
+        moveTheft(lerp(320, 110, easeInOutQuad(progress)), 6139, -2, POSE_IDLE, 2);
+      },
+      2000,
+    ],
+    [() => {}, 1000],
+    [
+      (progress) =>
+        moveTheft(lerp(110, 320, easeOutQuint(progress)), lerp(6139, 6239, easeOutQuint(progress)), 2, POSE_CHARGE, 2),
+      1000,
+    ],
+    [
+      (progress) => {
+        $g.$ = 0;
+        player.p.x = lerp($tempPlayerPos.$.x, 52, easeOutQuint(progress));
+        player.p.y = lerp($tempPlayerPos.$.y, 6300, easeOutQuint(progress));
+      },
+      1000,
+    ],
+    [() => drawCaption('(To be continued)'), 500, true],
+    [() => {
+      effects.push(wipe());
+    }],
+    [() => {}, 1000],
+    [() => $forceFacing.$ = undefined],
+  ]
 };

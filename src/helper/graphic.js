@@ -201,7 +201,7 @@ const drawMountain = (x, y, z, scale = 1, distance, fillGradient = true) => {
 
 export const staticMountain = (x, y, z, distance, scale) => 
   graphic(x, y,
-    () => drawMountain(x, y, z, scale, distance, false)
+    graphic => drawMountain(graphic.p.x, graphic.p.y, z, scale, distance, false)
   )
 
 export const movingMountain = (x, y, z, distance = 1, scale = 1) => background((offset, index) => {
@@ -221,6 +221,7 @@ export const letterBox = () => {
 }
 
 export const drawCaption = text => draw(62, ctx => {
+  ctx.setLineDash([]);
   ctx.lineWidth = transform(0.7);
   ctx.fillStyle = '#eec918';
   ctx.strokeStyle = 'rgba(0,0,0,0.75)';
@@ -234,17 +235,18 @@ export const summonTheft = (x, y, z) => () => {
   const skeleton = createSkeletion();
   $theft.$ = [graphic(x, y, graphic => draw(z, ctx => {
     skeleton.p($theft.$[2]);
-    skeleton.d(ctx, graphic.p, ['#8a302c', '#00959e', '#e8e8e8', '#a4413d', '#c57777'], $theft.$[1], 1);
+    skeleton.d(ctx, graphic.p, ['#8a302c', '#00959e', '#e8e8e8', '#a4413d', '#c57777'], $theft.$[1], $theft.$[3]);
     ['33', '66', '88', 'c4', '00', '11']
-  }), [checkRipple()]), 1, POSE_CHARGE]
+  }), [checkRipple()]), 1, POSE_CHARGE, 1]
   graphics.push($theft.$[0]);
 };
 
-export const moveTheft = (x, y, facing = 1, pose = POSE_CHARGE) => {
+export const moveTheft = (x, y, facing = 1, pose = POSE_CHARGE, flip = 1) => {
   $theft.$[0].p.x = x;
   $theft.$[0].p.y = y;;
   $theft.$[1] = facing;
   $theft.$[2] = pose;
+  $theft.$[3] = flip;
 }
 
 export function drawPath(ctx, img, color, offset, angle, facing, flip, func = 'fill') {
@@ -300,15 +302,16 @@ export function createSkeletion() {
   return {
     j,
     d: (ctx, center, colors, facing = 1, flip = 1) => p.forEach(([img, colorIndex, joints]) => {
+      const rotationDirection = (facing / Math.abs(facing)) * (flip / Math.abs(flip));
       let pos = vector(center.x, center.y);
       joints.forEach(([offset], index) => {
         const prevPos = vector(pos.x, pos.y);
         pos.x += offset.x * facing;
         pos.y += offset.y * flip;
-        if(index > 0) pos = rotate(prevPos, pos, joints[index - 1][1] * facing * flip);
+        if(index > 0) pos = rotate(prevPos, pos, joints[index - 1][1] * rotationDirection);
       })
       const angle = joints[joints.length - 1][2] ? joints[joints.length - 1][2][1] : joints[joints.length - 1][1];
-      drawPath(ctx, img, colors[colorIndex], pos, angle * facing * flip, facing, flip); 
+      drawPath(ctx, img, colors[colorIndex], pos, angle * rotationDirection, facing, flip); 
     }),
     p: angles => angles.forEach((angle, index) => j[index][1] = angle)
   };
@@ -335,17 +338,17 @@ const LETTER_S = `4DUME<#`;
 const LETTER_O = `r":<FDOJa`;
 const scale = 0.6;
 const letters = [
-  decompressPath(LETTER_S, 0, 0, scale),
-  decompressPath(`	 'fe%`, -60, 85, scale),
-  decompressPath(LETTER_O, -140, 88, scale),
-  decompressPath(`#`, -220, 97, scale),
-  decompressPath(`%c#c`, -265, 90, scale),
-  decompressPath(`GOOM`, -280, 90, scale),
-  decompressPath(LETTER_S, -330, 0, scale),
-  decompressPath(`GGGE|GFNL`, -370, 5, scale),
-  decompressPath(LETTER_O, -490, 88, scale),
-  decompressPath(`[BD3OML`, -535, 95, scale),
-  decompressPath(`[UFF?,`, -570, 90, scale)
+  decompressPath(LETTER_S, -10, 0, scale),
+  decompressPath(`	 'fe%`, -70, 85, scale),
+  decompressPath(LETTER_O, -150, 88, scale),
+  decompressPath(`#`, -230, 97, scale),
+  decompressPath(`%c#c`, -275, 90, scale),
+  decompressPath(`GOOM`, -290, 90, scale),
+  decompressPath(LETTER_S, -340, 0, scale),
+  decompressPath(`GGGE|GFNL`, -380, 5, scale),
+  decompressPath(LETTER_O, -500, 88, scale),
+  decompressPath(`[BD3OML`, -545, 95, scale),
+  decompressPath(`[UFF?,`, -580, 90, scale)
 ];
 
 export function drawTitle(opacity) {
@@ -354,7 +357,6 @@ export function drawTitle(opacity) {
     ctx.lineJoin = 'bevel';
     ctx.lineWidth = easeInQuad(opacity) * transform(3);
     ctx.setLineDash([50 * easeInOutQuint(opacity), transform(100) * easeInOutQuad(1 - opacity)])
-    // letters.forEach(img => drawPath(ctx, img, `#aaa`, vector(-160, $titleY.$), 0, 1, 1.01, 'stroke'));
     letters.forEach(img => drawPath(ctx, img, color, vector(-160, $titleY.$), 0, 1, 1, 'stroke'));
     ctx.lineJoin = 'miter';
   })

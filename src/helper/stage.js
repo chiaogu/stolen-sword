@@ -50,7 +50,7 @@ import {
   transform,
 } from '../state';
 import { getActionProgress, object, objectEvent, vectorOp, vector } from '../utils';
-import { graphic, drawTitle } from './graphic';
+import { graphic, drawTitle, wipe } from './graphic';
 
 let initialWave = +load(KEY_SAVE_WAVE) || 0;
 
@@ -82,7 +82,9 @@ const creatStage = (config) => ({
             } else {
               save(KEY_SAVE_WAVE, undefined);
               initialWave = 0;
-              setStage($stageIndex.$ + 1);
+              const nextStage = ($stageIndex.$ + 1) % stages.length;
+              if(nextStage === 0) $isGameStarted.$ = false;
+              setStage(nextStage);
             }
           };
           if (wait) {
@@ -147,7 +149,7 @@ function _setWave(wave) {
   delete $stage.$[KEY_STAGE_TRANSITION_FRAME];
   enemies.splice(0, enemies.length);
   $stageWave.$ = wave;
-  if(wave !== -1) save(KEY_SAVE_WAVE, wave);
+  if(wave !== -1 && wave !== $stage.$[KEY_STAGE_WAVES].length) save(KEY_SAVE_WAVE, wave);
   if ($stage.$[KEY_STAGE_WAVES][wave])
     enemies.push(...$stage.$[KEY_STAGE_WAVES][wave]());
 }

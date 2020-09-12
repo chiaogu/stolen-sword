@@ -126,7 +126,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
     }
   
     // update pose
-    skeleton.j[0][0].y = 11.9;
+    skeleton.j[0][0].y = 9;
     if(player[KEY_PLAYER_DEATH_FRAME]) {
       // die
       skeleton.j[0][0].y = -25;
@@ -154,7 +154,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
             else skeleton.p(POSE_RUN);
             const progress = getActionProgress(player[KEY_OBJECT_FRAME], 600);
             const p = easeInOutQuad(alternateProgress(progress));
-            skeleton.j[0][0].y = 4 + 2 * alternateProgress(p);
+            skeleton.j[0][0].y = 8 + 2 * alternateProgress(p);
             setAngle(2, lerp(POSE_RUN[2], -0.16, p));
             setAngle(3, lerp(POSE_RUN[3], 0.172, p));
             setAngle(6, lerp(POSE_RUN[6], 0.2, alternateProgress(easeInQuad(progress))));
@@ -163,6 +163,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
           facing = 1;
         } else {
           // idle
+          skeleton.j[0][0].y = 11.9;
           animateToPose(KEY_PLAYER_STOP_FRAME, 200, POSE_STOP, POSE_IDLE, easeOutQuint);
         }
       } else {
