@@ -311,3 +311,4 @@ export const save = (...args) => window.localStorage.setItem(...args);
 export const load = (...args) => window.localStorage.getItem(...args);
 
 export const needTutorial = load(KEY_SAVE_NEED_TUTORIAL) != 1;
+export const $titleY = ref();

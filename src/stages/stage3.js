@@ -50,11 +50,13 @@ import {
   platforms,
   player,
   $forceFacing,
+  $titleY,
 } from '../state';
 import { alternateProgress, objectAction, vector } from '../utils';
 
 export default {
   [KEY_STAGE_INITIATE]() {
+    $titleY.$ = 300;
     $g.$ = 0.3;
     $maxReleaseVelocity.$ = 12;
     cameraCenter.y = player.p.y + 100;
@@ -81,8 +83,8 @@ export default {
         [1, '#2b435b'],
       ]),
       ...movingMountain(177, 0, 9, 0.3, 2.8),
-      ...movingMountain(0, 40, 9, 0.2, 3.6),
-      ...movingMountain(-37, 60, 9, 0.15, 4)
+      ...movingMountain(0, 40, 8, 0.2, 3.6),
+      ...movingMountain(-37, 60, 8, 0.15, 4)
     );
     platforms.push(
       water(0, -200, DEFAULT_FRAME_WIDTH * 2, 400),

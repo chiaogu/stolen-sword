@@ -48,6 +48,7 @@ import {
   $timeRatio,
   $playerCollisionSide,
   backToNormal,
+  $titleY,
 } from '../state';
 import { alternateProgress, vector, getActionProgress, lerp } from '../utils';
 
@@ -56,6 +57,7 @@ const getAliveEnemies = () => enemies.filter(enemy => !enemy[KEY_ENEMY_DEAD_FRAM
 
 export default {
   [KEY_STAGE_INITIATE]() {
+    $titleY.$ = 380;
     $backgroundColor.$ = '#ddeaf0';
     player.p.x = -260;
     cameraCenter.y = player.p.y + 200;

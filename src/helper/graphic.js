@@ -22,10 +22,11 @@ import {
   needTutorial,
   $stage,
   $isPressing,
-  enemies
+  enemies,
+  $titleY
 } from '../state';
 import { object, vector, getActionProgress, vectorMagnitude, decompressPath, rotate, lerp } from '../utils';
-import { easeInQuint, easeInQuad, easeOutQuad, easeInOutQuint } from '../easing';
+import { easeInQuint, easeInQuad, easeOutQuad, easeInOutQuint, easeOutQuint, easeInOutQuad } from '../easing';
 import { circular, slideIn } from '../animation';
 
 export const graphic = (x, y, draw, animations = []) => ({
@@ -246,13 +247,13 @@ export const moveTheft = (x, y, facing = 1, pose = POSE_CHARGE) => {
   $theft.$[2] = pose;
 }
 
-export function drawPath(ctx, img, color, offset, angle, facing, flip) {
-  ctx.fillStyle = color;
+export function drawPath(ctx, img, color, offset, angle, facing, flip, func = 'fill') {
+  ctx[`${func}Style`] = color;
   ctx.beginPath();
   img.p.forEach(p => {
     ctx.lineTo(...transform(rotate(offset, vector(p.x * facing + offset.x, p.y * flip + offset.y), angle)));
   })
-  ctx.fill();
+  ctx[func]();
 }
 
 const hatImg = decompressPath(`4#+};K1BLild`, -105, -35, 0.108);
@@ -328,4 +329,33 @@ export function drawDragTrack(fromX, fromY, toX, toY, opacity = 0.2) {
     ctx.stroke();
     ctx.lineCap = 'butt';
   });
+}
+
+const LETTER_S = `4DUME<#`;
+const LETTER_O = `r":<FDOJa`;
+const scale = 0.6;
+const letters = [
+  decompressPath(LETTER_S, 0, 0, scale),
+  decompressPath(`	 'fe%`, -60, 85, scale),
+  decompressPath(LETTER_O, -140, 88, scale),
+  decompressPath(`#`, -220, 97, scale),
+  decompressPath(`%c#c`, -265, 90, scale),
+  decompressPath(`GOOM`, -280, 90, scale),
+  decompressPath(LETTER_S, -330, 0, scale),
+  decompressPath(`GGGE|GFNL`, -370, 5, scale),
+  decompressPath(LETTER_O, -490, 88, scale),
+  decompressPath(`[BD3OML`, -535, 95, scale),
+  decompressPath(`[UFF?,`, -570, 90, scale)
+];
+
+export function drawTitle(opacity) {
+  draw(61, ctx => {
+    const color = `#fff`;
+    ctx.lineJoin = 'bevel';
+    ctx.lineWidth = easeInQuad(opacity) * transform(3);
+    ctx.setLineDash([50 * easeInOutQuint(opacity), transform(100) * easeInOutQuad(1 - opacity)])
+    // letters.forEach(img => drawPath(ctx, img, `#aaa`, vector(-160, $titleY.$), 0, 1, 1.01, 'stroke'));
+    letters.forEach(img => drawPath(ctx, img, color, vector(-160, $titleY.$), 0, 1, 1, 'stroke'));
+    ctx.lineJoin = 'miter';
+  })
 }

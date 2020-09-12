@@ -30,6 +30,7 @@ import {
   platforms,
   player,
   transform,
+  $titleY,
 } from '../state';
 import {
   alternateProgress,
@@ -120,6 +121,7 @@ const _randomMovement = () => [
 
 export default {
   [KEY_STAGE_INITIATE]() {
+    $titleY.$ = 580;
     $backgroundColor.$ = '#D8DBE6';
     $reflectionY.$ = 0;
     player.p.x = -250;
@@ -215,21 +217,21 @@ export default {
       ),
       gradient(5421, 250, 51, 1.5, cloudGradient, 1),
       gradient(5421, 250, 51, 1.2, cloudGradient, 1),
-      gradient(5421, 250, 10, 0.7, cloudGradient, 1),
-      gradient(5421, 250, 10, 0.5, cloudGradient, 1),
-      gradient(5421, 250, 10, 0.4, cloudGradient, 1),
-      gradient(5421, 250, 10, 0.35, cloudGradient, 1),
-      gradient(5421, 250, 10, 0.3, cloudGradient, 1),
-      staticMountain(-100, -42, 9, 0.6, 5),
-      staticMountain(177, 0, 9, 0.5, 3),
-      staticMountain(177, 0, 9, 0.3, 2.8),
-      staticMountain(-50, 40, 9, 0.2, 3.6),
-      staticMountain(-237, 40, 9, 0.17, 3.5),
-      staticMountain(-266, 40, 9, 0.15, 5),
-      staticMountain(226, 100, 9, 0.12, 5),
-      staticMountain(16, 100, 9, 0.1, 4),
-      staticMountain(-406, 110, 9, 0.075, 4),
-      staticMountain(16, 110, 9, 0.06, 4)
+      gradient(5421, 250, 8, 0.7, cloudGradient, 1),
+      gradient(5421, 250, 8, 0.5, cloudGradient, 1),
+      gradient(5421, 250, 8, 0.4, cloudGradient, 1),
+      gradient(5421, 250, 8, 0.35, cloudGradient, 1),
+      gradient(5421, 250, 8, 0.3, cloudGradient, 1),
+      staticMountain(-100, -42, 7, 0.6, 5),
+      staticMountain(177, 0, 7, 0.5, 3),
+      staticMountain(177, 0, 7, 0.3, 2.8),
+      staticMountain(-50, 40, 7, 0.2, 3.6),
+      staticMountain(-237, 40, 7, 0.17, 3.5),
+      staticMountain(-266, 40, 7, 0.15, 5),
+      staticMountain(226, 100, 7, 0.12, 5),
+      staticMountain(16, 100, 7, 0.1, 4),
+      staticMountain(-406, 110, 7, 0.075, 4),
+      staticMountain(16, 110, 7, 0.06, 4)
     );
   },
   [KEY_STAGE_WAVES]: [

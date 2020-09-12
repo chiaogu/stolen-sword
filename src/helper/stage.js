@@ -47,11 +47,12 @@ import {
   $timeRatio,
   load,
   save,
+  transform,
 } from '../state';
-import { getActionProgress, object, objectEvent, vectorOp } from '../utils';
-import { graphic } from './graphic';
+import { getActionProgress, object, objectEvent, vectorOp, vector } from '../utils';
+import { graphic, drawTitle } from './graphic';
 
-const initialWave = +load(KEY_SAVE_WAVE) || 0;
+let initialWave = +load(KEY_SAVE_WAVE) || 0;
 
 const creatStage = (config) => ({
   ...object(),
@@ -79,6 +80,8 @@ const creatStage = (config) => ({
                 stage[KEY_STAGE_ENDING_CUT_SCENE_INDEX]
               ][0](0);
             } else {
+              save(KEY_SAVE_WAVE, undefined);
+              initialWave = 0;
               setStage($stageIndex.$ + 1);
             }
           };
@@ -144,8 +147,7 @@ function _setWave(wave) {
   delete $stage.$[KEY_STAGE_TRANSITION_FRAME];
   enemies.splice(0, enemies.length);
   $stageWave.$ = wave;
-  save(KEY_SAVE_WAVE, wave);
-  console.log(wave)
+  if(wave !== -1) save(KEY_SAVE_WAVE, wave);
   if ($stage.$[KEY_STAGE_WAVES][wave])
     enemies.push(...$stage.$[KEY_STAGE_WAVES][wave]());
 }
@@ -176,11 +178,12 @@ export function setStage(stageIndex, wave) {
   }
   if(!$isGameStarted.$) {
     let startFrame;
-    const title = graphic(0,0,() => draw(61, ctx => {
+    const title = graphic(0,0,() => {
+      let opacity;
       if(startFrame != undefined) {
         const progress = getActionProgress($stage.$[KEY_OBJECT_FRAME] - startFrame, 1000, false);
         if(progress >= 1) return graphics.splice(graphics.indexOf(title), 1);
-        ctx.fillStyle = `rgba(0,0,0,${1 - progress})`;
+        opacity = 1 - progress;
       } else {
         const progress = Math.min(1, getActionProgress($stage.$[KEY_OBJECT_FRAME], 2000, false));
         if(progress >= 1) {
@@ -189,10 +192,10 @@ export function setStage(stageIndex, wave) {
             startFrame = $stage.$[KEY_OBJECT_FRAME];
           })
         }
-        ctx.fillStyle = `rgba(0,0,0,${progress})`;
+        opacity = progress;
       }
-      ctx.fillRect(100, 100, 100, 100);
-    }));
+      drawTitle(opacity);
+    });
     graphics.push(title);
   }
 }
