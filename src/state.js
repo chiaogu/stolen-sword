@@ -32,6 +32,7 @@ import {
   getClosetSide,
 } from './utils';
 import { easeOutQuint, easeOutQuad, easeInQuad } from './easing';
+import { playSound } from './helper/sound';
 
 const ref = (defaultValue) =>
   new Proxy(
@@ -84,6 +85,7 @@ export function dash() {
     player.v.x = v.x;
     player.v.y = v.y;
     $dash.$--;
+    playSound(3)
   }
 }
 export function playerDamage() {
@@ -92,6 +94,7 @@ export function playerDamage() {
       player.v = vector((-1 * player.v.x) / Math.abs(player.v.x || 1), 5);
     }
     if ($health.$ > 1) {
+      playSound(1);
       player[KEY_PLAYER_DAMAGE_FRAME] = player[KEY_OBJECT_FRAME];
       setDash(Math.max($dash.$, 1));
     }

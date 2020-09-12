@@ -343,8 +343,8 @@ export default {
     [
       (progress) => {
         $g.$ = 0;
-        draw(0, ctx => ctx.canvas.style = `filter: saturate(${1 - progress});`);
-        player.p.x = lerp($tempPlayerPos.$.x, 134, easeOutQuint(progress));
+        draw(0, ctx => ctx.canvas.style.filter = `saturate(${1 - progress})`);
+        player.p.x = lerp(-60, 134, easeOutQuint(progress));
         player.p.y = lerp($tempPlayerPos.$.y, 6360, easeOutQuint(progress));
       },
       1000,
@@ -356,7 +356,7 @@ export default {
     [() => {}, 1000],
     [() => {
       $forceFacing.$ = undefined;
-      draw(0, ctx => ctx.canvas.style = undefined);
+      draw(0, ctx => ctx.canvas.style.filter = '');
     }],
   ]
 };

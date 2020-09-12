@@ -13,7 +13,7 @@ import {
   FRAME_DURAITON,
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad, easeInOutQuint, easeInQuint, easeOutQuint } from '../easing';
-import { enemy, compund, fire } from '../helper/enemy';
+import { enemy, compund, fire, firework } from '../helper/enemy';
 import {
   drawCaption,
   gradient,
@@ -165,14 +165,14 @@ export default {
     () => [
       enemy('火', 0, 350, [
         slideIn(1500, 250, 400),
-        fire(3000, 500),
+        firework(1, 2000, 1000, 0.25),
         circularMovement(10000, 100, 10, 1500),
       ]),
     ],
     () =>
       compund(
         enemy('上', 0, 300, [
-          fire(3000, 500),
+          firework(1, 2000, 1000, 0.25),
           slideIn(2000, 250, 300),
           circularMovement(6000, 150, 10, 2000),
         ]),

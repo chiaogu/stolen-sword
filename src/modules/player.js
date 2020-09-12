@@ -65,6 +65,7 @@ import {
 } from '../utils';
 import { enemy } from '../helper/enemy';
 import { easeInOutQuint, easeInOutQuad, easeInQuad, easeOutQuad, easeOutQuint, easeInQuint } from '../easing';
+import { playSound } from '../helper/sound';
 
 const defaultColor = ['#666', '#111', '#c4c4c4', '#333', '#888'];
 
@@ -96,6 +97,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
   () => {
     // check death
     if (!player[KEY_PLAYER_DEATH_FRAME] && $health.$ === 0) {
+      playSound(1);
       player[KEY_PLAYER_DEATH_FRAME] = player[KEY_OBJECT_FRAME];
       effects.push(wipe());
     }

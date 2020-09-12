@@ -100,7 +100,7 @@ export default {
     ],
     () => [
       enemy('工', 10, 300, [
-        fire(6000, 1500),
+        firework(1, 4000, 1000, 0.25),
         slideIn(3500, 0, 550),
         circularMovement(8000, 100, 30, 3500),
       ]),

@@ -55,49 +55,7 @@ import {
   vectorOp,
 } from '../utils';
 import { checkRipple } from './graphic';
-
-// collision
-function handleCollision(enemy, enemyBoundary, collidedSide) {
-  if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
-  
-  if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
-    playerDamage();
-  } else {
-    player[KEY_PLAYER_ATTACK_FRAME] = player[KEY_OBJECT_FRAME];
-    if (enemy[KEY_ENEMY_IS_DEFENCING]) {
-      bounceBack(enemy, enemyBoundary, collidedSide);
-    }
-    takeDamage(enemy, enemyBoundary, collidedSide);
-  }
-}
-
-function bounceBack(enemy, enemyBoundary, collidedSide) {
-  if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
-    setDash(1);
-    player.v.y *= -0.5;
-    player.p.y =
-      enemyBoundary[collidedSide] +
-      (player.s.y / 2) * (collidedSide === SIDE_T ? 1 : -1);
-  } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
-    setDash(1);
-    player.v.x *= -0.5;
-    player.p.x =
-      enemyBoundary[collidedSide] +
-      (player.s.x / 2) * (collidedSide === SIDE_R ? 1 : -1);
-  }
-}
-
-function takeDamage(enemy, enemyBoundary, collidedSide) {
-  setDash(1);
-  if (enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] > 20) {
-    enemy[KEY_ENEMY_HEALTH]--;
-    enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] = enemy[KEY_OBJECT_FRAME];
-    if (enemy[KEY_ENEMY_HEALTH] === 0) {
-      enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
-      vectorOp((v) => v * 0.3, [player.v], enemy.v);
-    }
-  }
-}
+import { playSound } from './sound';
 
 // rendering
 const getEnemyColor = (enemy) => {
@@ -196,10 +154,11 @@ function drawEnemy(enemy) {
       ctx.fillRect(...transform(vector(enemy.p.x - 18, enemy.p.y + 18)), transform(36), transform(36));
       drawEnemyShell(ctx, enemy, 6);
     }
-    
+  });
+  draw(enemy[KEY_OBJECT_Z_INDEX] + 1, (ctx) => {
     const reflection = getReflection(enemy);
     if (reflection) {
-      ctx.fillStyle = color;
+      ctx.fillStyle = getEnemyColor(enemy);
       ctx.globalAlpha = 0.3 * reflection.d;
       let appearance = enemy[KEY_ENEMY_APPEARANCE];
       if(appearance == '士') appearance = '干';
@@ -214,7 +173,44 @@ function drawEnemy(enemy) {
 // class
 const _enemy = (x, y, w, h, options = {}) => ({
   ...object(x, y, w, h),
-  [KEY_OBJECT_ON_COLLIDED]: handleCollision,
+  [KEY_OBJECT_ON_COLLIDED](enemy, enemyBoundary, collidedSide) {
+    if (!collidedSide || enemy[KEY_ENEMY_DEAD_FRAME]) return;
+    
+    if (enemy[KEY_ENEMY_IS_UNTOUCHABLE]) {
+      playerDamage();
+    } else {
+      player[KEY_PLAYER_ATTACK_FRAME] = player[KEY_OBJECT_FRAME];
+      if (enemy[KEY_ENEMY_IS_DEFENCING]) {
+        // bounce back
+        if (collidedSide === SIDE_T || collidedSide === SIDE_B) {
+          setDash(1);
+          player.v.y *= -0.5;
+          player.p.y =
+            enemyBoundary[collidedSide] +
+            (player.s.y / 2) * (collidedSide === SIDE_T ? 1 : -1);
+        } else if (collidedSide === SIDE_L || collidedSide === SIDE_R) {
+          setDash(1);
+          player.v.x *= -0.5;
+          player.p.x =
+            enemyBoundary[collidedSide] +
+            (player.s.x / 2) * (collidedSide === SIDE_R ? 1 : -1);
+        }
+        playSound(2, 1, Math.round(3 + 3 * Math.random()));
+      } else {
+        playSound(0, 1);
+      }
+      // take damage
+      setDash(1);
+      if (enemy[KEY_OBJECT_FRAME] - enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] > 20) {
+        enemy[KEY_ENEMY_HEALTH]--;
+        enemy[KEY_ENEMY_LAST_DAMAGE_FRAME] = enemy[KEY_OBJECT_FRAME];
+        if (enemy[KEY_ENEMY_HEALTH] === 0) {
+          enemy[KEY_ENEMY_DEAD_FRAME] = enemy[KEY_OBJECT_FRAME];
+          vectorOp((v) => v * 0.3, [player.v], enemy.v);
+        }
+      }
+    }
+  },
   [KEY_ENEMY_LAST_DAMAGE_FRAME]: -1,
   [KEY_OBJECT_Z_INDEX]: 15,
   ...options,
@@ -325,13 +321,13 @@ export const fire = (interval, startTime = 0) =>
     }
   );
 
-export const firework = (amount, interval, startTime = 0) =>
+export const firework = (amount, interval, startTime = 0, angle = 0) =>
   objectEvent(
     (enemy) => {
       if (!enemy[KEY_ENEMY_DEAD_FRAME]) {
         const v = 2;
         for (let i = 0; i < amount; i++) {
-          const theta = (i / amount) * 2 * Math.PI;
+          const theta = (i / amount - angle) * 2 * Math.PI;
           projectiles.push(projectile(enemy, vector(v * Math.cos(theta), v * Math.sin(theta))));
         }
       }
