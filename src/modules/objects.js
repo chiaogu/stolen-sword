@@ -22,7 +22,6 @@ import {
   KEY_PROJECTILE_SORUCE,
   KEY_GRAPHIC_IS_ANIMATION_FINISH
 } from '../constants';
-import { projectile } from '../helper/projectile';
 
 function objectLoop(object, ctx) {
   let collidedSide;
@@ -39,10 +38,6 @@ function objectLoop(object, ctx) {
   return collidedSide;
 }
 
-function isSourceDead(projectile) {
-  return projectile[KEY_PROJECTILE_SORUCE] && projectile[KEY_PROJECTILE_SORUCE][KEY_ENEMY_IS_DEAD];
-}
-
 export default (ctx) => {
   for (let i = enemies.length - 1; i >= 0; i--) {
     // remove enemy when dead
@@ -57,7 +52,7 @@ export default (ctx) => {
   for (let i = projectiles.length - 1; i >= 0; i--) {
     if (
       isOutOfScreen(projectiles[i]) ||
-      isSourceDead(projectiles[i]) ||
+      projectiles[i][KEY_PROJECTILE_SORUCE] && projectiles[i][KEY_PROJECTILE_SORUCE][KEY_ENEMY_IS_DEAD] ||
       projectiles[i][KEY_PROJECTILE_IS_COMSUMED] ||
       projectiles[i].p.y <= - projectiles[i].s.y
     )

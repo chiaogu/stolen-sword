@@ -162,11 +162,12 @@ export default {
     },
     () =>
       chain(
-        shell('十', 0, 300, [
+        shell('十', 0, 200, [
           recover(3000, 3),
           slideIn(4000, 250, 450),
           firework(10, 6000, 1000),
-          lemniscateMovement(12000, 500, 3000),
+          circularMovement(10000, 200, 210, 5000),
+          // lemniscateMovement(12000, 500, 3000),
         ]),
         9,
         250,
@@ -178,11 +179,17 @@ export default {
         enemy(
           '回',
           0,
-          200,
+          300,
           [
             slideIn(5000, 270, -200),
             firework(10, 6000, 2000),
-            circularMovement(10000, 200, 210, 5000),
+            circularMovement(
+              20000,
+              190,
+              488,
+              4000,
+              (progress) => easeInOutQuad(alternateProgress(progress)) / -2
+            )
           ],
           true
         ),

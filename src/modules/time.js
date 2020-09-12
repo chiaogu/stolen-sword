@@ -1,10 +1,9 @@
 import { removeAnimation, animations, $timeRatio } from '../state'
 import { NORAML_TIME_RATIO } from '../constants';
 
-
-window.addEventListener('keydown', ({ key }) => {
-  if(key === 'Escape') $timeRatio.$ = $timeRatio.$ === 0 ? NORAML_TIME_RATIO : 0;
-});
+// window.addEventListener('keydown', ({ key }) => {
+//   if(key === 'Escape') $timeRatio.$ = $timeRatio.$ === 0 ? NORAML_TIME_RATIO : 0;
+// });
 
 export default (ctx) => {
   // execute animation

@@ -1,5 +1,5 @@
 import modules from './modules/index';
-import { $debug, $canvasLeftOffset } from './state';
+import { $debug, $canvasLeftOffset, cameraFrameSize } from './state';
 import { ASPECT_RATIO, FRAME_DURAITON } from './constants';
 
 const canvas = document.querySelector("canvas");
@@ -13,15 +13,16 @@ function resize() {
   let vh = window.innerHeight;
   if(vw < vh / ASPECT_RATIO) vh = vw * ASPECT_RATIO;
   if(vh < vw * ASPECT_RATIO) vw = vh / ASPECT_RATIO;
-  const scale = window.devicePixelRatio;
   canvas.style.width = Math.floor(vw);
   canvas.style.height = Math.floor(vh);
-  canvas.width = Math.floor(vw * scale);
-  canvas.height = Math.floor(vh * scale);
+  canvas.width = Math.floor(vw * devicePixelRatio);
+  canvas.height = Math.floor(vh * devicePixelRatio);
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
-  ctx.scale(scale, scale);
+  ctx.scale(devicePixelRatio, devicePixelRatio);
   $canvasLeftOffset.$ = canvas.getBoundingClientRect().left;
+  cameraFrameSize.x = Math.floor(canvas.width / devicePixelRatio);
+  cameraFrameSize.y = Math.floor(canvas.height / devicePixelRatio);
 }
 
 window.addEventListener('resize', () => setTimeout(resize, FRAME_DURAITON));
@@ -34,18 +35,19 @@ function tick() {
     modules.map(render => render(ctx));
     lastTimeTick = Date.now();
   }
-  if(!$debug.$) requestAnimationFrame(tick);
+  // if(!$debug.$) 
+  requestAnimationFrame(tick);
 };
 tick();
 
 
-window.addEventListener('keydown', ({ key }) => {
-  if(key === '`') {
-    $debug.$ = true;
-    tick();
-  }
-  if(key === 'Backspace') {
-    $debug.$ = false;
-    tick();
-  }
-});
+// window.addEventListener('keydown', ({ key }) => {
+//   if(key === '`') {
+//     $debug.$ = true;
+//     tick();
+//   }
+//   if(key === 'Backspace') {
+//     $debug.$ = false;
+//     tick();
+//   }
+// });
