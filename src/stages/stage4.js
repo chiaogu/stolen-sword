@@ -126,7 +126,7 @@ const _randomMovement = () => [
 ];
 
 let tempCamCenter;
-const fakeMountain = staticMountain(230, 1130, 7, 0.4, 4);
+const fakeMountain = staticMountain(205, 2750, 7, 1, 2);
 
 export default {
   [KEY_STAGE_INITIATE]() {
@@ -274,7 +274,7 @@ export default {
           [
             objectAction(5000, (enemy, progress) => {
               progress = easeInOutQuad(alternateProgress(progress));
-              enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + 472 * progress;
+              enemy.p.y = enemy[KEY_OBJECT_INITIAL_POS].y + 452 * progress;
               enemy.p.x =
                 enemy[KEY_OBJECT_INITIAL_POS].x +
                 400 * Math.sin((easeOutCirc(progress) * Math.PI) / 2);
@@ -318,31 +318,34 @@ export default {
     ],
     [
       (progress) => {
-        cameraCenter.y = lerp(tempCamCenter.y, player.p.y - 80, easeInOutQuad(progress));
+        cameraCenter.y = lerp(tempCamCenter.y, player.p.y - 30, easeInOutQuad(progress));
       },
       1000,
     ],
-    [summonTheft(250, 0, 11)],
+    [() => {
+      summonTheft(310, 6310, 11)();
+      moveTheft(310, 6310, -1, POSE_IDLE);
+    }],
     [() => drawCaption("Lost him again. Still can't find the theft."), 500, true],
     [
       (progress) => {
-        cameraCenter.x = lerp(tempCamCenter.x, -30, easeInOutQuad(progress));
-        fakeMountain.p.x = lerp(230, 110, easeInOutQuad(progress));
-        moveTheft(lerp(320, 110, easeInOutQuad(progress)), 6139, -2, POSE_IDLE, 2);
+        cameraCenter.x = lerp(tempCamCenter.x, 130, easeInOutQuad(progress));
+        player.p.x = lerp($tempPlayerPos.$.x, -60, easeInOutQuad(progress));
       },
       2000,
     ],
     [() => {}, 1000],
     [
-      (progress) =>
-        moveTheft(lerp(110, 320, easeOutQuint(progress)), lerp(6139, 6239, easeOutQuint(progress)), 2, POSE_CHARGE, 2),
-      1000,
+      progress =>
+        moveTheft(lerp(305, 450, easeOutQuint(progress)), lerp(6310, 6410, easeOutQuint(progress)), 1, POSE_CHARGE)
+      ,1000
     ],
     [
       (progress) => {
         $g.$ = 0;
-        player.p.x = lerp($tempPlayerPos.$.x, 52, easeOutQuint(progress));
-        player.p.y = lerp($tempPlayerPos.$.y, 6300, easeOutQuint(progress));
+        draw(0, ctx => ctx.canvas.style = `filter: saturate(${1 - progress});`);
+        player.p.x = lerp($tempPlayerPos.$.x, 134, easeOutQuint(progress));
+        player.p.y = lerp($tempPlayerPos.$.y, 6360, easeOutQuint(progress));
       },
       1000,
     ],
@@ -351,6 +354,9 @@ export default {
       effects.push(wipe());
     }],
     [() => {}, 1000],
-    [() => $forceFacing.$ = undefined],
+    [() => {
+      $forceFacing.$ = undefined;
+      draw(0, ctx => ctx.canvas.style = undefined);
+    }],
   ]
 };

@@ -37,7 +37,6 @@ import {
   graphics,
   platforms,
   player,
-  $isForceStopping,
   $forceFacing,
 } from '../state';
 import { alternateProgress, object, vector, vectorMagnitude, lerp } from '../utils';
@@ -98,7 +97,6 @@ export default {
   },
   [KEY_STAGE_WAVES]: [
     () => {
-      $isForceStopping.$ = false;
       return [
         enemy('卡', 25, 790, [circularMovement(3000, 50, 5)], true),
         enemy('ㄚ', -20, 1150, [circularMovement(6000, 5, 10)], true),
@@ -119,7 +117,6 @@ export default {
   },
   [KEY_STAGE_TRANSITION](progress) {
     player.p.x = -260 * easeInCirc(1 - progress);
-    $isForceStopping.$ = true;
   },
   [KEY_STAGE_ENDING_CUT_SCENE]: [
     [

@@ -48,7 +48,6 @@ import {
   effects,
   $reflectionY,
   isUnderWater,
-  $isForceStopping,
   $forceFacing,
 } from '../state';
 import {
@@ -144,7 +143,7 @@ player[KEY_OBJECT_ON_UPDATE] = [
       setAngle(6, lerp(POSE_SWIM[6], 0.246, alternateProgress(easeInQuad(progress))));
       setAngle(7, lerp(POSE_SWIM[7], 0.134, alternateProgress(easeInQuad(progress))));
     } else if($playerCollisionSide.$[SIDE_T]) {
-      if(vectorMagnitude(player.v) <= 0.6 && !$isForceStopping.$) {
+      if(vectorMagnitude(player.v) <= 0.6) {
         if($backgroundV.$ > 0) {
           // run
           if(player[KEY_PLAYER_STOP_FRAME]) {

@@ -201,7 +201,7 @@ const drawMountain = (x, y, z, scale = 1, distance, fillGradient = true) => {
 
 export const staticMountain = (x, y, z, distance, scale) => 
   graphic(x, y,
-    graphic => drawMountain(graphic.p.x, graphic.p.y, z, scale, distance, false)
+    () => drawMountain(x, y, z, scale, distance, false)
   )
 
 export const movingMountain = (x, y, z, distance = 1, scale = 1) => background((offset, index) => {
