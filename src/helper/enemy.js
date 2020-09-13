@@ -24,7 +24,7 @@ import {
   SIDE_R,
   SIDE_T,
 } from '../constants';
-import { easeInQuad } from '../easing';
+import { easeInQuad, easeInOutQuint, easeOutCirc, easeOutQuint } from '../easing';
 import { projectile } from '../helper/projectile';
 import {
   $backgroundV,
@@ -43,6 +43,7 @@ import {
   enemies,
   $reflectionGradient,
   isUnderWater,
+  effects,
 } from '../state';
 import {
   getActionProgress,
@@ -54,7 +55,7 @@ import {
   vectorMagnitude,
   vectorOp,
 } from '../utils';
-import { checkRipple } from './graphic';
+import { checkRipple, effect } from './graphic';
 import { playSound } from './sound';
 
 // rendering
@@ -201,6 +202,20 @@ const _enemy = (x, y, w, h, options = {}) => ({
           playSound(0, 500);
         } else {
           playSound(0, FRAME_DURAITON);
+          const pos = vector(enemy.p.x, enemy.p.y);
+          const vm = vectorMagnitude(player.v);
+          const v = vector(player.v.x / vm, player.v.y / vm);
+          effects.push(effect(0, 0, 300, (progress) => {
+            progress = easeOutCirc(progress);
+            draw(61, ctx => {
+              ctx.lineWidth = 10 * (1 - progress);
+              ctx.strokeStyle = `rgba(0,0,0,${1 - progress})`;
+              ctx.beginPath();
+              ctx.moveTo(...transform(vectorOp((a, b) => a - b * 200 * progress, [pos, v])));
+              ctx.lineTo(...transform(vectorOp((a, b) => a + b * 200 * progress, [pos, v])));
+              ctx.stroke();
+            });
+          }));
         }
       }
       // take damage

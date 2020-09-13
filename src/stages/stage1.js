@@ -187,7 +187,7 @@ export default {
     () => [
       enemy('林', 0, 380, [
         slideIn(3000, 250, 350),
-        circularMovement(4000, 10, 10, 3000)
+        // circularMovement(4000, 10, 10, 3000)
       ]),
       ...Array(6).fill().map((_, i) =>  enemy('木', -50 + i * 20, 200 + i % 2 * 100, [
         firework(1, 3000, 1000 + i % 2 * 1000, 0.25),
@@ -195,16 +195,16 @@ export default {
         circularMovement(8000, 150, 10 * Math.random() * 5, 2000 + i % 2 * 3000),
       ])),
     ],
-    () => compund(
-      enemy('丌', 0, 300, [
-        slideIn(5000, 250, 500),
-        circularMovement(10000, 150, 10, 5000)
-      ]),
-      ...Array(6).fill().map((_, i) =>  enemy('屮', -180 + i * 70, 150, [
-        slideIn(2500 + i * 500, 250, 500 + i * i * 30),
-        circularMovement(6000, 5, 150, 2500 + i * 500 + Math.random() * 2000),
-      ], true)),
-    ),
+    // () => compund(
+    //   enemy('丌', 0, 300, [
+    //     slideIn(5000, 250, 500),
+    //     circularMovement(10000, 150, 10, 5000)
+    //   ]),
+    //   ...Array(6).fill().map((_, i) =>  enemy('屮', -180 + i * 70, 150, [
+    //     slideIn(2500 + i * 500, 250, 500 + i * i * 30),
+    //     circularMovement(6000, 5, 150, 2500 + i * 500 + Math.random() * 2000),
+    //   ], true)),
+    // ),
     () => compund(
       enemy('丼', 0, 300, [
         slideIn(6000, 120, 500),

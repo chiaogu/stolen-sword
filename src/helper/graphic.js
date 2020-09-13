@@ -37,7 +37,7 @@ export const graphic = (x, y, draw, animations = []) => ({
   ],
 });
 
-const effect = (x, y, duration, draw) => graphic(x, y, (graphic) => {
+export const effect = (x, y, duration, draw) => graphic(x, y, (graphic) => {
   const progress = getActionProgress(graphic[KEY_OBJECT_FRAME], duration, false);
   if(progress >= 1) graphic[KEY_GRAPHIC_IS_ANIMATION_FINISH] = true;
   if(!graphic[KEY_GRAPHIC_IS_ANIMATION_FINISH]) draw(progress, graphic);
