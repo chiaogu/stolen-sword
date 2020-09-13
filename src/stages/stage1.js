@@ -13,7 +13,7 @@ import {
   FRAME_DURAITON,
 } from '../constants';
 import { easeInOutQuad, easeInQuad, easeOutQuad, easeInOutQuint, easeInQuint, easeOutQuint } from '../easing';
-import { enemy, compund, fire, firework } from '../helper/enemy';
+import { enemy, compund, fire, firework, chain } from '../helper/enemy';
 import {
   drawCaption,
   gradient,
@@ -145,7 +145,7 @@ export default {
           slideIn(2000, 250, 350),
           circularMovement(5000, 10, 5, 2000),
         ]),
-        enemy('木', 75, 350, [
+        enemy('丕', 75, 350, [
           slideIn(2000, 250, 450),
           circularMovement(3000, 10, 5, 2000),
         ]),
@@ -157,7 +157,7 @@ export default {
           slideIn(2000, 250, 330),
           circularMovement(5000, 10, 0, 2000),
         ]),
-        enemy('人', 0, 300, [
+        enemy('子', 0, 300, [
           slideIn(1000, 250, 300),
           circularMovement(6000, 100, 50, 1000),
         ])
@@ -171,19 +171,49 @@ export default {
     ],
     () =>
       compund(
-        enemy('上', 0, 300, [
+        enemy('凸', 0, 300, [
           firework(1, 2000, 1000, 0.25),
           slideIn(2000, 250, 300),
           circularMovement(6000, 150, 10, 2000),
         ]),
         enemy(
-          '下',
+          '凹',
           0,
           220,
           [slideIn(1000, 250, 220), circularMovement(5000, 100, 10, 1000)],
           true
         )
       ),
+    () => [
+      enemy('林', 0, 380, [
+        slideIn(3000, 250, 350)
+      ]),
+      ...Array(6).fill().map((_, i) =>  enemy('木', -50 + i * 20, 200 + i % 2 * 100, [
+        firework(1, 3000, 1000 + i % 2 * 1000, 0.25),
+        slideIn(2000 + i % 2 * 1000, 250, 200 + i % 2 * 100),
+        circularMovement(8000, 150, 10 * Math.random() * 5, 2000 + i % 2 * 1000),
+      ])),
+    ],
+    () => compund(
+      enemy('丌', 0, 300, [
+        slideIn(5000, 250, 500),
+        circularMovement(10000, 150, 10, 5000)
+      ]),
+      ...Array(6).fill().map((_, i) =>  enemy('屮', -180 + i * 70, 150, [
+        slideIn(2500 + i * 500, 250, 500 + i * i * 30),
+        circularMovement(6000, 5, 150, 2500 + i * 500 + Math.random() * 2000),
+      ], true)),
+    ),
+    () => compund(
+      enemy('丼', 0, 300, [
+        slideIn(6000, 120, 500),
+        // circularMovement(10000, 5, 5, 6000)
+      ]),
+      ...chain(enemy('井', 0, 300, [
+        slideIn(2000, 250, 450),
+        circularMovement(3000, 100, 100, 2000),
+      ], 1), 12, 200, 0, i => enemy('井', 250, 450, [], 1))
+    ),
   ],
   [KEY_STAGE_IS_WAVE_CLEAN]() {
     return enemies.length === 0 && Math.round(player.p.y) <= 0;

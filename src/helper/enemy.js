@@ -197,7 +197,11 @@ const _enemy = (x, y, w, h, options = {}) => ({
         }
         playSound(2);
       } else {
-        playSound(0, 400);
+        if(enemy[KEY_ENEMY_COMPUND_PARENT]) {
+          playSound(0, 500);
+        } else {
+          playSound(0, FRAME_DURAITON);
+        }
       }
       // take damage
       setDash(1);
