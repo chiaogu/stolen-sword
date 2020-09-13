@@ -225,20 +225,16 @@ export default {
         })
       ),
       gradient(5421, 250, 51, 1.5, cloudGradient, 1),
-      gradient(5421, 250, 51, 1.2, cloudGradient, 1),
-      gradient(5421, 250, 8, 0.7, cloudGradient, 1),
       gradient(5421, 250, 8, 0.5, cloudGradient, 1),
-      gradient(5421, 250, 8, 0.4, cloudGradient, 1),
-      gradient(5421, 250, 8, 0.35, cloudGradient, 1),
       gradient(5421, 250, 8, 0.3, cloudGradient, 1),
-      staticMountain(-100, -42, 7, 0.6, 5),
+      // staticMountain(-100, -42, 7, 0.6, 5),
       staticMountain(177, 0, 7, 0.5, 3),
-      staticMountain(177, 0, 7, 0.3, 2.8),
+      // staticMountain(177, 0, 7, 0.3, 2.8),
       staticMountain(-50, 40, 7, 0.2, 3.6),
-      staticMountain(-237, 40, 7, 0.17, 3.5),
+      // staticMountain(-237, 40, 7, 0.17, 3.5),
       staticMountain(-266, 40, 7, 0.15, 5),
       staticMountain(226, 100, 7, 0.12, 5),
-      staticMountain(16, 100, 7, 0.1, 4),
+      // staticMountain(16, 100, 7, 0.1, 4),
       staticMountain(-406, 110, 7, 0.075, 4),
       staticMountain(16, 110, 7, 0.06, 4)
     );
@@ -326,7 +322,7 @@ export default {
       summonTheft(310, 6310, 11)();
       moveTheft(310, 6310, -1, POSE_IDLE);
     }],
-    [() => drawCaption("Lost him again. Still can't find the theft."), 500, true],
+    [() => drawCaption("Still can't find him."), 500, true],
     [
       (progress) => {
         cameraCenter.x = lerp(tempCamCenter.x, 130, easeInOutQuad(progress));

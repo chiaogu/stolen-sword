@@ -85,7 +85,7 @@ export function dash() {
     player.v.x = v.x;
     player.v.y = v.y;
     $dash.$--;
-    playSound(3)
+    playSound(3, 0)
   }
 }
 export function playerDamage() {

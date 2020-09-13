@@ -51,6 +51,7 @@ import {
 } from '../state';
 import { getActionProgress, object, objectEvent, vectorOp, vector } from '../utils';
 import { graphic, drawTitle, wipe } from './graphic';
+import { playHarmony } from './sound';
 
 let initialWave = +load(KEY_SAVE_WAVE) || 0;
 
@@ -190,6 +191,7 @@ export function setStage(stageIndex, wave) {
         const progress = Math.min(1, getActionProgress($stage.$[KEY_OBJECT_FRAME], 2000, false));
         if(progress >= 1) {
           waitForClick(KEY_GAME_START_KEY, () => {
+            playHarmony()
             $isGameStarted.$ = true;
             startFrame = $stage.$[KEY_OBJECT_FRAME];
           })

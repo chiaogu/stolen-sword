@@ -195,9 +195,9 @@ const _enemy = (x, y, w, h, options = {}) => ({
             enemyBoundary[collidedSide] +
             (player.s.x / 2) * (collidedSide === SIDE_R ? 1 : -1);
         }
-        playSound(2, 1, Math.round(3 + 3 * Math.random()));
+        playSound(2);
       } else {
-        playSound(0, 1);
+        playSound(0, 400);
       }
       // take damage
       setDash(1);

@@ -106,11 +106,11 @@ export default {
       ]),
       shell('干', -120, 100, [
         slideIn(2500, -150, -250),
-        recover(3000, 3),
+        // recover(3000, 3),
         circularMovement(5000, 10, 15, 2500),
       ]),
       shell('士', 120, 150, [
-        recover(3000, 3),
+        // recover(3000, 3),
         slideIn(3500, 150, -250),
         circularMovement(6000, 10, 15, 3500),
       ]),
@@ -163,7 +163,7 @@ export default {
     () =>
       chain(
         shell('十', 0, 200, [
-          recover(3000, 3),
+          // recover(3000, 3),
           slideIn(4000, 250, 450),
           firework(10, 6000, 1000),
           circularMovement(10000, 200, 210, 5000),
@@ -201,7 +201,8 @@ export default {
             i === 0 ? '由' : i % 2 == 1 ? '口' : '回',
             270,
             -200,
-            [...(i === 0 ? [recover(2500, 3)] : [])],
+            // [...(i === 0 ? [recover(2500, 3)] : [])],
+            [],
             i === 8
           )
       ),
