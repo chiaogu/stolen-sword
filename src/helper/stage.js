@@ -206,8 +206,8 @@ export function setStage(stageIndex, wave) {
 
 setStage(+load(KEY_SAVE_STAGE) || 0);
 
-window.addEventListener('keydown', ({ key }) => {
-  if (key === 'Shift') setStage(($stageIndex.$ + 1) % stages.length);
-  if (key === 'Control')
-    _setWave(($stageWave.$ + 1) % $stage.$[KEY_STAGE_WAVES].length);
-});
+// window.addEventListener('keydown', ({ key }) => {
+//   if (key === 'Shift') setStage(($stageIndex.$ + 1) % stages.length);
+//   if (key === 'Control')
+//     _setWave(($stageWave.$ + 1) % $stage.$[KEY_STAGE_WAVES].length);
+// });

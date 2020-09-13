@@ -186,12 +186,13 @@ export default {
       ),
     () => [
       enemy('林', 0, 380, [
-        slideIn(3000, 250, 350)
+        slideIn(3000, 250, 350),
+        circularMovement(4000, 10, 10, 3000)
       ]),
       ...Array(6).fill().map((_, i) =>  enemy('木', -50 + i * 20, 200 + i % 2 * 100, [
         firework(1, 3000, 1000 + i % 2 * 1000, 0.25),
         slideIn(2000 + i % 2 * 1000, 250, 200 + i % 2 * 100),
-        circularMovement(8000, 150, 10 * Math.random() * 5, 2000 + i % 2 * 1000),
+        circularMovement(8000, 150, 10 * Math.random() * 5, 2000 + i % 2 * 3000),
       ])),
     ],
     () => compund(
@@ -207,7 +208,7 @@ export default {
     () => compund(
       enemy('丼', 0, 300, [
         slideIn(6000, 120, 500),
-        // circularMovement(10000, 5, 5, 6000)
+        circularMovement(10000, 5, 5, 6000)
       ]),
       ...chain(enemy('井', 0, 300, [
         slideIn(2000, 250, 450),

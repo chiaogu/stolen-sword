@@ -235,7 +235,7 @@ export const summonTheft = (x, y, z) => () => {
   const skeleton = createSkeletion();
   $theft.$ = [graphic(x, y, graphic => draw(z, ctx => {
     skeleton.p($theft.$[2]);
-    skeleton.d(ctx, graphic.p, ['#8a302c', '#00959e', '#e8e8e8', '#a4413d', '#c57777'], $theft.$[1], $theft.$[3]);
+    skeleton.d(ctx, graphic.p, ['#8a302c', '#DB6157', '#e8e8e8', '#a4413d', '#c57777'], $theft.$[1], $theft.$[3]);
     ['33', '66', '88', 'c4', '00', '11']
   }), [checkRipple()]), 1, POSE_CHARGE, 1]
   graphics.push($theft.$[0]);
