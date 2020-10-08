@@ -3,10 +3,11 @@ import { minify as htmlMinify } from 'html-minifier-terser';
 const template = script => `
 <html lang="en">
   <head>
-    <title>Untitled</title>
+    <title>Stolen Sword</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
   </head>
-  <body style="margin:0;background:#000">
+  <body style="display:flex;justify-content:center;align-items:center;margin:0;background:#000;overflow:hidden;user-select: none;pointer-events: none;">
     <canvas></canvas>
     ${script}
   </body>

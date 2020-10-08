@@ -14,7 +14,19 @@ export default ({ watch }) => ({
   },
   plugins: [
     del({ targets: 'dist/*' }),
-    isProduction && terser(),
+    isProduction && terser({
+      compress: {
+        booleans_as_integers: true,
+        module: true,
+        ecma: '2015',
+        unsafe_arrows: true
+      },
+      mangle: {
+        toplevel: true
+      },
+      toplevel: true,
+      
+    }),
     html(isProduction),
     watch && browsersync({ server: "dist", open: false }),
     isProduction && zip()
