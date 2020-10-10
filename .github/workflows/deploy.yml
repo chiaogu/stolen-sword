@@ -14,7 +14,7 @@ jobs:
       - run: npm run build
       - uses: peaceiris/actions-gh-pages@v3.6.1
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: dist
           force_orphan: true
           enable_jekyll: true

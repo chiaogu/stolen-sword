@@ -6,11 +6,15 @@ import advzip from 'advzip-bin';
 import JSZip from 'jszip';
 
 const zip = () => ({
-  generateBundle(output, bundle) {
-    const zipPath = path.join(__dirname, '..', 'dist', 'index.zip');
+  name: 'zip',
+  generateBundle(_, bundle) {
+    const distPath = path.join(__dirname, '..', 'dist');
+    const zipPath = path.join(distPath, 'index.zip');
     const { source } = bundle['index.html'];
-    const zip = new JSZip();
-    zip
+
+    if (!fs.existsSync(distPath)) fs.mkdirSync(distPath);
+    
+    new JSZip()
       .file('index.html', source)
       .generateNodeStream({
         type:'nodebuffer',
@@ -20,7 +24,7 @@ const zip = () => ({
         }
       })
       .pipe(fs.createWriteStream(zipPath))
-      .on('finish', function () {
+      .on('finish', () => {
         execFile(advzip, ['--recompress', '--shrink-extra', zipPath], err => {
           console.log(err ? err : 'ZIP file minified!', filesize(fs.statSync(zipPath).size));
           execFile(path.join(__dirname, 'ect'), ['-8', '-zip', zipPath], (err, stdout, stderr) => {
